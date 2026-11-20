@@ -1,0 +1,138 @@
+:root {
+  --gold: #c9a227;
+  --bg: #000;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: #fff;
+  overflow: hidden;
+  font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
+}
+#wrap {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+#game {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  background: #000;
+}
+#loading {
+  position: absolute;
+  font-size: 20px;
+  color: #ffd84a;
+}
+#fs {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #555;
+  background: rgba(0, 0, 0, 0.5);
+  color: #ccc;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 5;
+}
+#nameBox {
+  position: absolute;
+  display: none;
+  gap: 8px;
+  left: 50%;
+  top: 56%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+#nameInput {
+  font: 900 22px 'Noto Sans TC', sans-serif;
+  padding: 8px 12px;
+  width: 240px;
+  border: 3px solid var(--gold);
+  background: #111;
+  color: #fff;
+  outline: none;
+  user-select: text;
+  -webkit-user-select: text;
+}
+#nameOk {
+  font: 900 20px 'Noto Sans TC', sans-serif;
+  padding: 8px 16px;
+  border: 3px solid var(--gold);
+  background: #ffd84a;
+  color: #111;
+  cursor: pointer;
+}
+
+/* ───── 觸控按鈕（只在觸控裝置顯示） ───── */
+#touch { display: none; }
+body.touch #touch {
+  display: block;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+.tbtn {
+  position: absolute;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 900;
+  font-size: 18px;
+  touch-action: none;
+}
+.tbtn.on { background: rgba(255, 216, 74, 0.55); }
+.pad {
+  position: absolute;
+  left: max(16px, env(safe-area-inset-left));
+  bottom: 18px;
+  width: 150px;
+  height: 150px;
+}
+.pad .tbtn { width: 54px; height: 54px; border-radius: 12px; }
+.pad .up { left: 48px; top: 0; }
+.pad .down { left: 48px; bottom: 0; }
+.pad .left { left: 0; top: 48px; }
+.pad .right { right: 0; top: 48px; }
+.acts {
+  position: absolute;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: 18px;
+  width: 190px;
+  height: 150px;
+}
+.acts .tbtn { width: 58px; height: 58px; }
+.acts .atk { right: 0; bottom: 0; width: 70px; height: 70px; background: rgba(255, 90, 60, 0.3); }
+.acts .jmp { right: 78px; bottom: 0; }
+.acts .def { right: 140px; bottom: 6px; }
+.acts .spe { right: 10px; bottom: 80px; background: rgba(60, 140, 255, 0.3); }
+.acts .sup { right: 78px; bottom: 74px; background: rgba(255, 200, 40, 0.35); }
+.tbtn.pause {
+  top: 8px;
+  left: 8px;
+  width: 40px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* 觸控裝置：把全螢幕與暫停按鈕移到上方角落，避免擋到攻擊鍵與 HUD */
+body.touch #fs { top: 8px; right: 8px; bottom: auto; }
+body.touch .tbtn.pause { top: 8px; left: 8px; transform: none; }

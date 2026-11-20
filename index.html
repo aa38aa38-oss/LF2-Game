@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <title>政壇大亂鬥</title>
+  <meta name="description" content="搞笑二創同人網頁格鬥遊戲：台灣政壇人物 2.5D 大亂鬥。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="wrap">
+    <canvas id="game" width="960" height="540"></canvas>
+    <div id="loading">載入中…</div>
+
+    <!-- 手機觸控按鈕 -->
+    <div id="touch">
+      <div class="pad">
+        <div class="tbtn up" data-btn="up">▲</div>
+        <div class="tbtn left" data-btn="left">◀</div>
+        <div class="tbtn right" data-btn="right">▶</div>
+        <div class="tbtn down" data-btn="down">▼</div>
+      </div>
+      <div class="acts">
+        <div class="tbtn a sup" data-btn="super">絕</div>
+        <div class="tbtn a spe" data-btn="special">特</div>
+        <div class="tbtn a def" data-btn="defend">防</div>
+        <div class="tbtn a jmp" data-btn="jump">跳</div>
+        <div class="tbtn a atk" data-btn="attack">攻</div>
+      </div>
+      <div class="tbtn sys pause" data-btn="pause">II</div>
+    </div>
+
+    <button id="fs" title="全螢幕">⛶</button>
+
+    <div id="nameBox">
+      <input id="nameInput" maxlength="10" placeholder="你的名字" autocomplete="off">
+      <button id="nameOk">送出</button>
+    </div>
+  </div>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
