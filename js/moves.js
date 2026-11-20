@@ -9,7 +9,7 @@ const afterimage = (b, f, every = 0.04) => {
     b.fx.add({ type: 'ghost', fighter: f, snap: snapshot(f), life: 0.25 });
   }
 };
-const snapshot = (f) => ({ x: f.x, z: f.z, y: f.y, facing: f.facing, state: f.state, stateT: f.stateT, animT: f.animT, char: f.char, mv: { ...f.mv } });
+const snapshot = (f) => ({ x: f.x, z: f.z, y: f.y, facing: f.facing, state: f.state, stateT: f.stateT, animT: f.animT, char: f.char, spKind: f.spKind, mv: { ...f.mv } });
 
 export const MOVES = {
   // ───────── 衝衝院長 ─────────
@@ -272,7 +272,7 @@ export const MOVES = {
       start(f, b) {
         const t = b.enemiesOf(f).find((e) => {
           const dx = (e.x - f.x) * f.facing;
-          return dx > -5 && dx < 62 && Math.abs(e.z - f.z) < 24 && e.y < 10 && !['down', 'getup', 'fall', 'grabbed'].includes(e.state);
+          return dx > -5 && dx < 62 && Math.abs(e.z - f.z) < 24 && e.y < 10 && !['down', 'getup', 'fall', 'grabbed', 'caught', 'roll', 'flip'].includes(e.state) && e.invuln <= 0;
         });
         if (t) {
           f.mv.t = t;
@@ -366,3 +366,191 @@ export const MOVES = {
     },
   },
 };
+
+// ═════════ 方向特技（防→上→攻 / 防→下→攻；或 特技鍵＋↑／↓） ═════════
+const EXTRA = {
+  su: {
+    specialUp: {
+      name: '衝天頭槌', cost: 20, dur: 0.7, ai: 'close', range: 70,
+      start(f) {
+        f.vy = 560;
+        f.y = 1;
+        f.vx = f.facing * 120;
+      },
+      update(f, b) {
+        if (f.stateT < 0.35) b.areaHit(f, { x0: -10, x1: 52, zr: 22, dmg: 16, knock: true, launch: 460, kb: 120, fall: 80 });
+        if (f.stateT > 0.1 && f.y <= 0) f.mv.done = true;
+      },
+      pose: () => ({ tilt: -0.2, aF: [2.9, 0.2], aB: [2.5, 0.3], lF: [0.9, -1.4], lB: [-0.2, -0.6], expr: 'shout' }),
+    },
+    specialDown: {
+      name: '衝刺頭槌', cost: 18, dur: 0.6, ai: 'mid', range: 230,
+      update(f, b) {
+        f.vx = f.stateT < 0.4 ? f.facing * 640 : f.vx * 0.85;
+        if (f.stateT < 0.42) b.areaHit(f, { x0: -5, x1: 48, zr: 22, dmg: 14, knock: true, launch: 280, kb: 280, fall: 80 });
+        afterimage(b, f, 0.05);
+      },
+      pose: () => ({ tilt: 0.85, aF: [-0.4, 0.4], aB: [-0.6, 0.4], lF: [0.6, -0.8], lB: [-0.8, -0.3], expr: 'shout' }),
+    },
+  },
+  wang: {
+    specialUp: {
+      name: '拍案而起', cost: 22, dur: 0.6, ai: 'crowd',
+      update(f, b) {
+        if (!f.mv.fired && f.stateT > 0.25) {
+          f.mv.fired = true;
+          b.sfx('heavy');
+          b.shake(6, 0.2);
+          b.fx.add({ type: 'ring', x: f.x, z: f.z, y: 0, life: 0.45, r: 150, color: '#ffd84a' });
+          b.fx.add({ type: 'text', x: f.x, z: f.z, y: 120, text: '砰！', color: '#ffd84a', size: 30, life: 0.7 });
+          for (const e of b.enemiesOf(f)) {
+            if (Math.abs(e.x - f.x) < 120 && Math.abs(e.z - f.z) < 40 && e.y < 60) b.applyHit(f, e, { dmg: 11, knock: true, launch: 300, kb: 240, dir: sign(e.x - f.x) || 1 });
+          }
+        }
+      },
+      pose: (f, T) => (T < 0.25 ? { aF: [2.9, 0.2], aB: [2.8, 0.2], expr: 'shout' } : { aF: [0.9, 0], aB: [0.7, 0], tilt: 0.3, expr: 'shout', lF: [0.6, -0.9] }),
+    },
+    specialDown: {
+      name: '躺地抗議', cost: 18, dur: 1.6, ai: 'defensive',
+      start(f, b) {
+        f.armor = 1.6;
+        b.fx.add({ type: 'text', x: f.x, z: f.z, y: 120, text: '除非踏過我！', color: '#fff', size: 22, life: 1.2 });
+      },
+      update(f, b) {
+        f.vx = f.vz = 0;
+        for (const e of b.enemiesOf(f)) {
+          if (f.hitList.has(e) || e.y > 6) continue;
+          if (Math.abs(e.x - f.x) < 46 && Math.abs(e.z - f.z) < 18) {
+            f.hitList.add(e);
+            b.applyHit(f, e, { dmg: 12, knock: true, launch: 260, kb: 120, slip: true, dir: e.facing });
+          }
+        }
+      },
+      pose: () => ({ lying: true, aF: [2.6, 0.3], aB: [2.4, 0.2], lF: [0.1, 0], lB: [0.2, 0], expr: 'shout' }),
+    },
+  },
+  han: {
+    specialUp: {
+      name: '貨出得去', cost: 25, dur: 0.55, ai: 'proj',
+      update(f, b) {
+        if (!f.mv.fired && f.stateT > 0.25) {
+          f.mv.fired = true;
+          b.sfx('throw');
+          b.spawnProj({
+            owner: f, kind: 'crate', x: f.x + f.facing * 30, z: f.z, y: 90, vx: f.facing * 400, vy: 260, gravity: 1300,
+            life: 2, w: 30, h: 50, dmg: 22, knock: true, launch: 320, kb: 200, vanishOnGround: true,
+          });
+        }
+      },
+      pose: (f, T) => (T < 0.25 ? { aF: [2.9, 0.1], aB: [2.8, 0.1], tilt: -0.2, prop: null } : { aF: [1.5, 0], aB: [1.4, 0], tilt: 0.3, prop: null }),
+    },
+    specialDown: {
+      name: '滷肉飯補血', cost: 30, dur: 0.9, ai: 'heal',
+      update(f, b) {
+        f.vx = f.vz = 0;
+        if (!f.mv.fired && f.stateT > 0.5) {
+          f.mv.fired = true;
+          b.sfx('heal');
+          f.heal(50, 30);
+          b.fx.add({ type: 'text', x: f.x, z: f.z, y: 130, text: '+50 呷飽', color: '#5cff7a', size: 22, life: 1 });
+          for (let i = 0; i < 6; i++) b.fx.add({ type: 'plus', x: f.x + rand(-20, 20), z: f.z, y: rand(30, 100), life: 0.7 });
+        }
+      },
+      pose: (f, T, t) => ({ aF: [2.2 + Math.sin(t * 20) * 0.2, 1.3], aB: [1.2, 1.4], prop: 'bowl', expr: 'smile' }),
+    },
+  },
+  ma: {
+    specialUp: {
+      name: '香蕉迴力鏢', cost: 20, dur: 0.45, ai: 'proj',
+      update(f, b) {
+        if (!f.mv.fired && f.stateT > 0.2) {
+          f.mv.fired = true;
+          b.sfx('banana');
+          b.spawnProj({
+            owner: f, kind: 'boomerang', x: f.x + f.facing * 30, z: f.z, y: f.y + 60, vx: f.facing * 560, boomerang: f.facing,
+            life: 1.25, w: 22, h: 40, dmg: 10, stun: 0.35, kb: 60, pierce: true,
+          });
+        }
+      },
+      pose: (f, T) => ({ aF: T < 0.2 ? [-0.5, 1.5] : [1.6, 0], prop: T < 0.2 ? 'banana' : null, tilt: 0.1, expr: 'smile' }),
+    },
+    specialDown: {
+      name: '慢跑閃避', cost: 10, dur: 0.5, ai: 'escape',
+      start(f) {
+        f.invuln = 0.5;
+      },
+      update(f, b) {
+        f.vx = f.facing * 560;
+        afterimage(b, f, 0.035);
+      },
+      pose: (f, T, t) => {
+        const s = Math.sin(t * 24);
+        return { tilt: 0.3, lF: [s + 0.2, -1.2], lB: [-s + 0.2, -1.2], aF: [0.3 - s * 0.8, 1.9], aB: [0.3 + s * 0.8, 1.9], expr: 'smile' };
+      },
+    },
+  },
+  ko: {
+    specialUp: {
+      name: '電擊器', cost: 22, dur: 0.55, ai: 'close', range: 75,
+      update(f, b) {
+        if (!f.mv.fired && f.stateT > 0.2) {
+          f.mv.fired = true;
+          b.sfx('zap');
+          b.fx.add({ type: 'spark', x: f.x + f.facing * 45, z: f.z, y: 60, life: 0.3, big: true, color: '#9ff8ff' });
+          b.areaHit(f, { x0: -5, x1: 78, zr: 24, dmg: 12, dizzy: 1.8 });
+        }
+      },
+      pose: (f, T) => ({ aF: T < 0.2 ? [0.8, 1.6] : [1.57, 0], aB: T < 0.2 ? [0.6, 1.6] : [1.5, 0.1], tilt: 0.2, expr: 'flat' }),
+    },
+    specialDown: {
+      name: '單車環島', cost: 24, dur: 0.95, ai: 'mid', range: 300,
+      start(f, b) {
+        b.fx.add({ type: 'text', x: f.x, z: f.z, y: 130, text: '叮叮！', color: '#2ec4b6', size: 22, life: 0.7 });
+      },
+      update(f, b) {
+        f.vx = f.facing * (f.stateT < 0.75 ? 700 : 200);
+        if (f.stateT < 0.8) b.areaHit(f, { x0: -10, x1: 55, zr: 24, dmg: 16, knock: true, launch: 300, kb: 300, fall: 80 });
+        afterimage(b, f, 0.05);
+      },
+      pose: (f, T, t) => {
+        const s = Math.sin(t * 26);
+        return { bike: true, tilt: 0.35, lF: [1.0 + s * 0.4, -1.4], lB: [1.0 - s * 0.4, -1.4], aF: [1.3, 0.3], aB: [1.2, 0.3], expr: 'flat' };
+      },
+    },
+  },
+  guan: {
+    specialUp: {
+      name: '館長上勾拳', cost: 20, dur: 0.55, ai: 'close', range: 70,
+      start(f) {
+        f.vy = 300;
+        f.y = 1;
+      },
+      update(f, b) {
+        if (f.stateT > 0.05 && f.stateT < 0.3) b.areaHit(f, { x0: -5, x1: 62, zr: 22, dmg: 20, knock: true, launch: 580, kb: 110, fall: 80, heavy: true });
+        if (f.stateT > 0.1 && f.y <= 0) f.mv.done = true;
+      },
+      pose: () => ({ aF: [2.9, 0], aB: [0.4, 1.6], tilt: -0.2, expr: 'shout', lF: [0.2, -0.1], lB: [-0.3, -0.6] }),
+    },
+    specialDown: {
+      name: '啞鈴投擲', cost: 22, dur: 0.55, ai: 'proj',
+      update(f, b) {
+        if (!f.mv.fired && f.stateT > 0.25) {
+          f.mv.fired = true;
+          b.sfx('throw');
+          b.spawnProj({
+            owner: f, kind: 'dumbbell', x: f.x + f.facing * 30, z: f.z, y: 80, vx: f.facing * 430, vy: 280, gravity: 1400,
+            life: 2, w: 26, h: 50, dmg: 22, knock: true, launch: 300, kb: 180, vanishOnGround: true,
+          });
+        }
+      },
+      pose: (f, T) => (T < 0.25 ? { aF: [-0.6, 1.4], aB: [0.4, 1.6], tilt: -0.2 } : { aF: [1.7, 0], aB: [0.4, 1.6], tilt: 0.3 }),
+    },
+  },
+};
+for (const [id, ex] of Object.entries(EXTRA)) Object.assign(MOVES[id], ex);
+
+// 依方向取得特技定義
+export function specialDef(id, kind) {
+  const m = MOVES[id];
+  return kind === 'up' ? m.specialUp : kind === 'down' ? m.specialDown : m.special;
+}

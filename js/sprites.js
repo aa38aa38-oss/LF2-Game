@@ -2,7 +2,8 @@
 // 之後放入 Gemini 生成的圖檔時，drawFighter 會自動改用圖檔。
 import { ARENA } from './util.js';
 import { charFrame, ASSETS } from './assets.js';
-import { MOVES } from './moves.js';
+import { MOVES, specialDef } from './moves.js';
+import { drawItem } from './items.js';
 
 export const SC = 1.3;
 const OL = '#15121a';
@@ -92,6 +93,25 @@ function drawProp(ctx, prop, hx, hy, ang) {
   } else if (prop === 'mic') {
     poly(ctx, [[hx, hy], [hx + dx * 8, hy + dy * 8]], 2.4, '#333');
     circ(ctx, hx + dx * 10, hy + dy * 10, 3, '#9aa', 1.2);
+  } else if (prop === 'sign') {
+    ctx.translate(hx, hy);
+    ctx.rotate(Math.PI - ang);
+    drawItem(ctx, 'sign', 0, 6, 0, 0.75);
+  } else if (prop === 'egg') {
+    ctx.translate(hx + dx * 3, hy + dy * 3);
+    drawItem(ctx, 'egg', 0, 6, 0, 0.7);
+  } else if (prop === 'bowl') {
+    ctx.translate(hx, hy - 2);
+    ctx.beginPath();
+    ctx.arc(0, 0, 6, 0, Math.PI);
+    ctx.closePath();
+    ctx.fillStyle = '#f4f4f4';
+    ctx.fill();
+    ctx.strokeStyle = OL;
+    ctx.lineWidth = 1.3;
+    ctx.stroke();
+    ctx.fillStyle = '#7a3e12';
+    ctx.fillRect(-5, -2, 10, 2.5);
   }
   ctx.restore();
 }
@@ -465,6 +485,14 @@ export function poseFor(f) {
     aF: [0.5, 1.7], aB: [0.3, 1.8], lF: [0.18, -0.18], lB: [-0.22, -0.05],
     tilt: 0.05, bob: 0, expr: L.expr || 'normal', prop: L.prop || null,
   };
+  const H = f.hold;
+  if (H) {
+    if (H.def.type === 'heavy') {
+      p.aF = [2.95, 0.15];
+      p.aB = [2.85, 0.15];
+      p.prop = null;
+    } else p.prop = H.kind === 'mic' ? 'mic' : H.kind;
+  }
   switch (st) {
     case 'idle': {
       const s = Math.sin(t * 4);
@@ -536,6 +564,50 @@ export function poseFor(f) {
       }
       break;
     }
+    case 'djatk':
+      p.lF = [1.5, -0.05];
+      p.lB = [-0.6, -0.4];
+      p.aF = [0.6, 1.6];
+      p.aB = [-0.9, 0.6];
+      p.tilt = -0.35;
+      p.expr = 'shout';
+      break;
+    case 'roll':
+      p.rot = T * 15;
+      p.lF = [1.2, -2.2];
+      p.lB = [1.0, -2.0];
+      p.aF = [1.2, 1.4];
+      p.aB = [1.0, 1.4];
+      p.prop = null;
+      break;
+    case 'flip':
+      p.rot = -T * 14;
+      p.lF = [1.2, -2.0];
+      p.lB = [1.0, -1.8];
+      p.aF = [1.5, 1.2];
+      p.aB = [1.3, 1.2];
+      p.prop = null;
+      break;
+    case 'pick':
+      p.tilt = 0.6;
+      p.aF = [0.3, 0];
+      p.lF = [0.7, -1.2];
+      break;
+    case 'catch': {
+      const punch = f.mv.punchShow > 0;
+      p.aF = punch ? [1.6, 0] : [1.4, 0.3];
+      p.aB = punch ? [1.4, 0.4] : [1.3, 0.4];
+      p.tilt = 0.12;
+      p.expr = punch ? 'shout' : p.expr;
+      break;
+    }
+    case 'caught':
+      p.tilt = -0.25;
+      p.aF = [-0.2, 0.3];
+      p.aB = [-0.4, 0.3];
+      p.expr = 'hurt';
+      p.prop = null;
+      break;
     case 'jatk':
       p.lF = [1.2, -0.15];
       p.lB = [-0.3, -1.3];
@@ -622,9 +694,8 @@ export function poseFor(f) {
       break;
     case 'special':
     case 'super': {
-      const mv = MOVES[f.char.id];
-      const def = st === 'special' ? mv.special : mv.super;
-      if (def.pose) Object.assign(p, def.pose(f, T, t));
+      const def = st === 'special' ? specialDef(f.char.id, f.spKind) : MOVES[f.char.id].super;
+      if (def && def.pose) Object.assign(p, def.pose(f, T, t));
       break;
     }
   }
@@ -660,7 +731,7 @@ export function drawChar(ctx, ch, pose, x, y, facing, sc = SC, alpha = 1, flash 
     ctx.rotate(p.rot);
     ctx.translate(0, 40);
   }
-  const hipY = -Math.max(ext(p.lF), ext(p.lB), 8) - 3 - (p.bob || 0);
+  const hipY = (p.bike ? -20 : -Math.max(ext(p.lF), ext(p.lB), 8) - 3) - (p.bob || 0);
   const shY = hipY - 26;
   const hr = L.hr || 13.5;
   const hx = 1.5, hy = shY - hr + 4;
@@ -670,6 +741,17 @@ export function drawChar(ctx, ch, pose, x, y, facing, sc = SC, alpha = 1, flash 
     ctx.rotate(tilt);
     ctx.translate(0, -hipY);
   };
+  if (p.bike) {
+    for (const wx of [-16, 18]) {
+      ctx.beginPath();
+      ctx.arc(wx, -9, 9, 0, Math.PI * 2);
+      ctx.strokeStyle = OL;
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+    }
+    poly(ctx, [[-16, -9], [0, -20], [18, -9]], 2.4, '#2ec4b6');
+    poly(ctx, [[0, -20], [14, -30]], 2.2, '#2ec4b6');
+  }
   drawLeg(ctx, L, -3, hipY, p.lB, true);
   ctx.save();
   upper();
@@ -689,6 +771,7 @@ const ANIM_MAP = {
   idle: 'idle', walk: 'walk', run: 'run', jump: 'jump', a1: 'attack1', a2: 'attack2', a3: 'attack3',
   jatk: 'jump_attack', ratk: 'run_attack', defend: 'defend', hurt: 'hurt', fall: 'fall', down: 'down',
   ko: 'down', getup: 'getup', dizzy: 'dizzy', victory: 'victory', grabbed: 'fall', special: 'special',
+  djatk: 'jump_attack', roll: 'roll', flip: 'roll', pick: 'getup', catch: 'catch', caught: 'hurt', land: 'idle',
   super: 'super', superwait: 'super',
 };
 const LOOP_ANIMS = new Set(['idle', 'walk', 'run', 'dizzy', 'victory', 'defend']);
@@ -710,6 +793,7 @@ export function drawFighter(ctx, f, alpha = 1) {
   } else {
     drawChar(ctx, f.char, poseFor(f), sx, sy, f.facing, SC, alpha, f.flash > 0, f.animT);
   }
+  if (f.hold && f.hold.def && f.hold.def.type === 'heavy') drawItem(ctx, f.hold.kind, sx, sy - 112, 0, 1.2);
   if (f.state === 'dizzy') {
     for (let i = 0; i < 3; i++) {
       const a = f.animT * 5 + (i * Math.PI * 2) / 3;

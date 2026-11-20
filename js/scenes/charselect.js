@@ -115,24 +115,32 @@ export class CharSelectScene {
       this.hot.add(x - 4, y - 4, s + 8, s + 36, () => (this.sel === i ? this.confirm() : ((this.sel = i), this.g.audio.sfx('move'))));
     });
     // 資訊面板
-    panel(ctx, 420, 236, 520, 270);
-    txt(ctx, ch.title, 444, 266, { size: 32, weight: 900, color: ch.color, stroke: '#000', sw: 5 });
-    txt(ctx, ch.type, 920, 266, { size: 16, weight: 700, color: '#aaa', align: 'right' });
+    panel(ctx, 420, 226, 520, 300);
+    txt(ctx, ch.title, 444, 254, { size: 30, weight: 900, color: ch.color, stroke: '#000', sw: 5 });
+    txt(ctx, ch.type, 920, 254, { size: 15, weight: 700, color: '#aaa', align: 'right' });
     const stats = [['力量', ch.stats.pow], ['速度', ch.stats.spd], ['防禦', ch.stats.def]];
     stats.forEach(([n, v], i) => {
-      const y = 302 + i * 24;
-      txt(ctx, n, 444, y, { size: 15, weight: 900, color: '#ddd' });
-      segBar(ctx, 492, y - 7, 150, 13, v / 5, { segs: 5, color: ['#ff6a4a', '#5cc8ff', '#7cff7a'][i] });
+      const y = 290 + i * 22;
+      txt(ctx, n, 444, y, { size: 14, weight: 900, color: '#ddd' });
+      segBar(ctx, 486, y - 6, 120, 12, v / 5, { segs: 5, color: ['#ff6a4a', '#5cc8ff', '#7cff7a'][i] });
     });
-    txt(ctx, `特技｜${ch.special.name}`, 670, 302, { size: 15, weight: 900, color: '#8ab8ff' });
-    txt(ctx, ch.special.desc, 670, 324, { size: 13, color: '#ccc' });
-    txt(ctx, `大絕｜${ch.superMove.name}`, 670, 350, { size: 15, weight: 900, color: '#ffd84a' });
-    txt(ctx, ch.superMove.desc, 670, 372, { size: 13, color: '#ccc' });
+    ch.specials.forEach((sp, i) => {
+      const y = 282 + i * 38;
+      txt(ctx, sp.cmd, 630, y, { size: 13, weight: 900, color: '#8ab8ff' });
+      txt(ctx, sp.name, 686, y, { size: 15, weight: 900, color: '#fff' });
+      txt(ctx, sp.desc, 686, y + 17, { size: 12, color: '#aaa' });
+    });
+    txt(ctx, '大絕', 630, 400, { size: 13, weight: 900, color: '#ffd84a' });
+    txt(ctx, ch.superMove.name, 686, 400, { size: 15, weight: 900, color: '#ffd84a' });
+    txt(ctx, ch.superMove.desc, 686, 417, { size: 12, color: '#aaa' });
     ctx.fillStyle = 'rgba(255,255,255,0.08)';
-    ctx.fillRect(436, 400, 488, 66);
-    txt(ctx, '金句', 452, 418, { size: 13, weight: 900, color: '#aaa' });
-    txt(ctx, `「${ch.quote}」`, 680, 442, { size: 26, weight: 900, color: '#fff', align: 'center', stroke: '#000', sw: 5 });
-    txt(ctx, '← → 選擇　Enter 確定　Esc 返回', 680, 490, { size: 13, color: '#999', align: 'center' });
+    ctx.fillRect(436, 362, 180, 72);
+    txt(ctx, '金句', 446, 376, { size: 12, weight: 900, color: '#aaa' });
+    const q = `「${ch.quote}」`;
+    const qs = q.length > 9 ? [q.slice(0, Math.ceil(q.length / 2)), q.slice(Math.ceil(q.length / 2))] : [q];
+    qs.forEach((l, i) => txt(ctx, l, 526, 400 + i * 22 - (qs.length - 1) * 8, { size: 16, weight: 900, color: '#fff', align: 'center', stroke: '#000', sw: 4 }));
+    txt(ctx, '特技：防→方向→攻（或 特技鍵＋↑↓）', 680, 456, { size: 13, color: '#8ab8ff', align: 'center' });
+    txt(ctx, '← → 選擇　Enter 確定　Esc 返回', 680, 500, { size: 13, color: '#999', align: 'center' });
     if (this.flashT > 0) {
       ctx.fillStyle = `rgba(255,255,255,${this.flashT})`;
       ctx.fillRect(0, 0, 960, 540);

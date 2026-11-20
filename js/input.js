@@ -22,10 +22,34 @@ export class Controller {
     this.state = {};
     this.hits = {};
     this.wantRun = false;
+    this.frame = 0;
+    this.log = []; // 最近按過的鍵（給「防→方向→攻」指令用）
   }
   setBtn(b, v) {
-    if (v && !this.state[b]) this.hits[b] = true;
+    if (v && !this.state[b]) {
+      this.hits[b] = true;
+      this.log.push({ b, f: this.frame });
+      if (this.log.length > 12) this.log.shift();
+    }
     this.state[b] = v;
+  }
+  // 小朋友齊打交式指令：防 → (方向) → 攻，在 0.6 秒內完成。回傳 'fwd' | 'up' | 'down' | null
+  command(facing) {
+    const now = this.frame;
+    const L = this.log.filter((e) => now - e.f <= 36);
+    let di = -1;
+    for (let i = L.length - 1; i >= 0; i--) if (L[i].b === 'defend') { di = i; break; }
+    if (di < 0) return null;
+    let dir = null;
+    for (let i = di + 1; i < L.length; i++) {
+      const b = L[i].b;
+      if (b === 'up' || b === 'down') dir = b;
+      else if (b === 'left' || b === 'right') dir = b;
+    }
+    if (!dir) return null;
+    this.log = [];
+    if (dir === 'up' || dir === 'down') return dir;
+    return dir === 'left' ? 'fwdL' : 'fwdR';
   }
   tap(b) {
     this.hits[b] = true;
@@ -38,11 +62,13 @@ export class Controller {
   }
   endFrame() {
     this.hits = {};
+    this.frame++;
   }
   reset() {
     this.state = {};
     this.hits = {};
     this.wantRun = false;
+    this.log = [];
   }
   // 選單用
   get confirm() {
@@ -91,6 +117,67 @@ export class Input {
       el.addEventListener('pointercancel', off);
       el.addEventListener('pointerleave', off);
     });
+  }
+  // 浮動虛擬搖桿（類似傳說對決）：左半邊任何地方按下，搖桿底座就出現在手指下
+  bindJoystick(zone, base, knob) {
+    const R = 52;
+    const p1 = this.p1;
+    let id = null, cx = 0, cy = 0;
+    const home = () => {
+      base.style.left = '';
+      base.style.top = '';
+      base.style.bottom = '';
+      base.classList.remove('active');
+      knob.style.transform = '';
+    };
+    const apply = (nx, ny) => {
+      const T = 0.38;
+      p1.setBtn('left', nx < -T);
+      p1.setBtn('right', nx > T);
+      p1.setBtn('up', ny < -T);
+      p1.setBtn('down', ny > T);
+      // 推到底就跑步
+      p1.wantRun = Math.abs(nx) > 0.9 && Math.abs(ny) < 0.6;
+    };
+    zone.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      if (this.onAny) this.onAny(e);
+      if (id !== null) return;
+      id = e.pointerId;
+      try {
+        zone.setPointerCapture(id);
+      } catch (err) {
+        /* ignore */
+      }
+      const r = base.offsetParent ? base.offsetParent.getBoundingClientRect() : { left: 0, top: 0 };
+      cx = e.clientX;
+      cy = e.clientY;
+      base.style.left = `${cx - r.left - base.offsetWidth / 2}px`;
+      base.style.top = `${cy - r.top - base.offsetHeight / 2}px`;
+      base.style.bottom = 'auto';
+      base.classList.add('active');
+    });
+    zone.addEventListener('pointermove', (e) => {
+      if (e.pointerId !== id) return;
+      e.preventDefault();
+      let dx = e.clientX - cx, dy = e.clientY - cy;
+      const len = Math.hypot(dx, dy);
+      if (len > R) {
+        dx = (dx / len) * R;
+        dy = (dy / len) * R;
+      }
+      knob.style.transform = `translate(${dx}px, ${dy}px)`;
+      apply(dx / R, dy / R);
+    });
+    const end = (e) => {
+      if (e.pointerId !== id) return;
+      id = null;
+      apply(0, 0);
+      p1.wantRun = false;
+      home();
+    };
+    zone.addEventListener('pointerup', end);
+    zone.addEventListener('pointercancel', end);
   }
   endFrame() {
     this.p1.endFrame();

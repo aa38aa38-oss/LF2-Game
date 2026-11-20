@@ -41,14 +41,27 @@ class Game {
     });
     const touch = document.getElementById('touch');
     this.input.bindTouch(touch);
-    document.getElementById('fs').addEventListener('click', () => this.toggleFullscreen());
+    this.input.bindJoystick(document.getElementById('stickZone'), document.getElementById('stickBase'), document.getElementById('stickKnob'));
+    this.supBtn = touch.querySelector('.sup');
+    const fs = document.getElementById('fs');
+    if (canFullscreen()) {
+      fs.addEventListener('click', () => this.toggleFullscreen());
+    } else {
+      // iPhone Safari 不支援網頁全螢幕 → 改成說明「加入主畫面」
+      fs.textContent = '📲 全螢幕';
+      fs.style.display = isStandalone() ? 'none' : '';
+      fs.addEventListener('click', () => showTip());
+    }
   }
 
   toggleFullscreen() {
-    const el = document.getElementById('wrap');
-    if (!document.fullscreenElement) {
-      (el.requestFullscreen || el.webkitRequestFullscreen || (() => {})).call(el);
-    } else document.exitFullscreen && document.exitFullscreen();
+    const el = document.documentElement;
+    if (!(document.fullscreenElement || document.webkitFullscreenElement)) {
+      const req = el.requestFullscreen || el.webkitRequestFullscreen;
+      const pr = req && req.call(el);
+      const lock = () => screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape').catch(() => {});
+      if (pr && pr.then) pr.then(lock).catch(() => {});
+    } else (document.exitFullscreen || document.webkitExitFullscreen || (() => {})).call(document);
   }
 
   beginPix() {
@@ -70,6 +83,8 @@ class Game {
     if (this.scene && this.scene.exit) this.scene.exit();
     this.scene = s;
     this.fade = 1;
+    document.body.dataset.scene = s instanceof BattleScene ? 'battle' : 'menu';
+    this.input.p1.reset();
     if (s.enter) s.enter();
   }
   setHi(score) {
@@ -113,6 +128,10 @@ class Game {
       this.ctx.fillStyle = '#000';
       this.ctx.fillRect(0, 0, W, H);
       this.scene.draw();
+      if (this.supBtn) {
+        const P = this.scene.player;
+        this.supBtn.classList.toggle('ready', !!(P && P.mp >= 100 && !P.dead));
+      }
       if (this.audio.muted) txt(this.ctx, '🔇', 940, 528, { size: 14, align: 'right', alpha: 0.7 });
       if (this.fade > 0) {
         this.ctx.fillStyle = `rgba(0,0,0,${this.fade})`;
@@ -124,18 +143,70 @@ class Game {
   }
 }
 
+function canFullscreen() {
+  return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+}
+function isStandalone() {
+  return window.navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches);
+}
+function isIOS() {
+  return /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+function showTip() {
+  const t = document.getElementById('tip');
+  document.getElementById('tipText').innerHTML = isIOS()
+    ? 'iPhone 的 Safari 不支援網頁全螢幕。<br>請點 Safari 下方的「<b>分享</b>」按鈕 →「<b>加入主畫面</b>」，之後從手機桌面的「政壇大亂鬥」圖示開啟，就會是<b>全螢幕、沒有網址列</b>。<br>記得把手機<b>轉成橫向</b>。'
+    : '請用瀏覽器選單的「<b>加入主畫面</b>／安裝應用程式」，之後從桌面圖示開啟就是全螢幕。';
+  t.classList.add('show');
+}
+
+// 防止 iPhone 雙擊／雙指縮放把畫面放大卡住
+function noZoom() {
+  const vp = document.querySelector('meta[name=viewport]');
+  const base = vp.getAttribute('content');
+  const reset = () => {
+    vp.setAttribute('content', base + ',shrink-to-fit=no');
+    setTimeout(() => vp.setAttribute('content', base), 50);
+  };
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach((ev) => document.addEventListener(ev, (e) => e.preventDefault(), { passive: false }));
+  let last = 0;
+  document.addEventListener(
+    'touchend',
+    (e) => {
+      const now = Date.now();
+      if (now - last < 350 && e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') e.preventDefault();
+      last = now;
+    },
+    { passive: false }
+  );
+  document.addEventListener('touchmove', (e) => {
+    if (e.touches && e.touches.length > 1) e.preventDefault();
+    else if (e.target.tagName !== 'INPUT') e.preventDefault();
+  }, { passive: false });
+  document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
+  window.addEventListener('orientationchange', () => setTimeout(() => { reset(); fit(); }, 200));
+  window.addEventListener('resize', () => {
+    if (window.visualViewport && window.visualViewport.scale > 1.01) reset();
+  });
+}
+
 function fit() {
   const wrap = document.getElementById('wrap');
   const c = document.getElementById('game');
-  const vw = wrap.clientWidth, vh = wrap.clientHeight;
+  const vv = window.visualViewport;
+  const vw = vv ? Math.min(vv.width, wrap.clientWidth) : wrap.clientWidth;
+  const vh = vv ? Math.min(vv.height, wrap.clientHeight) : wrap.clientHeight;
   const s = Math.min(vw / W, vh / H);
   c.style.width = `${Math.floor(W * s)}px`;
   c.style.height = `${Math.floor(H * s)}px`;
 }
 
 async function boot() {
+  noZoom();
   fit();
   window.addEventListener('resize', fit);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', fit);
+  document.getElementById('tipOk').addEventListener('click', () => document.getElementById('tip').classList.remove('show'));
   document.addEventListener('fullscreenchange', () => setTimeout(fit, 50));
   const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
   if (coarse || 'ontouchstart' in window) document.body.classList.add('touch');

@@ -3,20 +3,20 @@ import { txt, pixelText, panel, blink } from '../ui.js';
 import { menuBg } from './common.js';
 
 const KEYS = [
-  ['方向鍵 / WASD', '移動（可前後走）；連按兩下 ← → 奔跑'],
-  ['J / Z', '攻擊（連按三下打出連段）'],
-  ['K / 空白鍵', '跳躍（空中可再按攻擊）'],
-  ['L / X', '防禦（按住；擋不住大絕）'],
-  ['U / C', '特技（耗氣力，每個角色不同）'],
+  ['方向鍵 / WASD', '移動；連按兩下 ← → 奔跑'],
+  ['J / Z', '攻擊（三下連段）／撿道具／丟重物'],
+  ['K / 空白', '跳躍；跑步中跳＝衝刺跳'],
+  ['L / X', '防禦（連續擋太多會被破防）'],
+  ['防→方向→攻', '三招特技（→ 前、↑ 上、↓ 下）'],
+  ['U / C ＋↑↓', '特技快捷鍵（同上）'],
   ['I / V', '大絕（氣力滿時）'],
-  ['P / Esc', '暫停'],
-  ['M', '靜音'],
+  ['P / Esc　M', '暫停　靜音'],
 ];
 const TIPS = [
-  '• 打人和被打都會累積氣力，氣力滿了 HUD 會閃「大絕 OK」',
-  '• 大絕會先跳出角色海報和金句，期間全場時間暫停',
-  '• 倒地時短暫無敵，趁機拉開距離；被暈眩時會冒星星',
-  '• 跑步中按攻擊是衝刺攻擊，可以直接把人撞倒',
+  '• 連續挨打會「搖搖晃晃」，這時走過去就能抓住他，連揍幾拳再按方向＋攻擊丟出去！',
+  '• 被打飛時按「跳」可以空中翻身；跑步中按「防」可以翻滾閃避',
+  '• 天上會掉道具：便當回血、珍奶回氣、標語牌／麥克風可以揮或丟、椅子舉起來砸人',
+  '• 深紅色的血會慢慢回來；血越少回氣越快，絕地大反攻！',
 ];
 
 export class HowToScene {
@@ -44,14 +44,14 @@ export class HowToScene {
     g.flushPix();
     const ctx = g.ctx;
     pixelText(ctx, '操作說明', 480, 50, { size: 48, scale: 3, color: '#8CFF5B', color2: '#2fbf2f', outline: '#062006' });
-    panel(ctx, 140, 84, 680, 300);
+    panel(ctx, 130, 80, 700, 300);
     KEYS.forEach(([k, d], i) => {
       const y = 116 + i * 34;
-      txt(ctx, k, 360, y, { size: 21, weight: 900, color: '#ffd84a', align: 'right' });
-      txt(ctx, d, 390, y, { size: 20, weight: 700, color: '#fff' });
+      txt(ctx, k, 370, y, { size: 19, weight: 900, color: '#ffd84a', align: 'right' });
+      txt(ctx, d, 395, y, { size: 18, weight: 700, color: '#fff' });
     });
-    TIPS.forEach((s, i) => txt(ctx, s, 160, 408 + i * 26, { size: 17, weight: 700, color: '#fff', stroke: '#000', sw: 4 }));
+    TIPS.forEach((s, i) => txt(ctx, s, 70, 402 + i * 24, { size: 15, weight: 700, color: '#fff', stroke: '#000', sw: 4 }));
     if (blink(this.t, 1.2)) pixelText(ctx, 'PRESS ENTER', 480, 515, { size: 24, scale: 2, font: 'px', color: '#ffd84a', color2: '#ff9a1a', outline: '#2a1000' });
-    if (document.body.classList.contains('touch')) txt(ctx, '手機：左邊十字鍵移動，右邊按鈕「攻／跳／防／特／絕」', 480, 490, { size: 14, color: '#ccc', align: 'center' });
+    if (document.body.classList.contains('touch')) txt(ctx, '手機：左半邊任意處按住拖曳＝搖桿（推到底奔跑），右邊「攻／跳／防／特／絕」', 480, 494, { size: 14, color: '#ccc', align: 'center' });
   }
 }

@@ -104,12 +104,18 @@ export function panel(ctx, x, y, w, h, o = {}) {
 }
 
 export function segBar(ctx, x, y, w, h, ratio, o = {}) {
-  const { segs = 20, colors = null, color = '#46e04a', back = '#1a1a1a', mirror = false } = o;
+  const { segs = 20, colors = null, color = '#46e04a', back = '#1a1a1a', mirror = false, ghost = null } = o;
   ctx.fillStyle = '#000';
   ctx.fillRect(x - 2, y - 2, w + 4, h + 4);
   ctx.fillStyle = back;
   ctx.fillRect(x, y, w, h);
   const sw = w / segs;
+  if (ghost != null && ghost > ratio) {
+    // 可回復的血量（深紅色）
+    ctx.fillStyle = '#6a1414';
+    const gw = w * ghost;
+    ctx.fillRect(mirror ? x + w - gw : x, y + 1, gw, h - 2);
+  }
   const n = ratio * segs;
   let col = color;
   if (colors) col = ratio > 0.5 ? colors[0] : ratio > 0.25 ? colors[1] : colors[2];

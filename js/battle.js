@@ -8,6 +8,7 @@ import { FX } from './fx.js';
 import { STAGES, STAGE_BY_ID } from './stages.js';
 import { drawFighter, drawShadow, drawChar, drawBanana, drawPortrait, POSTER_POSE, rrect } from './sprites.js';
 import { ASSETS } from './assets.js';
+import { ITEM_DEFS, spawnRandomItem, newItem, drawItem } from './items.js';
 import { txt, pixelText, segBar, panel, blink, Hotspots } from './ui.js';
 
 export const MODE_NAME = { '1v1': '單挑模式', brawl: '四人大亂鬥', survival: '連戰生存' };
@@ -25,6 +26,8 @@ export class BattleScene {
     this.stage = STAGE_BY_ID[cfg.stage] || STAGES[0];
     this.fx = new FX();
     this.projs = [];
+    this.items = [];
+    this.itemTimer = 5;
     this.fighters = [];
     this.time = 0;
     this.hitstop = 0;
@@ -123,8 +126,9 @@ export class BattleScene {
     return best;
   }
   meleeHit(f, a) {
-    const reach = f.char.look.prop === 'gavel' ? 1.12 : 1;
-    const h = { ...a, dmg: a.dmg * f.char.mul.pow };
+    const W = f.hold && f.hold.def.type === 'light' && !a.air ? f.hold : null;
+    const reach = (f.char.look.prop === 'gavel' ? 1.12 : 1) + (W ? W.def.reach / a.x1 : 0);
+    const h = { ...a, dmg: (a.dmg + (W ? W.def.dmg : 0)) * f.char.mul.pow };
     for (const t of this.fighters) {
       if (t === f || t.team === f.team || t.dead || f.hitList.has(t)) continue;
       const dx = (t.x - f.x) * f.facing;
@@ -132,7 +136,100 @@ export class BattleScene {
       if (Math.abs(t.z - f.z) > a.zr) continue;
       if (Math.abs(t.y - f.y) > 70) continue;
       f.hitList.add(t);
-      this.applyHit(f, t, h);
+      const r = this.applyHit(f, t, h);
+      if (r && W) {
+        W.dur--;
+        if (W.dur <= 0) {
+          f.hold = null;
+          this.fx.add({ type: 'text', x: f.x, z: f.z, y: 110, text: `${W.def.name}壞了！`, color: '#ccc', size: 18, life: 0.8 });
+          this.sfx('block');
+        }
+      }
+    }
+  }
+  // ───── 道具 ─────
+  tryPickup(f) {
+    let best = null, bd = 1e9;
+    for (const it of this.items) {
+      if (it.y > 5) continue;
+      const d = Math.abs(it.x - f.x) + Math.abs(it.z - f.z) * 1.5;
+      if (Math.abs(it.x - f.x) < 38 && Math.abs(it.z - f.z) < 20 && d < bd) {
+        bd = d;
+        best = it;
+      }
+    }
+    if (!best) return false;
+    this.items.splice(this.items.indexOf(best), 1);
+    const D = best.def;
+    f.setState('pick');
+    f.vx = f.vz = 0;
+    if (D.type === 'food') {
+      if (D.hp) f.heal(D.hp, D.cap);
+      if (D.mp) f.mp = Math.min(100, f.mp + D.mp);
+      this.sfx('heal');
+      this.fx.add({ type: 'text', x: f.x, z: f.z, y: 120, text: D.hp ? `${D.name} +${D.hp}` : `${D.name} 氣+${D.mp}`, color: D.hp ? '#5cff7a' : '#6ab8ff', size: 20, life: 0.9 });
+    } else {
+      f.hold = best;
+      this.sfx('coin');
+      this.fx.add({ type: 'text', x: f.x, z: f.z, y: 120, text: D.name, color: '#ffd84a', size: 18, life: 0.7 });
+    }
+    return true;
+  }
+  throwHeld(f, dash = false) {
+    const it = f.hold;
+    if (!it) return;
+    f.hold = null;
+    const heavy = it.def.type === 'heavy';
+    this.spawnProj({
+      owner: f, kind: 'item', item: it, x: f.x + f.facing * 24, z: f.z, y: f.y + (heavy ? 110 : 70),
+      vx: f.facing * (heavy ? 430 : dash ? 720 : 620), vy: heavy ? 220 : 90, gravity: heavy ? 1300 : 700,
+      life: 3, w: heavy ? 34 : 22, h: 50, dmg: it.def.throwDmg, knock: heavy || it.def.type === 'light', launch: 300, kb: heavy ? 260 : 180, stun: 0.4, fall: heavy ? 80 : 50,
+    });
+    f.setState('a2');
+    f.stateT = 0.18;
+    this.sfx('throw');
+  }
+  dropHeld(f) {
+    const it = f.hold;
+    if (!it) return;
+    f.hold = null;
+    it.x = f.x;
+    it.z = f.z;
+    it.y = Math.max(20, f.y + 40);
+    it.vy = 200;
+    this.items.push(it);
+  }
+  landItem(it, x, z) {
+    if (it.def.type === 'throw') {
+      this.fx.add({ type: 'text', x, z, y: 10, text: '啪', color: '#fff6c0', size: 18, life: 0.5 });
+      return;
+    }
+    if (it.def.type === 'light' && it.dur <= 0) return;
+    it.x = Math.max(ARENA.xMin, Math.min(ARENA.xMax, x));
+    it.z = z;
+    it.y = 30;
+    it.vy = 150;
+    this.items.push(it);
+  }
+  updateItems(dt) {
+    if (this.fightOn) {
+      this.itemTimer -= dt;
+      if (this.itemTimer <= 0) {
+        this.itemTimer = rand(6, 11);
+        if (this.items.length < 3) this.items.push(spawnRandomItem());
+      }
+    }
+    for (const it of this.items) {
+      it.t += dt;
+      if (it.y > 0 || it.vy > 0) {
+        it.vy -= 1500 * dt;
+        it.y += it.vy * dt;
+        if (it.y <= 0) {
+          it.y = 0;
+          if (it.vy < -300) this.fx.add({ type: 'dust', x: it.x, z: it.z, y: 0, life: 0.3 });
+          it.vy = 0;
+        }
+      }
     }
   }
   areaHit(f, box) {
@@ -152,9 +249,10 @@ export class BattleScene {
     const r = t.takeHit(src, h, this);
     if (!r) return null;
     const hy = t.y + 58;
-    if (r === 'block') {
+    if (r === 'block' || r === 'break') {
       this.fx.add({ type: 'block', x: t.x - sign(t.x - src.x) * 10, z: t.z, y: hy, life: 0.18 });
-      this.sfx('block');
+      this.sfx(r === 'break' ? 'heavy' : 'block');
+      if (r === 'break') this.hitstop = Math.max(this.hitstop, 0.08);
       return r;
     }
     const dealt = before - t.hp;
@@ -240,6 +338,7 @@ export class BattleScene {
       if (f.ai) f.ai.ctrl.endFrame();
     }
     this.updateProjs(sdt);
+    this.updateItems(sdt);
     if (this.announce) {
       this.announce.t += dt;
       if (this.announce.t > this.announce.life) this.announce = null;
@@ -366,6 +465,14 @@ export class BattleScene {
       p.t += dt;
       if (p.t >= p.life) p.dead = true;
       if (p.dead) continue;
+      if (p.boomerang) {
+        p.vx -= p.boomerang * 1250 * dt;
+        if (p.t > 0.5 && !p.back) {
+          p.back = true;
+          p.hits.clear();
+        }
+        if (p.back && Math.abs(p.x - p.owner.x) < 20 && Math.abs(p.z - p.owner.z) < 30) p.dead = true;
+      }
       if (p.gravity && !p.landed) p.vy -= p.gravity * dt;
       p.x += p.vx * dt;
       p.z += p.vz * dt;
@@ -375,13 +482,21 @@ export class BattleScene {
         if (p.trap) {
           p.landed = true;
           p.vx = p.vy = p.vz = 0;
+        } else if (p.kind === 'item') {
+          p.dead = true;
+          this.landItem(p.item, p.x, p.z);
+          continue;
         } else if (p.vanishOnGround) {
           p.dead = true;
           this.fx.add({ type: 'spark', x: p.x, z: p.z, y: 4, life: 0.15, color: '#ffd84a' });
           continue;
         }
       }
-      if (p.kind !== 'wave' && (p.x < -50 || p.x > 1010)) p.dead = true;
+      if (p.kind !== 'wave' && (p.x < -50 || p.x > 1010)) {
+        p.dead = true;
+        if (p.kind === 'item') this.landItem(p.item, p.x, p.z);
+        continue;
+      }
       if (p.trap && !p.landed) continue;
       for (const f of this.fighters) {
         if (f.team === p.team || f.dead || f.hp <= 0 || p.hits.has(f)) continue;
@@ -391,14 +506,41 @@ export class BattleScene {
           if (f.y > 4 || f.state === 'down' || f.state === 'getup') continue;
         } else if (p.y < f.y - 10 || p.y > f.y + p.h + 70) continue;
         const dir = p.dir || sign(p.vx) || sign(f.x - p.x) || 1;
-        const h = { dmg: p.dmg * p.owner.char.mul.pow, kb: p.kb, stun: p.stun, knock: p.knock, launch: p.launch, unblockable: p.unblockable, dizzy: p.dizzy, slip: p.slip, dir: p.slip ? f.facing : dir };
+        const h = { dmg: p.dmg * p.owner.char.mul.pow, kb: p.kb, stun: p.stun, knock: p.knock, launch: p.launch, unblockable: p.unblockable, dizzy: p.dizzy, slip: p.slip, fall: p.fall, dir: p.slip ? f.facing : dir };
         const r = this.applyHit(p.owner, f, h);
         if (r) {
           p.hits.add(f);
           if (!p.pierce) {
             p.dead = true;
+            if (p.kind === 'item') this.landItem(p.item, p.x, p.z);
             break;
           }
+        }
+      }
+    }
+    // 飛行道具互撞抵銷（大絕的不會）
+    const live = this.projs.filter((p) => !p.dead && !p.trap && !p.noClash && !['wave', 'coin', 'ingot'].includes(p.kind));
+    for (let i = 0; i < live.length; i++) {
+      for (let j = i + 1; j < live.length; j++) {
+        const a = live[i], c = live[j];
+        if (a.dead || c.dead || a.team === c.team) continue;
+        if (Math.abs(a.x - c.x) < 26 && Math.abs(a.z - c.z) < 20 && Math.abs(a.y - c.y) < 50) {
+          a.dead = c.dead = true;
+          if (a.kind === 'item') this.landItem(a.item, a.x, a.z);
+          if (c.kind === 'item') this.landItem(c.item, c.x, c.z);
+          this.fx.add({ type: 'spark', x: (a.x + c.x) / 2, z: a.z, y: a.y, life: 0.25, big: true, color: '#fff' });
+          this.sfx('block');
+        }
+      }
+    }
+    // 被丟出去的人會撞倒路上的人
+    for (const t of this.fighters) {
+      if (!t.thrownBy || t.state !== 'fall') continue;
+      for (const o of this.fighters) {
+        if (o === t || o.dead || t.thrownHits.has(o)) continue;
+        if (Math.abs(o.x - t.x) < 36 && Math.abs(o.z - t.z) < 18 && Math.abs(o.y - t.y) < 70) {
+          t.thrownHits.add(o);
+          this.applyHit(t.thrownBy, o, { dmg: 16, knock: true, launch: 300, kb: 220, dir: sign(t.vx) || 1, unblockable: true });
         }
       }
     }
@@ -422,8 +564,9 @@ export class BattleScene {
     p.translate(ox, oy);
     this.stage.draw(p, this.time);
     for (const f of this.fighters) drawShadow(p, f.x, f.z, f.y);
-    for (const pr of this.projs) if (pr.trap || pr.kind === 'coin' || pr.kind === 'ingot') drawShadow(p, pr.x, pr.z, pr.y, 10);
-    const list = [...this.fighters.map((f) => ({ z: f.z, f })), ...this.projs.map((pr) => ({ z: pr.z + 0.5, pr }))];
+    for (const pr of this.projs) if (pr.trap || pr.gravity) drawShadow(p, pr.x, pr.z, pr.y, 10);
+    for (const it of this.items) drawShadow(p, it.x, it.z, it.y, 14);
+    const list = [...this.fighters.map((f) => ({ z: f.z, f })), ...this.projs.map((pr) => ({ z: pr.z + 0.5, pr })), ...this.items.map((it) => ({ z: it.z - 0.5, it }))];
     list.sort((a, b) => a.z - b.z);
     const superOn = this.fighters.some((f) => f.state === 'super');
     if (superOn) {
@@ -446,6 +589,10 @@ export class BattleScene {
           p.restore();
         }
         drawFighter(p, f);
+      } else if (d.it) {
+        const it = d.it;
+        const bob = it.y <= 0 ? Math.sin(this.time * 4 + it.x) * 1.5 : 0;
+        drawItem(p, it.kind, it.x, ARENA.floorY + it.z - it.y + bob, 0, 1.15);
       } else this.drawProj(p, d.pr);
     }
     this.fx.draw(p);
@@ -530,6 +677,42 @@ export class BattleScene {
       case 'banana':
         drawBanana(ctx, x, y - 4, 1.6, p.landed ? 0 : p.t * 12);
         break;
+      case 'boomerang':
+        drawBanana(ctx, x, y, 2, p.t * 20);
+        break;
+      case 'item':
+        drawItem(ctx, p.item.kind, x, y + 10, p.item.def.type === 'heavy' ? p.t * 4 : p.t * 14 * sign(p.vx), 1.15);
+        break;
+      case 'crate':
+        ctx.translate(x, y - 16);
+        ctx.rotate(p.t * 5);
+        ctx.fillStyle = '#b07a3a';
+        ctx.fillRect(-18, -18, 36, 36);
+        ctx.strokeStyle = '#4a2c10';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(-18, -18, 36, 36);
+        ctx.beginPath();
+        ctx.moveTo(-18, -18);
+        ctx.lineTo(18, 18);
+        ctx.stroke();
+        ctx.fillStyle = '#fff';
+        ctx.font = '900 10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('高雄', 0, 4);
+        break;
+      case 'dumbbell':
+        ctx.translate(x, y - 10);
+        ctx.rotate(p.t * 9);
+        ctx.fillStyle = '#333';
+        ctx.fillRect(-16, -2.5, 32, 5);
+        ctx.fillStyle = '#555';
+        ctx.fillRect(-20, -9, 8, 18);
+        ctx.fillRect(12, -9, 8, 18);
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(-20, -9, 8, 18);
+        ctx.strokeRect(12, -9, 8, 18);
+        break;
       case 'scalpel': {
         const d = sign(p.vx);
         ctx.strokeStyle = '#e8eef5';
@@ -608,7 +791,8 @@ export class BattleScene {
     const nx = mirror ? bx + bw : bx;
     txt(ctx, f.char.title, nx, y + 8, { size: 15, weight: 900, color: '#fff', align: al, stroke: '#000', sw: 3 });
     txt(ctx, f === this.player ? 'P1' : 'CPU', mirror ? bx : bx + bw, y + 8, { size: 9, font: 'px', color: f === this.player ? '#5cff7a' : '#ff8a8a', align: mirror ? 'left' : 'right' });
-    segBar(ctx, bx, y + 20, bw, 15, f.hp / f.maxHp, { segs: w > 300 ? 22 : 14, colors: ['#46e04a', '#ffd84a', '#ff4a3a'], mirror });
+    segBar(ctx, bx, y + 20, bw, 15, f.hp / f.maxHp, { segs: w > 300 ? 22 : 14, colors: ['#46e04a', '#ffd84a', '#ff4a3a'], mirror, ghost: f.cap / f.maxHp });
+    if (f.hold) txt(ctx, `持：${f.hold.def.name}`, mirror ? bx + bw : bx + bw, y + 60, { size: 10, weight: 900, color: '#ffd84a', align: 'right', stroke: '#000', sw: 3 });
     const full = f.mp >= 100;
     const mc = full ? (blink(this.time, 4) ? '#ffe14a' : '#ff9a2a') : '#3a8cff';
     segBar(ctx, bx, y + 42, bw * 0.78, 8, f.mp / 100, { segs: 10, color: mc, mirror });

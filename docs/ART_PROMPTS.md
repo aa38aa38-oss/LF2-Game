@@ -58,7 +58,7 @@ side view facing right, full body, single character, centered, feet touching the
 - 遊戲顯示時每格高度約 128px，所以細節不用太多，輪廓清楚最重要
 - 存檔：`assets/characters/<角色ID>/<動作名>.png`，例如 `assets/characters/su/idle.png`
 
-### 3.2 動作清單（每個角色都要這 18 組）
+### 3.2 動作清單（每個角色都要這 20 組）
 
 | 動作名（檔名） | 格數 | 用在 | 動作描述（【動作】，貼在 prompt 裡） |
 |---|---|---|---|
@@ -80,6 +80,8 @@ side view facing right, full body, single character, centered, feet touching the
 | `special` | 4 | 特技 | 見下面 3.3 |
 | `super` | 4 | 大絕 | 見下面 3.3 |
 | `victory` | 4 | 勝利 | `victory pose, fist pumped into the air, triumphant expression` |
+| `roll` | 4 | 翻滾閃避／空中翻身 | `doing a forward somersault roll, curled into a ball` |
+| `catch` | 2 | 抓住對手揍 | `holding an opponent by the collar with one hand and punching with the other (draw only him)` |
 
 > 韓議長（`han`）的 `attack1`、`attack3` 建議改成「用議事槌敲」：`swinging a wooden gavel down`。
 
@@ -90,6 +92,8 @@ side view facing right, full body, single character, centered, feet touching the
 ```
 
 ### 3.3 特技 / 大絕動作
+
+> 目前每個角色有三招特技（前／上／下），動作圖共用 `special` 一組即可；之後要細分再加。
 
 | 角色 | `special`（4 格） | `super`（4 格） |
 |---|---|---|
@@ -191,3 +195,9 @@ side view facing right, full body, single character, centered, feet touching the
 - 也可以一格一張：`"idle": 4` 代表 `assets/characters/su/idle_1.png` ～ `idle_4.png`
 - **注意**：一個角色只要有登記某個動作，那個動作就用圖；沒登記的動作會用程式畫的。建議一個角色的動作**全部生完再一起登記**，不然會出現圖和程式畫的混在一起
 - 去背不乾淨（有綠邊）時，把 `chromaTolerance` 調高（例如 160）；角色身上的綠色被吃掉時調低
+
+---
+
+## 9. 道具圖（可選）
+
+道具目前是程式畫的，之後想換圖再說。清單：便當、珍奶、抗議標語牌、麥克風、雞蛋、議場椅子。
