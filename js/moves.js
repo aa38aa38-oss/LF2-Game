@@ -439,7 +439,7 @@ const EXTRA = {
       pose: (f, T) => (T < 0.25 ? { aF: [2.9, 0.1], aB: [2.8, 0.1], tilt: -0.2, prop: null } : { aF: [1.5, 0], aB: [1.4, 0], tilt: 0.3, prop: null }),
     },
     specialDown: {
-      name: '滷肉飯補血', cost: 30, dur: 0.9, ai: 'heal',
+      name: '滷肉飯補血', cost: 30, cd: 12, dur: 0.9, ai: 'heal',
       update(f, b) {
         f.vx = f.vz = 0;
         if (!f.mv.fired && f.stateT > 0.5) {
@@ -542,6 +542,11 @@ const EXTRA = {
   },
 };
 for (const [id, ex] of Object.entries(EXTRA)) Object.assign(MOVES[id], ex);
+
+// 技能冷卻秒數：沒特別指定就依原本的耗氣換算（耗 25 氣 ≈ 6 秒）
+export function specialCD(def) {
+  return def.cd != null ? def.cd : Math.round(def.cost * 0.24 * 2) / 2;
+}
 
 // 依方向取得特技定義
 export function specialDef(id, kind) {

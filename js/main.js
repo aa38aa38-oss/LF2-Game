@@ -1,4 +1,5 @@
 // 遊戲主程式：畫布、迴圈、場景切換
+import { specialDef, specialCD } from './moves.js';
 import { W, H, store } from './util.js';
 import { Input } from './input.js';
 import { Sound } from './audio.js';
@@ -44,6 +45,7 @@ class Game {
     this.input.bindTouch(touch);
     this.input.bindJoystick(document.getElementById('stickZone'), document.getElementById('stickBase'), document.getElementById('stickKnob'));
     this.supBtn = touch.querySelector('.sup');
+    this.skBtns = ['fwd', 'up', 'down'].map((k, i) => ({ k, el: touch.querySelector('.sk' + (i + 1)), last: -1, char: null }));
     const fs = document.getElementById('fs');
     if (canFullscreen()) {
       fs.addEventListener('click', () => this.toggleFullscreen());
@@ -100,6 +102,31 @@ class Game {
     this.input.p1.reset();
     if (s.enter) s.enter();
   }
+  // 觸控技能鍵：顯示技能名稱與冷卻倒數
+  updateSkillButtons(P) {
+    this.skBtns.forEach((s, i) => {
+      if (s.char !== P.char.id) {
+        s.char = P.char.id;
+        const n = P.char.specials[i].name;
+        const cut = n.length > 4 ? 3 : 2;
+        s.el.querySelector('.nm').innerHTML = n.slice(0, cut) + '<br>' + n.slice(cut);
+        s.last = -1;
+      }
+      const left = P.cd[s.k];
+      const shown = left > 0 ? Math.ceil(left) : 0;
+      if (left > 0) s.el.style.setProperty('--p', (left / specialCD(specialDef(P.char.id, s.k))).toFixed(3));
+      if (shown !== s.last) {
+        if (shown === 0 && s.last > 0) {
+          s.el.classList.remove('flashready');
+          void s.el.offsetWidth;
+          s.el.classList.add('flashready');
+        }
+        s.el.classList.toggle('cd', shown > 0);
+        s.el.querySelector('.cdn').textContent = shown || '';
+        s.last = shown;
+      }
+    });
+  }
   setHi(score) {
     if (score > this.hi) {
       this.hi = score;
@@ -146,6 +173,7 @@ class Game {
       if (this.supBtn) {
         const P = this.scene.player;
         this.supBtn.classList.toggle('ready', !!(P && P.mp >= 100 && !P.dead));
+        if (P && P.cd) this.updateSkillButtons(P);
       }
       if (this.audio.muted) txt(this.ctx, '🔇', 940, 528, { size: 14, align: 'right', alpha: 0.7 });
       if (this.fade > 0) {

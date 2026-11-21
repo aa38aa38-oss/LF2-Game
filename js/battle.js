@@ -2,11 +2,11 @@
 import { ARENA, WORLD_W, rand, pick, shuffle, sign, easeOut, easeIn, clamp } from './util.js';
 import { Fighter, ATK } from './fighter.js';
 import { CHARS, CHAR_BY_ID } from './characters.js';
-import { MOVES } from './moves.js';
+import { MOVES, specialDef, specialCD } from './moves.js';
 import { AI } from './ai.js';
 import { FX } from './fx.js';
 import { STAGES, STAGE_BY_ID } from './stages.js';
-import { drawFighter, drawShadow, drawChar, drawBanana, drawPortrait, POSTER_POSE, rrect } from './sprites.js';
+import { drawFighter, drawShadow, drawBanana, drawPortrait, portrait, rrect } from './sprites.js';
 import { ASSETS } from './assets.js';
 import { ITEM_DEFS, spawnRandomItem, newItem, drawItem } from './items.js';
 import { txt, pixelText, segBar, panel, blink, Hotspots } from './ui.js';
@@ -655,10 +655,6 @@ export class BattleScene {
       p.restore();
       drawFighter(p, f);
     }
-    if (this.banner) {
-      p.setTransform(0.5, 0, 0, 0.5, g.ox / 2, 0);
-      this.drawCutinArt(p, this.banner);
-    }
     g.flushPix();
 
     const ctx = g.ctx;
@@ -670,8 +666,9 @@ export class BattleScene {
     this.drawOffscreen(ctx);
     this.fx.drawUI(ctx, 'screen');
     this.drawHUD(ctx);
+    this.drawSkillBar(ctx);
     this.drawCombo(ctx);
-    if (this.banner) this.drawCutinText(ctx, this.banner);
+    if (this.banner) this.drawBanner(ctx, this.banner);
     if (this.announce) this.drawAnnounce(ctx);
     if (this.paused) this.drawPause(ctx);
   }
@@ -918,82 +915,101 @@ export class BattleScene {
     ctx.restore();
   }
 
-  // 大絕橫幅：頭像＋金句，從血條下方滑過（不擋中間的打鬥）
+  // 大絕橫幅：頭像＋金句，暫時蓋在最上面的血條區，完全不擋中間的打鬥
   bannerOffset(ci) {
     const p = ci.t / ci.dur;
-    if (p < 0.1) return -(1 - easeOut(p / 0.1)) * 1200;
-    if (p > 0.85) return easeIn((p - 0.85) / 0.15) * 1200;
+    if (p < 0.1) return -(1 - easeOut(p / 0.1)) * 1300;
+    if (p > 0.85) return easeIn((p - 0.85) / 0.15) * 1300;
     return 0;
   }
-  bannerPath(ctx) {
-    ctx.beginPath();
-    ctx.moveTo(-200, 92);
-    ctx.lineTo(1160, 86);
-    ctx.lineTo(1160, 186);
-    ctx.lineTo(-200, 196);
-    ctx.closePath();
-  }
-  drawCutinArt(ctx, ci) {
+  drawBanner(ctx, ci) {
     const f = ci.f, ch = f.char;
-    const ox = this.bannerOffset(ci);
+    const ox = this.g.ox, CW = this.g.CW;
+    const H0 = 96;
     ctx.save();
-    ctx.translate(ox, 0);
-    this.bannerPath(ctx);
-    const gr = ctx.createLinearGradient(0, 86, 0, 196);
+    ctx.translate(this.bannerOffset(ci), 0);
+    ctx.beginPath();
+    ctx.moveTo(-ox - 20, 0);
+    ctx.lineTo(CW - ox + 20, 0);
+    ctx.lineTo(CW - ox + 20, H0 - 8);
+    ctx.lineTo(-ox - 20, H0);
+    ctx.closePath();
+    const gr = ctx.createLinearGradient(0, 0, 0, H0);
     gr.addColorStop(0, ch.color);
     gr.addColorStop(1, ch.color2);
-    ctx.globalAlpha = 0.88;
     ctx.fillStyle = gr;
     ctx.fill();
-    ctx.globalAlpha = 1;
     ctx.save();
     ctx.clip();
-    ctx.globalAlpha = 0.45;
+    ctx.globalAlpha = 0.4;
     ctx.fillStyle = '#fff';
-    for (const l of ci.lines) ctx.fillRect(1100 - ((ci.t * l.s + l.o) % 1500), l.y, l.l, 3);
-    ctx.globalAlpha = 1;
-    const img = ASSETS.posters[ch.id];
-    if (img) {
-      const h = 220, w = (img.width * h) / img.height;
-      ctx.drawImage(img, 180 - w / 2, 80, w, h);
-    } else {
-      drawChar(ctx, ch, { ...POSTER_POSE[ch.id] }, 190, 355, 1, 2.9, 1, false, ci.t);
-    }
+    for (const l of ci.lines) ctx.fillRect(1100 - ((ci.t * l.s + l.o) % 1500), l.y - 86, l.l, 3);
     ctx.restore();
     ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(-200, 92);
-    ctx.lineTo(1160, 86);
-    ctx.moveTo(1160, 186);
-    ctx.lineTo(-200, 196);
+    ctx.moveTo(CW - ox + 20, H0 - 8);
+    ctx.lineTo(-ox - 20, H0);
     ctx.stroke();
+    // 頭像（有 Gemini 圖就用 portraits 圖）
+    const tx = document.body.classList.contains('touch') ? 64 : 0; // 手機左上有暫停鍵
+    const px = 22 + tx, py = 8, ps = 80;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(px + ps / 2, py + ps / 2, ps / 2, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.imageSmoothingEnabled = !!ASSETS.portraits[ch.id];
+    ctx.drawImage(portrait(ch, 96), px, py, ps, ps);
+    ctx.restore();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(px + ps / 2, py + ps / 2, ps / 2, 0, Math.PI * 2);
+    ctx.stroke();
+    // 文字
+    const p = ci.t / ci.dur;
+    const pop = p < 0.2 ? 1.3 - easeOut((p - 0.08) / 0.12) * 0.3 : 1;
+    txt(ctx, `大絕・${ch.superMove.name}`, 120 + tx, 22, { size: 15, weight: 900, color: '#ffe14a', align: 'left', stroke: '#000', sw: 5 });
+    const q = `「${ch.quote}」`;
+    const size = Math.min(38, Math.floor(780 / Math.max(8, q.length * (/[a-z]/i.test(q) ? 0.62 : 1))));
+    ctx.translate(120 + tx, 58);
+    ctx.scale(pop, pop);
+    txt(ctx, q, 0, 0, { size, weight: 900, color: '#fff', align: 'left', stroke: '#000', sw: 8, shadow: ch.color2 });
     ctx.restore();
     if (ci.t < 0.08) {
-      ctx.fillStyle = `rgba(255,255,255,${0.7 * (1 - ci.t / 0.08)})`;
-      ctx.fillRect(-this.g.ox, 0, this.g.CW, 540);
+      ctx.fillStyle = `rgba(255,255,255,${0.6 * (1 - ci.t / 0.08)})`;
+      ctx.fillRect(-ox, 0, CW, 540);
     }
   }
 
-  drawCutinText(ctx, ci) {
-    const ch = ci.f.char;
-    const ox = this.bannerOffset(ci);
-    const p = ci.t / ci.dur;
-    const pop = p < 0.2 ? 1.3 - easeOut((p - 0.08) / 0.12) * 0.3 : 1;
-    ctx.save();
-    ctx.translate(ox, 0);
-    txt(ctx, `大絕・${ch.superMove.name}`, 300, 178, { size: 15, weight: 900, color: '#ffe14a', align: 'left', stroke: '#000', sw: 5 });
-    ctx.translate(590, 146);
-    ctx.rotate(-0.03);
-    ctx.scale(pop, pop);
-    const q = `「${ch.quote}」`;
-    const lines = q.length > 12 ? splitQuote(q) : [q];
-    const size = lines.length > 1 ? 27 : 36;
-    lines.forEach((ln, i) => {
-      const yy = (i - (lines.length - 1) / 2) * (size * 1.12);
-      txt(ctx, ln, 0, yy, { size, weight: 900, color: '#fff', align: 'center', stroke: '#000', sw: 8, shadow: ch.color2 });
+  // 電腦版：畫面左下顯示三個技能的冷卻倒數（手機版直接顯示在按鈕上）
+  drawSkillBar(ctx) {
+    const P = this.player;
+    if (!P || P.dead || document.body.classList.contains('touch')) return;
+    const keys = [['1', 'fwd', '防→攻'], ['2', 'up', '防↑攻'], ['3', 'down', '防↓攻']];
+    const x0 = 10 - this.g.ox, y = 496, w = 176;
+    keys.forEach(([key, k, cmd], i) => {
+      const def = specialDef(P.char.id, k);
+      if (!def) return;
+      const x = x0 + i * (w + 6);
+      const left = P.cd[k], ready = left <= 0;
+      ctx.fillStyle = 'rgba(8,8,20,0.78)';
+      ctx.fillRect(x, y, w, 36);
+      if (!ready) {
+        ctx.fillStyle = 'rgba(60,140,255,0.35)';
+        ctx.fillRect(x, y + 32, w * (1 - left / specialCD(def)), 4);
+      } else {
+        ctx.fillStyle = 'rgba(60,140,255,0.9)';
+        ctx.fillRect(x, y + 32, w, 4);
+      }
+      ctx.strokeStyle = ready ? '#7fc0ff' : '#444';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x, y, w, 36);
+      txt(ctx, key, x + 12, y + 17, { size: 14, font: 'px', align: 'center', color: '#ffd84a' });
+      txt(ctx, P.char.specials[i].name, x + 26, y + 12, { size: 14, weight: 900, color: ready ? '#fff' : '#888' });
+      txt(ctx, cmd, x + 26, y + 26, { size: 10, color: '#9aa' });
+      txt(ctx, ready ? 'OK' : left.toFixed(1), x + w - 8, y + 17, { size: ready ? 12 : 16, font: 'px', align: 'right', color: ready ? '#7fffa0' : '#fff' });
     });
-    ctx.restore();
   }
 
   drawPause(ctx) {
@@ -1014,13 +1030,4 @@ export class BattleScene {
       this.hot.add(360, y - 18, 240, 36, () => this.pauseChoose(i));
     });
   }
-}
-
-function splitQuote(q) {
-  const m = q.slice(0, -2).match(/[，,！!]/);
-  if (m) return [q.slice(0, m.index + 1), q.slice(m.index + 1)];
-  const sp = q.lastIndexOf(' ', Math.ceil(q.length / 2) + 2);
-  if (sp > 0) return [q.slice(0, sp), q.slice(sp + 1)];
-  const mid = Math.ceil(q.length / 2);
-  return [q.slice(0, mid), q.slice(mid)];
 }

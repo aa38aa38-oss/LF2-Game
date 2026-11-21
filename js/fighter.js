@@ -5,7 +5,7 @@
 //  - 可回復血量：受傷時一部分血（深紅色）會慢慢回來；血越少回氣越快
 //  - 防→方向→攻 指令技、跑步翻滾、被打飛時按跳可翻身、抓暈眩的人、撿道具
 import { ARENA, clamp, sign } from './util.js';
-import { MOVES, specialDef } from './moves.js';
+import { MOVES, specialDef, specialCD } from './moves.js';
 import { ITEM_DEFS } from './items.js';
 
 export const GRAV = 1900;
@@ -43,6 +43,8 @@ export class Fighter {
     this.hp = this.maxHp;
     this.cap = this.maxHp; // 可回復上限（深紅色那段）
     this.mp = o.mp != null ? o.mp : 30;
+    // 技能冷卻（傳說對決式）：秒數到了就能再放，不耗氣；氣只給大絕用
+    this.cd = { fwd: 0, up: 0, down: 0 };
     this.state = 'idle';
     this.stateT = 0;
     this.animT = Math.random() * 3;
@@ -103,6 +105,7 @@ export class Fighter {
     if (this.invuln > 0) this.invuln -= dt;
     if (this.armor > 0) this.armor -= dt;
     if (this.flash > 0) this.flash -= dt;
+    if (b.fightOn) for (const k in this.cd) if (this.cd[k] > 0) this.cd[k] = Math.max(0, this.cd[k] - dt);
     if (this.comboT > 0) {
       this.comboT -= dt;
       if (this.comboT <= 0) this.combo = 0;
@@ -125,13 +128,14 @@ export class Fighter {
   // 嘗試發特技。kind: 'fwd' | 'up' | 'down'
   trySpecial(b, kind) {
     const def = specialDef(this.char.id, kind);
-    if (!def || this.mp < def.cost) return false;
+    if (!def || this.cd[kind] > 0) return false;
     this.startSpecial(b, kind);
     return true;
   }
   // 讀取「防→方向→攻」或「特技鍵＋方向」
   readSpecial(b) {
     const c = this.ctrl;
+    for (const [btn, k] of [['sk1', 'fwd'], ['sk2', 'up'], ['sk3', 'down']]) if (c.pressed(btn)) return this.trySpecial(b, k);
     if (c.pressed('special')) {
       const k = c.held('up') ? 'up' : c.held('down') ? 'down' : 'fwd';
       return this.trySpecial(b, k);
@@ -315,7 +319,7 @@ export class Fighter {
     } else if (st === 'down') {
       // 倒地：時間到自動起身；按任何鍵可以提早起身
       this.invuln = 0.3;
-      const quick = T > 0.2 && b.fightOn && (c.pressed('attack') || c.pressed('jump') || c.pressed('defend') || c.pressed('special'));
+      const quick = T > 0.2 && b.fightOn && (c.pressed('attack') || c.pressed('jump') || c.pressed('defend') || c.pressed('special') || c.pressed('sk1') || c.pressed('sk2') || c.pressed('sk3'));
       if (T >= 0.6 || quick) this.setState('getup');
     } else if (st === 'getup') {
       this.invuln = 0.45;
@@ -403,7 +407,7 @@ export class Fighter {
 
   startSpecial(b, kind = 'fwd') {
     const def = specialDef(this.char.id, kind);
-    this.mp -= def.cost;
+    this.cd[kind] = specialCD(def);
     this.spKind = kind;
     this.setState('special');
     this.mv = {};

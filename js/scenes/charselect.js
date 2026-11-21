@@ -1,4 +1,6 @@
 // 選角（單挑模式會再選一次對手）
+import { specialDef, specialCD } from '../moves.js';
+const KINDS = ['fwd', 'up', 'down'];
 import { CHARS } from '../characters.js';
 import { drawChar, drawPortrait } from '../sprites.js';
 import { txt, pixelText, panel, segBar, blink, Hotspots } from '../ui.js';
@@ -126,7 +128,8 @@ export class CharSelectScene {
     });
     ch.specials.forEach((sp, i) => {
       const y = 282 + i * 38;
-      txt(ctx, sp.cmd, 630, y, { size: 13, weight: 900, color: '#8ab8ff' });
+      txt(ctx, `技${i + 1}`, 630, y, { size: 13, weight: 900, color: '#8ab8ff' });
+      txt(ctx, `冷卻 ${specialCD(specialDef(ch.id, KINDS[i]))} 秒`, 930, y, { size: 12, weight: 900, color: '#7fc0ff', align: 'right' });
       txt(ctx, sp.name, 686, y, { size: 15, weight: 900, color: '#fff' });
       txt(ctx, sp.desc, 686, y + 17, { size: 12, color: '#aaa' });
     });
@@ -139,7 +142,7 @@ export class CharSelectScene {
     const q = `「${ch.quote}」`;
     const qs = q.length > 9 ? [q.slice(0, Math.ceil(q.length / 2)), q.slice(Math.ceil(q.length / 2))] : [q];
     qs.forEach((l, i) => txt(ctx, l, 526, 400 + i * 22 - (qs.length - 1) * 8, { size: 16, weight: 900, color: '#fff', align: 'center', stroke: '#000', sw: 4 }));
-    txt(ctx, '特技：防→方向→攻（或 特技鍵＋↑↓）', 680, 456, { size: 13, color: '#8ab8ff', align: 'center' });
+    txt(ctx, '技能有冷卻秒數、不耗氣；氣集滿放大絕', 680, 456, { size: 13, color: '#8ab8ff', align: 'center' });
     txt(ctx, '← → 選擇　Enter 確定　Esc 返回', 680, 500, { size: 13, color: '#999', align: 'center' });
     if (this.flashT > 0) {
       ctx.fillStyle = `rgba(255,255,255,${this.flashT})`;

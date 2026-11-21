@@ -144,21 +144,32 @@ body.touch[data-scene='battle'] #touch {
   touch-action: none;
 }
 .tbtn.on { background: rgba(255, 216, 74, 0.6); transform: scale(0.94); }
-/* 右下技能環：攻擊鍵最大，其餘繞著它排成弧形 */
+/* 右下技能環（傳說對決式）：攻擊鍵在角落，三個技能鍵內圈、跳／防／大絕外圈 */
 .acts {
   position: absolute;
   right: max(4px, env(safe-area-inset-right));
   bottom: 4px;
-  width: 260px;
-  height: 260px;
+  width: 300px;
+  height: 290px;
   pointer-events: none;
 }
-.acts .tbtn { width: 62px; height: 62px; }
+.acts .tbtn { width: 56px; height: 56px; font-size: 18px; }
 .acts .atk { right: 8px; bottom: 8px; width: 86px; height: 86px; font-size: 28px; background: rgba(255, 90, 60, 0.35); }
-.acts .jmp { right: 118px; bottom: 12px; }
-.acts .def { right: 92px; bottom: 88px; }
-.acts .spe { right: 14px; bottom: 116px; background: rgba(60, 140, 255, 0.32); }
-.acts .sup { right: 100px; bottom: 166px; width: 66px; height: 66px; background: rgba(120, 100, 40, 0.35); }
+.acts .sk { width: 60px; height: 60px; background: rgba(60, 140, 255, 0.32); overflow: hidden; flex-direction: column; }
+.acts .sk1 { right: 121px; bottom: 21px; }
+.acts .sk2 { right: 92px; bottom: 92px; }
+.acts .sk3 { right: 21px; bottom: 121px; }
+.acts .jmp { right: 195px; bottom: 0px; }
+.acts .def { right: 175px; bottom: 111px; }
+.acts .sup { right: 84px; bottom: 180px; width: 66px; height: 66px; background: rgba(120, 100, 40, 0.35); }
+.sk .nm { font-size: 13px; line-height: 1.15; text-align: center; position: relative; z-index: 1; }
+/* 冷卻中：暗色扇形倒數＋大數字 */
+.sk.cd { background: conic-gradient(rgba(0, 0, 0, 0.72) calc(var(--p, 0) * 360deg), rgba(60, 140, 255, 0.25) 0); border-color: rgba(255, 255, 255, 0.2); }
+.sk.cd .nm { opacity: 0.35; }
+.sk .cdn { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; font-size: 24px; color: #fff; z-index: 2; }
+.sk.cd .cdn { display: flex; }
+.sk.flashready { animation: skready 0.35s; }
+@keyframes skready { from { box-shadow: 0 0 22px #9fd4ff; transform: scale(1.12); } to { box-shadow: none; transform: scale(1); } }
 .acts .sup.ready { background: rgba(255, 200, 40, 0.75); box-shadow: 0 0 18px #ffd84a; animation: pulse 0.6s infinite alternate; }
 @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
 .tbtn.pause {

@@ -164,11 +164,11 @@ export class AI {
       return;
     }
     // 特技
-    if (f.mp >= 25 && f.mp < 70 && Math.random() < this.p.special * 0.7) {
+    if (Math.random() < this.p.special * 0.7) {
       const ok = [];
       for (const k of KINDS) {
         const sp = specialDef(f.char.id, k);
-        if (!sp || f.mp < sp.cost + 5) continue;
+        if (!sp || f.cd[k] > 0) continue;
         let good = false;
         if (sp.ai === 'proj') good = adz < 22 && adx > 90 && adx < 480;
         else if (sp.ai === 'close') good = adx < (sp.range || 120) && adz < 26;

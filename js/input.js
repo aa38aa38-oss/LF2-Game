@@ -11,6 +11,8 @@ const KEYMAP = {
   KeyL: 'defend', KeyX: 'defend',
   KeyU: 'special', KeyC: 'special',
   KeyI: 'super', KeyV: 'super',
+  Digit1: 'sk1', Digit2: 'sk2', Digit3: 'sk3',
+  Numpad1: 'sk1', Numpad2: 'sk2', Numpad3: 'sk3',
   Enter: 'start', NumpadEnter: 'start',
   KeyP: 'pause', Escape: 'pause',
   KeyM: 'mute',
