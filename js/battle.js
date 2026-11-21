@@ -602,7 +602,7 @@ export class BattleScene {
     }
     const z = this.zoom, cam = this.cam, vw = this.viewW;
     const worldT = (c, k) => c.setTransform(k * z, 0, 0, k * z, k * (-cam.x * z + sx), k * (-cam.y * z + sy));
-    worldT(p, 0.5);
+    worldT(p, g.pixScale);
     this.stage.draw(p, this.time, cam.x - 10, cam.x + vw + 10);
     for (const f of this.fighters) drawShadow(p, f.x, f.z, f.y);
     for (const pr of this.projs) if (pr.trap || pr.gravity) drawShadow(p, pr.x, pr.z, pr.y, 10);

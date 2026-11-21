@@ -3,7 +3,7 @@ import { specialDef, specialCD } from './moves.js';
 import { W, H, store } from './util.js';
 import { Input } from './input.js';
 import { Sound } from './audio.js';
-import { loadAssets } from './assets.js';
+import { loadAssets, ASSETS } from './assets.js';
 import { clearTextCache, txt } from './ui.js';
 import { BattleScene } from './battle.js';
 import { IntroScene } from './scenes/intro.js';
@@ -24,6 +24,7 @@ class Game {
     this.canvas.height = H;
     this.ctx = this.canvas.getContext('2d');
     this.pixCanvas = document.createElement('canvas');
+    this.pixScale = 0.5; // 像素層解析度（0.5＝像素風；用插畫風角色圖時改 1）
     this.pixCanvas.width = W / 2;
     this.pixCanvas.height = H / 2;
     this.pix = this.pixCanvas.getContext('2d');
@@ -76,13 +77,19 @@ class Game {
     if (cw === this.CW) return;
     this.CW = cw;
     this.canvas.width = cw;
-    this.pixCanvas.width = cw / 2;
+    this.pixCanvas.width = cw * this.pixScale;
+  }
+  setPixScale(s) {
+    this.pixScale = s;
+    this.pixCanvas.width = this.CW * s;
+    this.pixCanvas.height = H * s;
   }
   beginPix(full = false) {
     const p = this.pix;
     p.setTransform(1, 0, 0, 1, 0, 0);
-    p.clearRect(0, 0, this.CW / 2, H / 2);
-    p.setTransform(0.5, 0, 0, 0.5, full ? 0 : this.ox / 2, 0);
+    const s = this.pixScale;
+    p.clearRect(0, 0, this.CW * s, H * s);
+    p.setTransform(s, 0, 0, s, full ? 0 : this.ox * s, 0);
     return p;
   }
   flushPix() {
@@ -268,6 +275,7 @@ async function boot() {
     /* 字型載入失敗就用系統字 */
   }
   await loadAssets();
+  if (ASSETS.hiRes) game.setPixScale(1);
   clearTextCache();
   document.fonts && document.fonts.ready.then(() => clearTextCache());
   game.goIntro();

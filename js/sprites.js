@@ -784,7 +784,7 @@ export function drawFighter(ctx, f, alpha = 1) {
   let img = f.state === 'special' ? charFrame(f.char.id, 'special_' + (f.spKind || 'fwd'), f.stateT, 10, false) : null;
   if (!img) img = charFrame(f.char.id, anim, loop ? f.animT : f.stateT, 10, loop);
   if (img) {
-    const h = 128, w = (img.width * h) / img.height;
+    const h = ASSETS.spriteH || 128, w = (img.width * h) / img.height;
     ctx.save();
     ctx.translate(sx, sy);
     ctx.scale(f.facing, 1);

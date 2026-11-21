@@ -4,5 +4,8 @@
   "characters": {},
   "posters": {},
   "portraits": {},
+  "select": {
+    "han": "assets/select/han.png"
+  },
   "stages": {}
 }

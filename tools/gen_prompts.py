@@ -4,21 +4,44 @@
 """
 import json, sys, html, pathlib
 
-STYLE = ("16-bit pixel art, retro arcade beat 'em up game art, adult body proportions about 5 heads tall (head about one fifth of body height, NOT chibi, NOT big-headed), detailed caricature face that keeps the real likeness, "
-         "thick dark outlines, vibrant saturated colors, cel shading, comedic cartoon style, original video game character")
+# 畫風：照使用者在 Gemini 做出、確定喜歡的「諷刺漫畫插畫風」（發大財議長那張立繪）
+STYLE = ("clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, "
+         "realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), "
+         "caricature face that keeps a strong likeness, light-hearted video game character art")
 SPRITE_END = ("side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, "
               "character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, "
               "plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders")
 # 注意：Gemini 會擋「真實姓名＋真人照片」的圖，也會擋「真人被打」的畫面。
-# 所以生圖 prompt 一律不寫姓名，只說「附件設定圖裡的卡通角色」，動作描述也寫成卡通搞笑風。
-REF_NOTE = ("Attached image: this character's reference sheet. Draw exactly this same cartoon character, "
-            "matching the face, hairstyle, glasses, outfit and colors of the reference sheet.")
+# 所以生圖 prompt 一律不寫姓名，只說「附件圖裡的角色」，動作描述也寫成卡通搞笑風。
+REF_NOTE = ("Use the attached images (this character's full-body illustration and three-view sheet) as the exact reference: "
+            "same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style.")
 
 def who(c):
-    return f"the cartoon game character from the attached reference sheet ({c['face']}; {c['desc']})"
+    return "the character from the attached reference images"
+
+BRIEF = """我正在做一款原創的網頁格鬥小遊戲，類型是 2.5D 橫向清版亂鬥（像經典街機的多人亂鬥遊戲），風格是輕鬆搞笑的政治諷刺漫畫。接下來我會請你幫我畫遊戲角色的美術素材，請先記住以下規則，之後每一張圖都要遵守：
+
+【美術風格】
+- 乾淨的手繪諷刺漫畫插畫風：粗黑外框線、平塗上色加簡單陰影
+- 正常成人比例，大約六頭身，不要 Q 版、不要大頭
+- 臉要保留本人的臉型、五官比例、髮際線和招牌表情，只把最有特色的地方稍微誇張，看一眼就要認得出是誰
+
+【圖片規格】
+- 背景一律是純綠色 #00FF00（遊戲會自動去背），角色身上不要用亮綠色
+- 角色一律「側面、面向右邊」、全身、腳底貼齊圖片下緣
+- 動作圖是「動作條」：同一個角色的連續動作，由左到右排成一列，每一格一樣寬、角色大小一樣、位置置中，格子之間不要畫框線
+- 圖上不要有任何文字、數字、浮水印、地面陰影
+- 動作要誇張好懂；被打、倒地這類動作要畫成搞笑的卡通反應（驚訝表情、頭上冒星星），不要畫成真的受傷
+
+【一致性】
+- 我會上傳這個角色的全身立繪和三視圖，每一張都要和它的臉、髮型、服裝、配色、身材比例、畫風完全一樣
+- 一次只畫一張圖，畫完等我確認再畫下一張
+
+"""
 
 CHARS = [
-  dict(id='su', title='衝衝院長', quote='在那叫什麼！', color='orange and dark brown',
+  dict(id='su', brief='這次要畫的角色叫「衝衝院長」，個性急躁、衝勁十足，招牌台詞是「在那叫什麼！」。外型：光亮的大光頭（頭頂有反光亮點）、細方框金屬眼鏡、又粗又斜的濃眉、銳利的眼神、深灰西裝、白襯衫、灰藍領帶、黑皮鞋。招式：光頭反光閃到人、往上衝的頭槌、低頭往前衝撞。大絕是連續三段暴衝，全身冒橘色火焰氣場。',
+    title='衝衝院長', quote='在那叫什麼！', color='orange and dark brown',
     zh='蘇貞昌', en='Su Tseng-chang', role='former Premier of Taiwan',
     face='completely bald shiny head, rectangular metal-frame glasses, thick dark slanted eyebrows, narrow intense eyes, deep smile lines, determined clenched jaw',
     desc='a bald elderly Taiwanese politician with a very shiny bald head and a bright white highlight, rectangular metal-frame glasses, thick dark stern eyebrows, dark charcoal suit, white shirt, grey-blue tie, black shoes, fierce hot-tempered energetic attitude',
@@ -30,7 +53,8 @@ CHARS = [
     ],
     poster="shouting furiously with mouth wide open behind the mask, leaning toward the viewer, one fist punching toward the camera, bald head gleaming",
     victory="arms crossed, chin up, bald head shining, proud stern look"),
-  dict(id='wang', title='堅哥', quote='Over my dead body！', color='gold and black',
+  dict(id='wang', brief='這次要畫的角色叫「堅哥」，情緒激動、熱血又戲劇化，招牌台詞是「Over my dead body！」。外型：及肩的黑色直長髮往後梳、粗黑眉、激動有神的大眼睛、黑西裝、白襯衫、黑領帶。招式：激動用手指指人並發出音波、雙手拍桌震出衝擊波、躺在地上抗議不走。大絕是張開雙臂怒吼，身上冒出金色光柱和震波。',
+    title='堅哥', quote='Over my dead body！', color='gold and black',
     zh='王世堅', en='Wang Shih-chien', role='Taiwanese legislator',
     face='shoulder-length straight black hair combed back behind the ears, long oval face, thick dark eyebrows, wide intense passionate eyes, prominent cheekbones',
     desc='a middle-aged Taiwanese politician with shoulder-length straight black hair combed back, thick dark eyebrows, intense passionate eyes, black suit, white shirt, black tie, very emotional dramatic expression',
@@ -42,10 +66,11 @@ CHARS = [
     ],
     poster="pointing his finger straight at the viewer, shouting with fiery passion, hair flowing dramatically, golden light behind him",
     victory="fist raised high, eyes closed, deeply moved and emotional, tears of passion"),
-  dict(id='han', title='發大財議長', quote='放馬過來，林北蛋你！', color='royal blue and navy',
+  dict(id='han', brief='這次要畫的角色叫「發大財議長」，圓臉、親切、笑口常開，招牌台詞是「放馬過來，林北蛋你！」。外型：頭頂禿、兩側短灰髮、寬圓臉、笑起來眼睛瞇成彎月形、咧嘴大笑、淺藍襯衫捲起袖子、黑皮帶、深藍長褲、黑皮鞋，招式會拿木製議事槌。招式：議事槌敲地震波、丟出水果貨箱、吃一碗滷肉飯回血。大絕是舉起雙手大笑，天上掉下金幣和金元寶。',
+    title='發大財議長', quote='放馬過來，林北蛋你！', color='royal blue and navy',
     zh='韓國瑜', en='Han Kuo-yu', role='Speaker of the Legislative Yuan of Taiwan',
     face='bald crown with short grey hair only on the sides and back, big round face, small smiling eyes, wide warm grin, full cheeks',
-    desc="a chubby round-faced elderly Taiwanese politician, bald on top with short grey hair on the sides, big warm friendly grin, white dress shirt with rolled-up sleeves, slight round belly, dark navy trousers, brown shoes, holding a wooden judge's gavel",
+    desc="a chubby round-faced elderly Taiwanese politician, bald on top with short grey hair on the sides, big warm friendly grin, light blue dress shirt with rolled-up sleeves, black belt, slight round belly, dark navy trousers, black shoes, holding a wooden judge's gavel",
     skills=[
       ('special_fwd', '技1 議事槌', 4, "raising a giant wooden gavel high overhead with both hands, then slamming it onto the ground, a shockwave and dust burst"),
       ('special_up', '技2 貨出得去', 4, "lifting a big cardboard fruit shipping crate and hurling it forward with both hands"),
@@ -54,7 +79,8 @@ CHARS = [
     ],
     poster="laughing heartily, raising a wooden gavel high, gold coins flying in the air, cheerful but daring expression",
     victory="giving a big thumbs up with a wide grin, gold coins sparkling"),
-  dict(id='ma', title='慢跑總統', quote='我是很喜歡吃香蕉的人', color='sky blue and white',
+  dict(id='ma', brief='這次要畫的角色叫「慢跑總統」，斯文有禮、愛慢跑、愛吃香蕉，招牌台詞是「我是很喜歡吃香蕉的人」。外型：身材瘦、整齊的深色旁分頭髮、溫和有禮的微笑、額頭戴紅白色運動頭帶、藍邊白色運動 T 恤、藍色運動短褲、白色慢跑鞋。招式：丟香蕉皮讓人滑倒、香蕉迴力鏢、輕快慢跑閃避。大絕是邊慢跑邊把一大堆香蕉拋向空中。',
+    title='慢跑總統', quote='我是很喜歡吃香蕉的人', color='sky blue and white',
     zh='馬英九', en='Ma Ying-jeou', role='former President of Taiwan',
     face='neat dark side-parted hair, slim oval face, gentle polite smile, soft eyes, clean-shaven, slim build',
     desc='a slim elderly Taiwanese gentleman with neat dark side-parted hair, gentle polite smile, red-and-white sweatband on his forehead, white running t-shirt with blue trim, blue running shorts, white running shoes, athletic jogger',
@@ -66,7 +92,8 @@ CHARS = [
     ],
     poster="smiling politely while holding up a yellow banana next to his face, sweatband on, jogging pose",
     victory="jogging in place happily, waving with one hand, holding a banana in the other"),
-  dict(id='ko', title='阿北', quote='賴祥德，沒有用的！', color='teal and dark green',
+  dict(id='ko', brief='這次要畫的角色叫「阿北」，以前是外科醫師，總是面無表情、講話很直，招牌台詞是「賴祥德，沒有用的！」。外型：灰色短髮、細金屬框眼鏡、寬臉、嘴巴抿成一直線的撲克臉、深藍西裝外套、淺藍色開領襯衫不打領帶、深色長褲。招式：射出三把手術刀、用電擊器電人、騎公路車衝刺。大絕是全身冒出綠色治療光芒，再舉起雙手召喚藍色閃電。',
+    title='阿北', quote='賴祥德，沒有用的！', color='teal and dark green',
     zh='柯文哲', en='Ko Wen-je', role='former Taipei mayor and surgeon',
     face='short grey hair, thin metal-frame glasses, wide flat face, straight mouth, deadpan expression, slightly heavy-lidded eyes',
     desc='a Taiwanese politician and former surgeon with short grey hair, thin metal-frame glasses, deadpan expressionless face, dark navy suit jacket over a light blue open-collar shirt with no tie, dark trousers, black shoes',
@@ -78,7 +105,8 @@ CHARS = [
     ],
     poster="deadpan expression, pushing up his glasses with one finger, the glasses glinting, holding a scalpel",
     victory="adjusting his glasses with a tiny satisfied smirk, arms behind his back"),
-  dict(id='guan', title='館長', quote='RRR！幫我開直播！', color='red and dark maroon',
+  dict(id='guan', brief='這次要畫的角色叫「館長」，超大隻的健身房老闆兼直播主，脾氣火爆，招牌台詞是「RRR！幫我開直播！」。外型：光頭、濃密的黑色大鬍子、粗眉、兇狠的眼神、粗脖子、黑色背心、超大的手臂肌肉、迷彩綠工作褲、黑靴子。招式：過肩摔、跳起來的上勾拳、丟出大啞鈴。大絕是舉起手機開直播（手機上有紅色 LIVE 燈），接著連續狂打，拳頭殘影一大堆。',
+    title='館長', quote='RRR！幫我開直播！', color='red and dark maroon',
     zh='館長 陳之漢', en="Chen Chih-han (the YouTuber known as 'Guan Zhang')", role='Taiwanese gym owner and livestreamer',
     face='shaved bald head, thick full black beard, heavy brow, fierce glaring eyes, thick neck',
     desc='a huge muscular bald Taiwanese man with a thick full black beard, fierce glaring eyes, black tank top, enormous muscular arms, camo green cargo pants, black boots',
@@ -118,46 +146,45 @@ ATTACK_OVERRIDE = {
 }
 
 def sprite(c, name, frames, action, extra=''):
-    return (f"{STYLE}, sprite sheet of {who(c)}, {action}, {frames} frames arranged in a single horizontal row from left to right"
-            f"{extra}, {SPRITE_END}. {REF_NOTE}")
+    return (f"{REF_NOTE} Draw a sprite strip of this character for a 2D fighting game: {action}. "
+            f"{frames} frames arranged in a single horizontal row from left to right{extra}, {SPRITE_END}. Art style: {STYLE}.")
 
 def char_sections(c):
     items = []
-    items.append(dict(group='第一步：讓 Gemini 上網找照片（純文字對話，不是生圖）', name='找照片＋整理長相特徵',
-        file='（不用存檔：把找到的 2～3 張清楚照片下載下來，下一步要上傳）', size='文字回答',
-        prompt=(f"請用 Google 搜尋{c['zh']}（{c['en']}）近幾年清楚的照片：至少一張正面、一張側面或半側面、一張全身照。"
-                f"請列出照片連結，並用英文條列他的長相特徵（臉型、髮型與髮色、眼鏡、眉毛、眼睛、嘴型與招牌表情、體型、常見穿著），"
-                f"我要拿來畫成 Q 版像素風的遊戲角色漫畫，所以請特別指出最有辨識度、可以誇張化的 3 個特徵。")))
-    base_sheet = (f"Three views side by side: front view, side view facing right, back view, full body, the same character in all views, "
-                  f"plain solid pure green background (#00FF00), no text.")
+    G0 = '第零步：每次開新對話，先貼這段'
+    G1 = '第一步：角色立繪（上傳 2～3 張照片＋貼這段）'
+    G2 = '第二步：三視圖（上傳第一步的立繪）'
+    items.append(dict(group=G0, name='遊戲說明＋這個角色的說明', file='（不用存檔）', size='文字',
+        prompt=BRIEF + c['brief'] + "\n\n如果了解了，請回答「了解」，然後等我上傳圖片和下一步的指示。"))
     feat = f"{c['face']}; {c['desc']}"
-    items.append(dict(group='第二步：角色設定圖（擇一；做好後，之後每張圖都只上傳這張）', name='做法 A：上傳 2～3 張照片＋貼這段',
-        file=f"assets/ref/{c['id']}.png（自己留著當參考，不用放進遊戲）", size='16:9 橫式',
-        prompt=(f"{STYLE}. Create an original pixel-art video game character design inspired by the hairstyle, face shape, glasses and outfit "
-                f"in the attached photos, exaggerated in a funny cartoon way: {feat}. Make the most distinctive features big and clear so the "
-                f"character still reads well as a small sprite. Character reference sheet. {base_sheet}")))
-    items.append(dict(group='第二步：角色設定圖（擇一；做好後，之後每張圖都只上傳這張）', name='做法 B：A 被拒絕時用（不上傳照片）',
-        file=f"assets/ref/{c['id']}.png（自己留著當參考，不用放進遊戲）", size='16:9 橫式',
-        prompt=(f"{STYLE}. Character reference sheet of an original pixel-art video game character: {feat}. "
-                f"Make the most distinctive features big and clear so the character still reads well as a small sprite, but keep normal adult body proportions (about 5 heads tall). {base_sheet}")))
+    items.append(dict(group=G1, name='做法 A：上傳照片（畫法跟發大財議長那張一樣）', file=f"assets/select/{c['id']}.png（這張也直接當選角立繪）",
+        size='直式 2:3（800×1200）',
+        prompt=("請參考附上的照片，畫一張這個角色的「諷刺漫畫風」全身立繪：乾淨的手繪漫畫插畫風（不是像素風），正常成人比例約六頭身，不要大頭。\n"
+                "畫之前，請先用文字列出照片中最能認出他的 5 個特徵（臉型、髮際線與髮型、眼睛形狀、笑容或招牌表情、體型），畫的時候這 5 點要明顯保留，並稍微誇張化。\n"
+                "服裝照我在角色說明裡寫的。三分之四側面、面向右，全身，腳底貼齊下緣，純綠色 #00FF00 背景，沒有文字。")))
+    items.append(dict(group=G1, name='做法 B：A 被拒絕時用（開新對話、不上傳照片）', file=f"assets/select/{c['id']}.png", size='直式 2:3（800×1200）',
+        prompt=(f"Full body character illustration, three-quarter view facing right, feet touching the bottom edge: {feat}. "
+                f"Art style: {STYLE}. Plain solid pure green background (#00FF00), no text.")))
+    items.append(dict(group=G1, name='不夠像時接著貼（把【】改成哪裡不像）', file='（同一張，修好再存）', size='—',
+        prompt="還不夠像。請再對照一次照片，先用文字列出你這張和照片最不像的 3 個地方，再修正。特別注意：【例如：臉要更寬、眼睛笑成彎月形、眉毛更粗更斜、頭髮更灰】。其他保持不變：畫風、服裝、六頭身比例、純綠背景。"))
+    items.append(dict(group=G2, name='三視圖設定圖', file=f"assets/ref/{c['id']}.png（自己留著當參考，不用放進遊戲）", size='16:9 橫式',
+        prompt=("請用附上這張立繪的角色，畫成「角色三視圖設定圖」：完全保留臉的長相、表情、服裝、配色、身材比例和畫風。"
+                "正面、面向右的側面、背面三個角度並排，全身，腳底對齊，純綠色 #00FF00 背景，沒有文字。")))
     for key, zh, n, act in BASIC:
         a = ATTACK_OVERRIDE.get(c['id'], {}).get(key, act)
         if key == 'victory':
             a = f"victory pose animation: {c['victory']}"
-        items.append(dict(group='基本動作', name=f"{zh}", file=f"assets/characters/{c['id']}/{key}.png", frames=n,
+        items.append(dict(group='基本動作（每張都上傳立繪＋三視圖，一次只生一張）', name=f"{zh}", file=f"assets/characters/{c['id']}/{key}.png", frames=n,
             size=f"{n} 格橫排（每格 512×512，整張 {512*n}×512）", prompt=sprite(c, key, n, a)))
     for key, zh, n, act in c['skills']:
-        items.append(dict(group='技能與大絕動作', name=zh, file=f"assets/characters/{c['id']}/{key}.png", frames=n,
+        items.append(dict(group='技能與大絕動作（同上）', name=zh, file=f"assets/characters/{c['id']}/{key}.png", frames=n,
             size=f"{n} 格橫排（每格 512×512，整張 {512*n}×512）", prompt=sprite(c, key, n, act)))
-    items.append(dict(group='畫面用圖', name='頭像（血條、選角卡片、大絕橫幅的圓形頭像）', file=f"assets/portraits/{c['id']}.png", frames=None,
+    items.append(dict(group='畫面用圖（同上）', name='頭像（血條、選角卡片、大絕橫幅的圓形頭像）', file=f"assets/portraits/{c['id']}.png", frames=None,
         size='正方形 1:1（512×512）',
-        prompt=f"{STYLE}, head and shoulders portrait of {who(c)}, facing slightly right, expressive face, simple {c['color']} gradient background, square image, character fills the frame, no text. {REF_NOTE}"))
-    items.append(dict(group='畫面用圖', name=f"大絕金句橫幅（放大絕時上方跳出，遊戲會在右邊疊上「{c['quote']}」）", file=f"assets/posters/{c['id']}.png", frames=None,
+        prompt=f"{REF_NOTE} Draw a head and shoulders portrait of this character, facing slightly right, expressive face, simple {c['color']} gradient background, square image, the face fills most of the frame, no text. Art style: {STYLE}."))
+    items.append(dict(group='畫面用圖（同上）', name=f"大絕金句橫幅（放大絕時上方跳出，遊戲會在右邊疊上「{c['quote']}」）", file=f"assets/posters/{c['id']}.png", frames=None,
         size='超寬橫式 4:1（1600×400）',
-        prompt=f"{STYLE}, fighting game super move cut-in banner, extreme close-up of the face of {who(c)}, {c['poster']}, face placed in the LEFT third of the image, the right two thirds is empty plain green for text, dramatic speed lines behind the face, very wide 4:1 horizontal strip, plain solid pure green background (#00FF00), no text. {REF_NOTE}"))
-    items.append(dict(group='畫面用圖', name='選角／VS 畫面全身立繪', file=f"assets/select/{c['id']}.png", frames=None,
-        size='直式 2:3（800×1200）',
-        prompt=f"{STYLE}, full body character select illustration of {who(c)}, heroic confident pose facing slightly right, dynamic low angle, larger and more detailed than a sprite, feet touching the bottom edge, plain solid pure green background (#00FF00), no text. {REF_NOTE}"))
+        prompt=f"{REF_NOTE} Draw a fighting game super move cut-in banner: extreme close-up of this character's face, {c['poster']}, the face placed in the LEFT third of the image, the right two thirds left as empty plain green for text, dramatic speed lines behind the face, very wide 4:1 horizontal strip, plain solid pure green background (#00FF00), no text. Art style: {STYLE}."))
     return items
 
 COMMON = [
@@ -200,13 +227,13 @@ def write_md(data, path):
     L.append("# Gemini 生圖 Prompt（可直接複製貼上）\n")
     L.append("> 這份是 `tools/gen_prompts.py` 自動產生的，要改內容請改那支程式再重跑。\n")
     L.append("## 怎麼用\n")
-    L.append("**Gemini 會擋兩種圖**：①prompt 寫真實姓名、又上傳真人照片；②真人「被打」的畫面。所以這版的生圖 prompt **都不寫姓名**，只說「附件設定圖裡的卡通角色」，被打、倒地也改成卡通搞笑的說法。\n")
-    L.append("1. **第一步（找照片，可略過）**：在 Gemini 一般文字對話貼上「找照片」那段，讓它找照片並整理長相特徵。把 2～3 張清楚照片下載下來。")
-    L.append("2. **第二步（設定圖）**：**開一個新對話**，上傳照片，貼「做法 A」。被拒絕就再開新對話，改用「做法 B」（不上傳照片，只靠文字描述）。多生幾次，挑最像的一張存起來。")
-    L.append("3. **之後每一張圖：只上傳設定圖（不要再傳真人照片），一次只貼一段 prompt、一次只生一張。** 不要叫 Gemini 一次排很多步驟連續生，中間一張被擋就會整批卡住。")
-    L.append("4. 某一張被拒絕時：**開新對話**，重新上傳設定圖，再貼那一張的 prompt。被拒絕過的對話，後面常常會一直被擋。")
-    L.append("5. 動作圖是「一整條動作條」：一張圖裡由左到右排好幾格。格子要等寬，遊戲會自動平均切開。Gemini 排不整齊時，可以改成一格一張（檔名 `idle_1.png`、`idle_2.png`…）。")
-    L.append("6. 綠色背景 `#00FF00` 會被遊戲自動去背，所以角色身上不要有亮綠色。")
+    L.append("**畫風**：照發大財議長那張成功的立繪（手繪諷刺漫畫風、約六頭身）。**Gemini 會擋**：寫真實姓名又附真人照片的圖，以及真人「被打」的畫面，所以 prompt 都不寫姓名，被打、倒地也寫成卡通搞笑的反應。\n")
+    L.append("1. **每個角色開一個新對話**，先貼「第零步」（遊戲說明＋角色說明），等 Gemini 回「了解」。")
+    L.append("2. **第一步・立繪**：上傳 2～3 張清楚的照片（正面、側面、全身，自己上網找），貼「做法 A」。不夠像就貼「不夠像時」那段修。滿意後存成 `assets/select/<角色>.png`，這張直接當選角立繪。被拒絕就開新對話改用「做法 B」。")
+    L.append("3. **第二步・三視圖**：上傳立繪，貼「三視圖」。")
+    L.append("4. **之後每一張**：上傳**立繪＋三視圖**（不要再傳真人照片），一次只貼一段、只生一張。某張被拒絕就開新對話，貼第零步、上傳兩張參考圖，再貼那一張。")
+    L.append("5. 動作圖是「一整條動作條」：一張圖裡由左到右排好幾格。格子要等寬，遊戲會自動平均切開。排不整齊時，可以改成一格一張（檔名 `idle_1.png`、`idle_2.png`…）。")
+    L.append("6. 綠色背景 `#00FF00` 會被遊戲自動去背。")
     L.append("7. 生好的圖照「存檔」那欄的路徑放進 repo，再登記到 `assets/manifest.json`（最下面有範例）。一個角色的動作建議**全部生完再一起登記**，不然會圖和程式畫的混在一起。\n")
     for c in data['chars']:
         L.append(f"---\n\n## {c['title']}（`{c['id']}`）　金句：「{c['quote']}」\n")
