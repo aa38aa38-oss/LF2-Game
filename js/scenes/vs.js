@@ -1,6 +1,6 @@
 // 對戰前 VS 畫面
 import { CHAR_BY_ID } from '../characters.js';
-import { drawChar } from '../sprites.js';
+import { drawChar, drawArt } from '../sprites.js';
 import { txt, pixelText } from '../ui.js';
 import { poseOf } from './common.js';
 import { easeOut } from '../util.js';
@@ -51,9 +51,9 @@ export class VSScene {
     p.fill();
     p.fillStyle = 'rgba(255,255,255,0.12)';
     for (let i = 0; i < 20; i++) p.fillRect(((i * 97 + t * 900) % 1100) - 100, (i * 53) % 540, 120, 3);
-    drawChar(p, me, { ...poseOf(me, 'idle', t), expr: 'shout' }, -200 + k * 440, 600, 1, 4.2, 1, false, t);
+    if (!drawArt(p, me, -200 + k * 440, 620, 560, 1)) drawChar(p, me, { ...poseOf(me, 'idle', t), expr: 'shout' }, -200 + k * 440, 600, 1, 4.2, 1, false, t);
     if (foes.length === 1) {
-      drawChar(p, foes[0], { ...poseOf(foes[0], 'idle', t), expr: 'shout' }, 1160 - k * 440, 600, -1, 4.2, 1, false, t);
+      if (!drawArt(p, foes[0], 1160 - k * 440, 620, 560, -1)) drawChar(p, foes[0], { ...poseOf(foes[0], 'idle', t), expr: 'shout' }, 1160 - k * 440, 600, -1, 4.2, 1, false, t);
     } else if (foes.length) {
       foes.forEach((f, i) => drawChar(p, f, poseOf(f, 'idle', t + i), 1100 - k * (420 - i * 110), 560 - i * 40, -1, 2.4, 1, false, t));
     }

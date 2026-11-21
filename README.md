@@ -70,7 +70,7 @@ repo 根目錄已經放了 `.nojekyll`，GitHub 不會亂處理檔案。
 
 ## 換成 Gemini 生成的美術圖
 
-目前所有角色、背景、大絕海報都是**程式畫的暫時素材**。生圖規格、檔名、每個角色每個動作的 prompt 都在 [`docs/ART_PROMPTS.md`](docs/ART_PROMPTS.md)。
+目前所有角色、背景、大絕海報都是**程式畫的暫時素材**。生圖規格、檔名、每個角色每個動作的 prompt 都在 [`docs/GEMINI_PROMPTS.md`](docs/GEMINI_PROMPTS.md)。
 
 圖放進 `assets/` 之後，在 `assets/manifest.json` 登記，遊戲就會自動改用圖檔；沒登記的部分繼續用程式畫的。
 

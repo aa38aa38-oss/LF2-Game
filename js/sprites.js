@@ -780,7 +780,9 @@ export function drawFighter(ctx, f, alpha = 1) {
   const sx = f.x, sy = ARENA.floorY + f.z - f.y;
   const anim = ANIM_MAP[f.state] || 'idle';
   const loop = LOOP_ANIMS.has(anim);
-  const img = charFrame(f.char.id, anim, loop ? f.animT : f.stateT, 10, loop);
+  // 三招技能可以各有一組圖（special_fwd / special_up / special_down），沒有就用共用的 special
+  let img = f.state === 'special' ? charFrame(f.char.id, 'special_' + (f.spKind || 'fwd'), f.stateT, 10, false) : null;
+  if (!img) img = charFrame(f.char.id, anim, loop ? f.animT : f.stateT, 10, loop);
   if (img) {
     const h = 128, w = (img.width * h) / img.height;
     ctx.save();
@@ -821,6 +823,19 @@ export function drawShadow(ctx, x, z, y, w = 26) {
   ctx.beginPath();
   ctx.ellipse(x, sy, w * s, 7 * s, 0, 0, Math.PI * 2);
   ctx.fill();
+}
+
+// 選角／VS 畫面的全身立繪（有登記 select 圖才會用），腳底對齊 (x, y)
+export function drawArt(ctx, ch, x, y, h, facing = 1) {
+  const img = ASSETS.select[ch.id];
+  if (!img) return false;
+  const w = (img.width * h) / img.height;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(facing, 1);
+  ctx.drawImage(img, -w / 2, -h, w, h);
+  ctx.restore();
+  return true;
 }
 
 // ---------- 頭像 ----------

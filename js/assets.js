@@ -2,7 +2,7 @@
 // assets/manifest.json 有列出的圖就用圖，沒有就用程式畫的暫時素材。
 // 素材規格與命名請看 docs/ART_PROMPTS.md
 
-export const ASSETS = { chars: {}, posters: {}, portraits: {}, stages: {} };
+export const ASSETS = { chars: {}, posters: {}, portraits: {}, stages: {}, select: {} };
 
 function chroma(img, hex, tol) {
   const c = document.createElement('canvas');
@@ -78,7 +78,7 @@ export async function loadAssets() {
       }
     }
   }
-  for (const group of ['posters', 'portraits', 'stages']) {
+  for (const group of ['posters', 'portraits', 'stages', 'select']) {
     for (const [id, path] of Object.entries(man[group] || {})) {
       const ck = group === 'stages' ? null : key;
       jobs.push(loadImg(path, ck, tol).then((im) => im && (ASSETS[group][id] = im)));

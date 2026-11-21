@@ -951,28 +951,45 @@ export class BattleScene {
     ctx.moveTo(CW - ox + 20, H0 - 8);
     ctx.lineTo(-ox - 20, H0);
     ctx.stroke();
-    // 頭像（有 Gemini 圖就用 portraits 圖）
+    // 有 Gemini 的「大絕特寫圖」（posters，4:1 橫幅）就用它；沒有就用圓形頭像
     const tx = document.body.classList.contains('touch') ? 64 : 0; // 手機左上有暫停鍵
-    const px = 22 + tx, py = 8, ps = 80;
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(px + ps / 2, py + ps / 2, ps / 2, 0, Math.PI * 2);
-    ctx.clip();
-    ctx.imageSmoothingEnabled = !!ASSETS.portraits[ch.id];
-    ctx.drawImage(portrait(ch, 96), px, py, ps, ps);
-    ctx.restore();
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.arc(px + ps / 2, py + ps / 2, ps / 2, 0, Math.PI * 2);
-    ctx.stroke();
+    const cut = ASSETS.posters[ch.id];
+    let textX = 120 + tx;
+    if (cut) {
+      const w = (cut.width * H0) / cut.height;
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(-ox - 20, 0);
+      ctx.lineTo(CW - ox + 20, 0);
+      ctx.lineTo(CW - ox + 20, H0 - 8);
+      ctx.lineTo(-ox - 20, H0);
+      ctx.clip();
+      ctx.drawImage(cut, tx, 0, w, H0);
+      ctx.restore();
+      textX = tx + w - 30;
+    } else {
+      const px = 22 + tx, py = 8, ps = 80;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(px + ps / 2, py + ps / 2, ps / 2, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.imageSmoothingEnabled = !!ASSETS.portraits[ch.id];
+      ctx.drawImage(portrait(ch, 96), px, py, ps, ps);
+      ctx.restore();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(px + ps / 2, py + ps / 2, ps / 2, 0, Math.PI * 2);
+      ctx.stroke();
+    }
     // 文字
     const p = ci.t / ci.dur;
     const pop = p < 0.2 ? 1.3 - easeOut((p - 0.08) / 0.12) * 0.3 : 1;
-    txt(ctx, `大絕・${ch.superMove.name}`, 120 + tx, 22, { size: 15, weight: 900, color: '#ffe14a', align: 'left', stroke: '#000', sw: 5 });
+    txt(ctx, `大絕・${ch.superMove.name}`, textX, 22, { size: 15, weight: 900, color: '#ffe14a', align: 'left', stroke: '#000', sw: 5 });
     const q = `「${ch.quote}」`;
-    const size = Math.min(38, Math.floor(780 / Math.max(8, q.length * (/[a-z]/i.test(q) ? 0.62 : 1))));
-    ctx.translate(120 + tx, 58);
+    const room = CW - ox - textX - 24;
+    const size = Math.max(20, Math.min(38, Math.floor(room / Math.max(6, q.length * (/[a-z]/i.test(q) ? 0.55 : 1)))));
+    ctx.translate(textX, 58);
     ctx.scale(pop, pop);
     txt(ctx, q, 0, 0, { size, weight: 900, color: '#fff', align: 'left', stroke: '#000', sw: 8, shadow: ch.color2 });
     ctx.restore();

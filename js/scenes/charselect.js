@@ -2,7 +2,7 @@
 import { specialDef, specialCD } from '../moves.js';
 const KINDS = ['fwd', 'up', 'down'];
 import { CHARS } from '../characters.js';
-import { drawChar, drawPortrait } from '../sprites.js';
+import { drawChar, drawPortrait, drawArt } from '../sprites.js';
 import { txt, pixelText, panel, segBar, blink, Hotspots } from '../ui.js';
 import { menuBg, poseOf } from './common.js';
 import { shuffle } from '../util.js';
@@ -86,7 +86,7 @@ export class CharSelectScene {
     p.ellipse(205, 505, 90, 16, 0, 0, Math.PI * 2);
     p.fill();
     const st = this.flashT > 0 ? 'victory' : 'idle';
-    drawChar(p, ch, poseOf(ch, st, t), 205, 505, 1, 3.0, 1, this.flashT > 0.2, t);
+    if (!drawArt(p, ch, 205, 515, 300, 1)) drawChar(p, ch, poseOf(ch, st, t), 205, 505, 1, 3.0, 1, this.flashT > 0.2, t);
     if (this.step === 1 && this.picked) {
       const me = CHARS.find((c) => c.id === this.picked);
       drawChar(p, me, poseOf(me, 'idle', t), 60, 520, 1, 1.4, 0.8, false, t);
