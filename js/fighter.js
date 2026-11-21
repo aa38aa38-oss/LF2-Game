@@ -24,6 +24,9 @@ export const ATK = {
   cpunch: { dur: 0.26, on: 0.08, off: 0.14, x0: -5, x1: 60, zr: 20, dmg: 8, fall: 0, bdef: 0 },
 };
 const NEXT = { a1: 'a2', a2: 'a3' };
+// 全體傷害倍率：原本一拳 7 點、血 420，要打 60 拳才倒，常常打到 time out。
+// 小朋友齊打交大約 25 拳倒一個人，所以整體攻擊力提高。
+export const DMG_SCALE = 1.5;
 const AIR_STATES = new Set(['fall', 'jump', 'jatk', 'djatk', 'flip']);
 const NO_FRICTION = new Set(['walk', 'run', 'jump', 'jatk', 'djatk', 'ratk', 'fall', 'special', 'super', 'grabbed', 'roll', 'flip', 'caught']);
 
@@ -473,7 +476,7 @@ export class Fighter {
     // 防禦（只擋正面）
     if (this.state === 'defend' && this.facing === -dir && !h.unblockable && !this.airborne) {
       this.bdef += h.bdef != null ? h.bdef : h.knock ? 45 : 20;
-      const d = h.dmg * 0.12;
+      const d = h.dmg * DMG_SCALE * 0.12;
       this.hp = Math.max(1, this.hp - d);
       this.cap = Math.max(this.hp, this.cap - d * 0.3);
       this.mp = Math.min(100, this.mp + 3);
@@ -488,7 +491,7 @@ export class Fighter {
       this.vx = dir * 140;
       return 'block';
     }
-    const dmg = h.dmg / this.char.mul.def;
+    const dmg = (h.dmg * DMG_SCALE) / this.char.mul.def;
     this.hp = Math.max(0, this.hp - dmg);
     this.cap = Math.max(this.hp, this.cap - dmg * 0.35);
     this.sinceHit = 0;

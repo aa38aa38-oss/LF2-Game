@@ -1,6 +1,6 @@
 // 電腦對手 AI：輸出和玩家一樣的 Controller 訊號
 import { Controller } from './input.js';
-import { specialDef } from './moves.js';
+import { specialDef, MOVES } from './moves.js';
 import { rand, sign } from './util.js';
 
 const DIFF = {
@@ -159,7 +159,8 @@ export class AI {
       this.mz = 0;
       return;
     }
-    if (f.mp >= 100 && adx < 420 && Math.random() < this.p.special) {
+    const sup = MOVES[f.char.id].super;
+    if (f.mp >= 100 && adx < (sup.aiRange || 420) && adz < (sup.aiZ || (sup.aiRange < 300 ? 40 : 999)) && Math.random() < this.p.special) {
       c.tap('super');
       return;
     }

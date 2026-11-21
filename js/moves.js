@@ -9,6 +9,19 @@ const afterimage = (b, f, every = 0.04) => {
     b.fx.add({ type: 'ghost', fighter: f, snap: snapshot(f), life: 0.25 });
   }
 };
+// 找最近的對手（大絕自動鎖定用）
+const nearestFoe = (f, b, range) => {
+  let best = null, bd = range;
+  for (const e of b.enemiesOf(f)) {
+    if (e.dead || e.hp <= 0) continue;
+    const d = Math.abs(e.x - f.x) + Math.abs(e.z - f.z) * 2;
+    if (d < bd) {
+      bd = d;
+      best = e;
+    }
+  }
+  return best;
+};
 const snapshot = (f) => ({ x: f.x, z: f.z, y: f.y, facing: f.facing, state: f.state, stateT: f.stateT, animT: f.animT, char: f.char, spKind: f.spKind, mv: { ...f.mv } });
 
 export const MOVES = {
@@ -27,49 +40,56 @@ export const MOVES = {
       pose: (f, T) => ({ tilt: 0.45, aF: [0.2, 0.9], aB: [0.1, 0.9], lF: [0.4, -0.5], lB: [-0.3, 0], expr: T > 0.18 ? 'shout' : 'normal' }),
     },
     super: {
-      // 三段短衝：每段開始時可以用方向鍵改方向（類似小朋友齊打交的連續衝撞）
-      dur: 1.6,
+      // 鎖定衝撞（參考大亂鬥「先撞到才進入大招」）：自動衝向最近的對手，撞到就連續頭槌三下再頂飛
+      dur: 2.0, aiRange: 650,
+      start(f, b) {
+        f.mv.tgt = nearestFoe(f, b, 750);
+      },
       update(f, b) {
-        const c = f.ctrl;
-        const D = 0.3, P = 0.15;
-        const k = Math.floor(f.stateT / (D + P));
-        const local = f.stateT - k * (D + P);
-        if (k >= 3) {
-          f.vx *= 0.8;
-          f.vz = 0;
+        const T = f.stateT, m = f.mv;
+        if (!m.lock) {
+          let t = m.tgt;
+          if (t && (t.dead || ['down', 'getup', 'roll'].includes(t.state))) t = m.tgt = nearestFoe(f, b, 750);
+          if (T > 0.75 || !t) {
+            f.vx *= 0.8;
+            f.vz = 0;
+            if (T > 0.9) m.done = true;
+            return;
+          }
+          f.facing = sign(t.x - f.x) || f.facing;
+          f.vx = f.facing * 950;
+          f.vz = Math.max(-320, Math.min(320, (t.z - f.z) * 9));
+          afterimage(b, f, 0.04);
+          if (Math.abs(t.x - f.x) < 60 && Math.abs(t.z - f.z) < 26 && t.y < 40) {
+            m.lock = t;
+            m.lt = T;
+            f.x = t.x - f.facing * 44;
+          }
           return;
         }
-        if (k !== f.mv.k) {
-          f.mv.k = k;
-          f.hitList.clear();
-          const dx = (c.held('right') ? 1 : 0) - (c.held('left') ? 1 : 0);
-          if (dx) f.facing = dx;
-          f.mv.dz = (c.held('down') ? 1 : 0) - (c.held('up') ? 1 : 0);
-          b.sfx('whiff');
-          b.fx.add({ type: 'text', x: f.x, z: f.z, y: 130, text: '衝！', color: '#f28c28', size: 24, life: 0.5 });
+        const t = m.lock;
+        f.vx = f.vz = 0;
+        t.vx = t.vz = 0;
+        const k = Math.floor((T - m.lt) / 0.2);
+        if (k < 3 && k !== m.k) {
+          m.k = k;
+          b.applyHit(f, t, { dmg: 10, stun: 0.5, kb: 0, fall: 0, unblockable: true, dir: f.facing });
+          b.fx.add({ type: 'headflash', x: f.x + f.facing * 20, z: f.z, y: 100, dir: f.facing, life: 0.15 });
         }
-        if (local < D) {
-          f.vx = f.facing * 760;
-          f.vz = f.mv.dz * 240;
-          b.areaHit(f, { x0: -20, x1: 60, zr: 32, dmg: k === 2 ? 26 : 16, knock: true, launch: k === 2 ? 500 : 320, kb: 300, unblockable: true, fall: 80, heavy: true });
-          afterimage(b, f, 0.04);
-          f.mv.dust = (f.mv.dust || 0) - 1 / 60;
-          if (f.mv.dust <= 0) {
-            f.mv.dust = 0.05;
-            b.fx.add({ type: 'dust', x: f.x - f.facing * 20, z: f.z, y: 0, life: 0.4 });
-          }
-        } else {
-          f.vx *= 0.6;
-          f.vz = 0;
+        if (k >= 3 && !m.fin) {
+          m.fin = true;
+          b.applyHit(f, t, { dmg: 28, knock: true, launch: 620, kb: 340, unblockable: true, heavy: true, dir: f.facing });
+          b.shake(12, 0.4);
         }
+        if (k >= 5) m.done = true;
       },
       pose: (f, T, t) => {
-        const k = Math.floor(T / 0.45), local = T - k * 0.45;
-        if (k < 3 && local < 0.3) {
+        if (!f.mv.lock) {
           const s = Math.sin(t * 24);
           return { tilt: 0.7, lF: [s * 1.0 + 0.3, -1.3], lB: [-s * 1.0 + 0.3, -1.3], aF: [-0.4, 0.4], aB: [-0.6, 0.4], expr: 'shout' };
         }
-        return { tilt: 0.2, aF: [0.6, 1.6], aB: [0.4, 1.6], lF: [0.5, -0.6], lB: [-0.5, 0], expr: 'shout' };
+        const k = Math.floor((T - f.mv.lt) / 0.1) % 2;
+        return { tilt: k ? 0.6 : 0.1, aF: [0.4, 0.6], aB: [0.3, 0.6], expr: 'shout' };
       },
     },
   },
@@ -84,14 +104,15 @@ export const MOVES = {
           b.sfx('sound');
           b.spawnProj({
             owner: f, kind: 'sound', x: f.x + f.facing * 40, z: f.z, y: f.y + 66, vx: f.facing * 470,
-            life: 1.3, w: 24, h: 46, dmg: 13, stun: 0.45, kb: 140,
+            life: 1.3, w: 24, h: 46, dmg: 15, stun: 0.5, kb: 140, fall: 45,
           });
         }
       },
       pose: (f, T) => ({ aF: T > 0.12 ? [1.57, 0] : [2.2, 0.6], prop: 'finger', tilt: 0.15, expr: 'shout', lF: [0.45, -0.4], lB: [-0.4, 0] }),
     },
     super: {
-      dur: 2.2,
+      // 全場震波（範圍型，類似小朋友齊打交的範圍大招）：左右兩邊各一道，前後範圍有限
+      dur: 1.6, aiRange: 480, aiZ: 70,
       update(f, b) {
         f.vx = 0;
         f.vz = 0;
@@ -101,8 +122,8 @@ export const MOVES = {
           b.shake(12, 0.7);
           for (const d of [-1, 1]) {
             b.spawnProj({
-              owner: f, kind: 'wave', x: f.x + d * 20, z: f.z, y: 0, vx: d * 620, life: 0.9, w: 44, zr: 999,
-              h: 140, dmg: 42, knock: true, launch: 480, kb: 320, pierce: true, unblockable: true, dir: d,
+              owner: f, kind: 'wave', x: f.x + d * 20, z: f.z, y: 0, vx: d * 640, life: 0.85, w: 44, zr: 80,
+              h: 140, dmg: 40, knock: true, launch: 480, kb: 320, pierce: true, unblockable: true, dir: d,
             });
           }
           b.fx.add({ type: 'ring', x: f.x, z: f.z, y: 0, life: 0.6, r: 260, color: '#ffd84a' });
@@ -135,30 +156,37 @@ export const MOVES = {
           : { aF: [1.15, 0], aB: [1.0, 0.3], prop: 'gavel', tilt: 0.4, expr: 'shout', lF: [0.6, -0.8], lB: [-0.5, 0] },
     },
     super: {
-      dur: 2.8,
+      // 金幣雨：畫面上每個對手頭上都下 10 枚金幣（會定住），最後再砸一個金元寶
+      dur: 2.2, aiRange: 800,
       update(f, b) {
         f.vx = 0;
         f.vz = 0;
-        f.mv.c = (f.mv.c || 0) - 1 / 60;
-        const foes = b.enemiesOf(f).filter((e) => Math.abs(e.x - f.x) < 650);
-        if (f.mv.c <= 0 && f.stateT < 2.3 && foes.length) {
-          f.mv.c = 0.045;
-          const e = pick(foes);
-          b.spawnProj({
-            owner: f, kind: 'coin', x: e.x + rand(-45, 45), z: Math.max(ARENA.zMin, Math.min(ARENA.zMax, e.z + rand(-22, 22))),
-            y: 520, vy: -250, gravity: 1300, life: 3, w: 18, h: 30, dmg: 5, stun: 0.22, kb: 20, vanishOnGround: true, unblockable: true,
-          });
+        const m = f.mv;
+        m.c = (m.c || 0) - 1 / 60;
+        m.n = m.n || new Map();
+        const foes = b.enemiesOf(f).filter((e) => Math.abs(e.x - f.x) < 850);
+        if (m.c <= 0 && f.stateT > 0.2 && f.stateT < 1.6) {
+          m.c = 0.13;
+          for (const e of foes) {
+            const n = m.n.get(e) || 0;
+            if (n >= 9) continue;
+            m.n.set(e, n + 1);
+            b.spawnProj({
+              owner: f, kind: 'coin', x: e.x + rand(-12, 12), z: Math.max(ARENA.zMin, Math.min(ARENA.zMax, e.z + rand(-8, 8))),
+              y: 420, vy: -300, gravity: 1300, life: 3, w: 22, zr: 24, h: 30, dmg: 3.2, stun: 0.32, kb: 10, fall: 0, vanishOnGround: true, unblockable: true,
+            });
+          }
+          b.sfx('coin');
         }
-        if (!f.mv.big && f.stateT > 2.3) {
-          f.mv.big = true;
+        if (!m.big && f.stateT > 1.6) {
+          m.big = true;
           for (const e of foes) {
             b.spawnProj({
-              owner: f, kind: 'ingot', x: e.x, z: e.z, y: 560, vy: -500, gravity: 1800, life: 3, w: 30, h: 40,
+              owner: f, kind: 'ingot', x: e.x, z: e.z, y: 480, vy: -500, gravity: 1800, life: 3, w: 30, zr: 26, h: 40,
               dmg: 18, knock: true, launch: 350, kb: 120, vanishOnGround: true, unblockable: true,
             });
           }
         }
-        if (Math.random() < 0.3) b.sfx('coin');
       },
       pose: (f, T, t) => ({ aF: [2.6 + Math.sin(t * 10) * 0.2, 0.2], aB: [2.4 - Math.sin(t * 10) * 0.2, 0.2], expr: 'smile', bob: Math.abs(Math.sin(t * 8)) * 3, prop: null }),
     },
@@ -183,20 +211,21 @@ export const MOVES = {
       pose: (f, T) => ({ aF: T < 0.2 ? [2.9, 0.3] : [1.4, 0], prop: T < 0.2 ? 'banana' : null, tilt: 0.15, expr: 'smile' }),
     },
     super: {
-      // 香蕉大放送：丟出 6 根會自動追人的香蕉（類似小朋友齊打交的追蹤氣功）
-      dur: 1.2,
+      // 追蹤香蕉：6 根會追人的香蕉，前 4 根打中會定住，最後 2 根把人打倒（類似小朋友齊打交的追蹤氣功）
+      dur: 1.3, aiRange: 800,
       update(f, b) {
         f.vx = f.vz = 0;
         const n = f.mv.n || 0;
-        if (n < 6 && f.stateT > 0.25 + n * 0.1) {
+        if (n < 6 && f.stateT > 0.25 + n * 0.12) {
           f.mv.n = n + 1;
-          const foes = b.enemiesOf(f).filter((e) => Math.abs(e.x - f.x) < 750);
+          const foes = b.enemiesOf(f).filter((e) => Math.abs(e.x - f.x) < 900);
           foes.sort((a, c) => Math.abs(a.x - f.x) - Math.abs(c.x - f.x));
           const tgt = foes.length ? foes[n % foes.length] : null;
+          const last = n >= 4;
           b.spawnProj({
             owner: f, kind: 'homing', homing: tgt, x: f.x + f.facing * 20, z: f.z, y: f.y + 90,
-            vx: f.facing * rand(220, 340), vz: rand(-160, 160), life: 2.6, w: 22, h: 40,
-            dmg: 14, knock: true, launch: 320, kb: 160, unblockable: true, noClash: true, fall: 80,
+            vx: f.facing * rand(260, 360), vz: rand(-160, 160), life: 2.8, w: 26, zr: 26, h: 40, unblockable: true, noClash: true,
+            ...(last ? { dmg: 12, knock: true, launch: 320, kb: 160, fall: 80 } : { dmg: 7, stun: 0.4, kb: 30, fall: 0 }),
           });
           b.sfx('banana');
         }
@@ -227,33 +256,34 @@ export const MOVES = {
       pose: (f, T) => ({ aF: T < 0.2 ? [2.6, 0.6] : [1.5, 0], prop: T < 0.2 ? 'scalpel' : null, tilt: 0.1, expr: 'flat' }),
     },
     super: {
-      dur: 2.6,
+      // 先回一點血，再對畫面上所有對手放電（範圍型）
+      dur: 2.0, aiRange: 700,
       start(f, b) {
         b.sfx('heal');
       },
       update(f, b, dt) {
         f.vx = f.vz = 0;
-        if (f.stateT < 1.3) {
-          f.hp = Math.min(f.maxHp, f.hp + f.maxHp * 0.15 * dt);
+        if (f.stateT < 1.0) {
+          f.heal(f.maxHp * 0.06 * dt, f.maxHp * 0.06 * dt);
           f.mv.p = (f.mv.p || 0) - dt;
           if (f.mv.p <= 0) {
             f.mv.p = 0.08;
             b.fx.add({ type: 'plus', x: f.x + rand(-25, 25), z: f.z, y: rand(20, 100), life: 0.7 });
           }
         }
-        if (!f.mv.zapped && f.stateT > 1.45) {
+        if (!f.mv.zapped && f.stateT > 1.1) {
           f.mv.zapped = true;
           b.sfx('zap');
           b.shake(10, 0.4);
           b.fx.add({ type: 'screenflash', color: '#bff8ff', life: 0.25 });
-          for (const e of b.enemiesOf(f).filter((e) => Math.abs(e.x - f.x) < 600)) {
+          for (const e of b.enemiesOf(f).filter((e) => Math.abs(e.x - f.x) < 750)) {
             b.fx.add({ type: 'bolt', x: e.x, z: e.z, y: e.y, life: 0.5 });
-            b.applyHit(f, e, { dmg: 32, knock: true, launch: 420, kb: 160, unblockable: true });
+            b.applyHit(f, e, { dmg: 38, knock: true, launch: 420, kb: 160, unblockable: true });
           }
         }
       },
       pose: (f, T, t) =>
-        T < 1.4
+        T < 1.05
           ? { aF: [1.3, 1.1], aB: [1.1, 1.2], expr: 'flat', bob: Math.sin(t * 6) }
           : { aF: [2.9, 0], aB: [2.7, 0], expr: 'shout', tilt: -0.1 },
     },
@@ -308,50 +338,62 @@ export const MOVES = {
       pose: (f, T) => (f.mv.whiff ? { aF: [1.6, 0.3], aB: [1.4, 0.4], tilt: 0.2 } : { aF: [2.9, 0.3], aB: [2.8, 0.3], tilt: -0.25 - Math.min(1, T * 2) * 0.3, expr: 'shout' }),
     },
     super: {
-      dur: 2.7,
+      // 開直播狂打（近身型，打中傷害最高）：先往最近的對手撲過去，再連打，連打中可以移動，最後上勾拳
+      dur: 2.1, aiRange: 260,
       start(f, b) {
-        b.fx.add({ type: 'live', life: 2.7 });
+        b.fx.add({ type: 'live', life: 2.1 });
         b.sfx('camera');
+        f.mv.tgt = nearestFoe(f, b, 300);
       },
       update(f, b) {
-        const T = f.stateT;
-        f.mv.cm = (f.mv.cm || 0) - 1 / 60;
-        if (f.mv.cm <= 0) {
-          f.mv.cm = 0.09;
+        const T = f.stateT, m = f.mv;
+        m.cm = (m.cm || 0) - 1 / 60;
+        if (m.cm <= 0) {
+          m.cm = 0.09;
           b.fx.add({ type: 'comment', text: pick(['RRR！', '館長加油！', '+1', '讚讚讚', '開直播啦', '777', '揪甘心', '衝啊！', '健身！']), y: rand(120, 300), life: 2.2 });
           if (Math.random() < 0.5) b.fx.add({ type: 'heart', x: f.x + rand(-20, 20), z: f.z, y: 110, life: 1.2 });
         }
-        if (T < 0.55) {
+        if (T < 0.25) {
           f.vx = f.vz = 0;
           return;
         }
-        if (T < 2.15) {
-          // 連打中可以用方向鍵慢慢移動、轉向
+        if (T < 0.42) {
+          // 撲向對手
+          const t = m.tgt;
+          if (t && Math.abs(t.x - f.x) > 50) {
+            f.facing = sign(t.x - f.x) || f.facing;
+            f.vx = f.facing * 900;
+            f.vz = Math.max(-300, Math.min(300, (t.z - f.z) * 9));
+          } else f.vx = f.vz = 0;
+          afterimage(b, f, 0.04);
+          return;
+        }
+        if (T < 1.75) {
           const c = f.ctrl;
           const dx = (c.held('right') ? 1 : 0) - (c.held('left') ? 1 : 0);
           const dz = (c.held('down') ? 1 : 0) - (c.held('up') ? 1 : 0);
           if (dx) f.facing = dx;
           f.vx = dx * 170;
           f.vz = dz * 120;
-          f.mv.pt = (f.mv.pt || 0) - 1 / 60;
-          if (f.mv.pt <= 0) {
-            f.mv.pt = 0.08;
+          m.pt = (m.pt || 0) - 1 / 60;
+          if (m.pt <= 0) {
+            m.pt = 0.08;
             f.hitList.clear();
-            b.areaHit(f, { x0: -5, x1: 75, zr: 36, dmg: 3.2, stun: 0.3, kb: 15, unblockable: true });
+            b.areaHit(f, { x0: -5, x1: 90, zr: 40, dmg: 2.8, stun: 0.34, kb: 0, fall: 0, unblockable: true });
           }
         } else {
           f.vx = f.vz = 0;
-          if (!f.mv.up) {
-            f.mv.up = true;
+          if (!m.up) {
+            m.up = true;
             f.hitList.clear();
-            b.areaHit(f, { x0: -10, x1: 85, zr: 40, dmg: 24, knock: true, launch: 560, kb: 260, unblockable: true, heavy: true });
+            b.areaHit(f, { x0: -10, x1: 95, zr: 42, dmg: 26, knock: true, launch: 560, kb: 260, unblockable: true, heavy: true });
             b.shake(10, 0.3);
           }
         }
       },
       pose: (f, T, t) => {
-        if (T < 0.55) return { aF: [2.8, 0.2], prop: 'phone', aB: [0.6, 1.6], expr: 'shout' };
-        if (T < 2.15) {
+        if (T < 0.25) return { aF: [2.8, 0.2], prop: 'phone', aB: [0.6, 1.6], expr: 'shout' };
+        if (T < 1.75) {
           const k = Math.floor(t * 14) % 2;
           return { aF: k ? [1.6, 0] : [0.6, 1.6], aB: k ? [0.4, 1.6] : [1.6, 0], tilt: 0.25, expr: 'shout', lF: [0.5, -0.5], lB: [-0.5, 0] };
         }
@@ -398,7 +440,7 @@ const EXTRA = {
           b.fx.add({ type: 'ring', x: f.x, z: f.z, y: 0, life: 0.45, r: 150, color: '#ffd84a' });
           b.fx.add({ type: 'text', x: f.x, z: f.z, y: 120, text: '砰！', color: '#ffd84a', size: 30, life: 0.7 });
           for (const e of b.enemiesOf(f)) {
-            if (Math.abs(e.x - f.x) < 120 && Math.abs(e.z - f.z) < 40 && e.y < 60) b.applyHit(f, e, { dmg: 11, knock: true, launch: 300, kb: 240, dir: sign(e.x - f.x) || 1 });
+            if (Math.abs(e.x - f.x) < 150 && Math.abs(e.z - f.z) < 44 && e.y < 60) b.applyHit(f, e, { dmg: 16, knock: true, launch: 320, kb: 260, dir: sign(e.x - f.x) || 1 });
           }
         }
       },

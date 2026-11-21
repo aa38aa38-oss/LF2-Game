@@ -284,7 +284,8 @@ export class BattleScene {
     src.combo++;
     src.comboT = 1.0;
     src.stats.maxCombo = Math.max(src.stats.maxCombo, src.combo);
-    src.mp = Math.min(100, src.mp + 4 + dealt * 0.15);
+    if (src.superDealt != null) src.superDealt += dealt;
+    else src.mp = Math.min(100, src.mp + 4 + dealt * 0.1);
     this.fx.add({ type: 'spark', x: t.x, z: t.z, y: hy, life: heavy ? 0.28 : 0.18, big: heavy, color: src.char.color });
     this.fx.add({ type: 'num', x: t.x + rand(-10, 10), z: t.z, y: t.y + 105, text: String(Math.round(dealt)), life: 0.7, color: heavy ? '#ffd84a' : '#fff', size: heavy ? 20 : 15 });
     this.sfx(heavy ? 'heavy' : 'hit');
@@ -317,6 +318,9 @@ export class BattleScene {
     f.mv = {};
     const def = MOVES[f.char.id].super;
     f.armor = def.dur + 0.2;
+    // 大絕命中統計：完全打空會返還一半的氣（避免辛苦集滿卻白放）
+    f.superDealt = 0;
+    f.superEndT = null;
     if (def.start) def.start(f, this);
     this.sfx('super');
   }
@@ -363,6 +367,17 @@ export class BattleScene {
     this.phaseT += dt;
     this.updatePhase(dt);
     for (const f of this.fighters) {
+      if (f.superDealt != null && f.state !== 'super') {
+        // 大絕結束後再等飛行道具落地 1.5 秒，才結算有沒有打中
+        if (f.superEndT == null) f.superEndT = this.time + 1.5;
+        if (this.time > f.superEndT) {
+          if (f.superDealt <= 0 && !f.dead) {
+            f.mp = Math.min(100, f.mp + 50);
+            this.fx.add({ type: 'text', x: f.x, z: f.z, y: 140, text: '落空！返還一半氣', color: '#9fd4ff', size: 18, life: 1.2 });
+          }
+          f.superDealt = null;
+        }
+      }
       if (f.ai && this.fightOn) f.ai.update(sdt, this);
       f.update(sdt, this);
       if (f.ai) f.ai.ctrl.endFrame();
@@ -532,7 +547,7 @@ export class BattleScene {
           continue;
         }
       }
-      if (p.kind !== 'wave' && (p.x < -50 || p.x > 1010)) {
+      if (p.kind !== 'wave' && (p.x < -50 || p.x > WORLD_W + 50)) {
         p.dead = true;
         if (p.kind === 'item') this.landItem(p.item, p.x, p.z);
         continue;
