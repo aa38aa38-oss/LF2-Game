@@ -24,6 +24,7 @@ export const ATK = {
   cpunch: { dur: 0.26, on: 0.08, off: 0.14, x0: -5, x1: 60, zr: 20, dmg: 8, fall: 0, bdef: 0 },
 };
 const NEXT = { a1: 'a2', a2: 'a3' };
+const AIR_STATES = new Set(['fall', 'jump', 'jatk', 'djatk', 'flip']);
 const NO_FRICTION = new Set(['walk', 'run', 'jump', 'jatk', 'djatk', 'ratk', 'fall', 'special', 'super', 'grabbed', 'roll', 'flip', 'caught']);
 
 export class Fighter {
@@ -296,6 +297,13 @@ export class Fighter {
     } else if (st === 'hurt') {
       if (T >= this.stun) this.setState('idle');
     } else if (st === 'fall') {
+      // 保險：被打飛太久（例如卡在牆角）就強制落地
+      if (T > 2.5) {
+        this.y = 0;
+        this.vy = 0;
+        this.onLand(b);
+        return;
+      }
       // 被打飛時按跳：空中翻身，直接站著落地
       if (b.fightOn && c.pressed('jump') && this.hp > 0 && T > 0.15 && !this.mv.noFlip && !this.thrownBy) {
         this.setState('flip');
@@ -405,7 +413,8 @@ export class Fighter {
   }
 
   physics(dt, b) {
-    const wasAir = this.airborne;
+    // 在空中類狀態一律套用重力（避免高度剛好很小時卡在半空中）
+    const wasAir = this.airborne || AIR_STATES.has(this.state);
     if (wasAir) this.vy -= GRAV * dt;
     this.x += this.vx * dt;
     this.z += this.vz * dt;

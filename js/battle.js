@@ -307,7 +307,9 @@ export class BattleScene {
     f.mp = 0;
     f.setState('superwait');
     f.vx = f.vz = 0;
-    this.cutin = { f, t: 0, dur: 1.7, lines: Array.from({ length: 26 }, () => ({ y: rand(80, 470), l: rand(80, 300), s: rand(1500, 3200), o: rand(0, 1000) })) };
+    // 全場只停頓 0.3 秒（變暗＋閃光），之後頭像與金句橫幅在上方滑過，不影響其他人繼續打
+    this.cutin = { f, t: 0, dur: 0.3 };
+    this.banner = { f, t: 0, dur: 1.7, lines: Array.from({ length: 12 }, () => ({ y: rand(92, 190), l: rand(80, 260), s: rand(1500, 3000), o: rand(0, 1000) })) };
     this.sfx('cutin');
   }
   beginSuper(f) {
@@ -338,6 +340,10 @@ export class BattleScene {
     }
     this.time += dt;
     this.updateCamera(dt);
+    if (this.banner) {
+      this.banner.t += dt;
+      if (this.banner.t >= this.banner.dur) this.banner = null;
+    }
     if (this.cutin) {
       this.cutin.t += dt;
       if (this.cutin.t >= this.cutin.dur) {
@@ -632,8 +638,26 @@ export class BattleScene {
     }
     this.fx.draw(p);
     if (this.cutin) {
+      // 大絕發動瞬間：其他東西變暗，只有發動者亮著
+      const f = this.cutin.f;
+      p.fillStyle = 'rgba(0,0,12,0.6)';
+      p.fillRect(cam.x - 50, 0, vw + 100, 540);
+      const fy = ARENA.floorY + f.z - f.y - 55;
+      p.save();
+      p.globalCompositeOperation = 'lighter';
+      const gr = p.createRadialGradient(f.x, fy, 5, f.x, fy, 120);
+      gr.addColorStop(0, '#ffffff');
+      gr.addColorStop(0.3, f.char.color);
+      gr.addColorStop(1, 'rgba(0,0,0,0)');
+      p.globalAlpha = 0.8;
+      p.fillStyle = gr;
+      p.fillRect(f.x - 120, fy - 120, 240, 240);
+      p.restore();
+      drawFighter(p, f);
+    }
+    if (this.banner) {
       p.setTransform(0.5, 0, 0, 0.5, g.ox / 2, 0);
-      this.drawCutinArt(p, this.cutin);
+      this.drawCutinArt(p, this.banner);
     }
     g.flushPix();
 
@@ -647,7 +671,7 @@ export class BattleScene {
     this.fx.drawUI(ctx, 'screen');
     this.drawHUD(ctx);
     this.drawCombo(ctx);
-    if (this.cutin) this.drawCutinText(ctx, this.cutin);
+    if (this.banner) this.drawCutinText(ctx, this.banner);
     if (this.announce) this.drawAnnounce(ctx);
     if (this.paused) this.drawPause(ctx);
   }
@@ -894,80 +918,80 @@ export class BattleScene {
     ctx.restore();
   }
 
+  // 大絕橫幅：頭像＋金句，從血條下方滑過（不擋中間的打鬥）
+  bannerOffset(ci) {
+    const p = ci.t / ci.dur;
+    if (p < 0.1) return -(1 - easeOut(p / 0.1)) * 1200;
+    if (p > 0.85) return easeIn((p - 0.85) / 0.15) * 1200;
+    return 0;
+  }
+  bannerPath(ctx) {
+    ctx.beginPath();
+    ctx.moveTo(-200, 92);
+    ctx.lineTo(1160, 86);
+    ctx.lineTo(1160, 186);
+    ctx.lineTo(-200, 196);
+    ctx.closePath();
+  }
   drawCutinArt(ctx, ci) {
     const f = ci.f, ch = f.char;
-    const p = ci.t / ci.dur;
-    let ox = 0;
-    if (p < 0.14) ox = -(1 - easeOut(p / 0.14)) * 1200;
-    else if (p > 0.86) ox = easeIn((p - 0.86) / 0.14) * 1200;
+    const ox = this.bannerOffset(ci);
     ctx.save();
-    ctx.fillStyle = `rgba(0,0,0,${Math.min(0.65, p * 5)})`;
-    ctx.fillRect(-this.g.ox, 0, this.g.CW, 540);
     ctx.translate(ox, 0);
-    // 斜帶
-    ctx.beginPath();
-    ctx.moveTo(-120, 150);
-    ctx.lineTo(1080, 70);
-    ctx.lineTo(1080, 400);
-    ctx.lineTo(-120, 480);
-    ctx.closePath();
-    const gr = ctx.createLinearGradient(0, 70, 0, 480);
+    this.bannerPath(ctx);
+    const gr = ctx.createLinearGradient(0, 86, 0, 196);
     gr.addColorStop(0, ch.color);
     gr.addColorStop(1, ch.color2);
+    ctx.globalAlpha = 0.88;
     ctx.fillStyle = gr;
     ctx.fill();
+    ctx.globalAlpha = 1;
     ctx.save();
     ctx.clip();
-    ctx.globalAlpha = 0.5;
+    ctx.globalAlpha = 0.45;
     ctx.fillStyle = '#fff';
-    for (const l of ci.lines) {
-      const lx = 1100 - ((ci.t * l.s + l.o) % 1600);
-      ctx.fillRect(lx, l.y, l.l, 3);
-    }
+    for (const l of ci.lines) ctx.fillRect(1100 - ((ci.t * l.s + l.o) % 1500), l.y, l.l, 3);
     ctx.globalAlpha = 1;
     const img = ASSETS.posters[ch.id];
     if (img) {
-      const h = 420, w = (img.width * h) / img.height;
-      ctx.drawImage(img, 300 - w / 2, 80, w, h);
+      const h = 220, w = (img.width * h) / img.height;
+      ctx.drawImage(img, 180 - w / 2, 80, w, h);
     } else {
-      const zoom = 1 + p * 0.06;
-      drawChar(ctx, ch, { ...POSTER_POSE[ch.id] }, 290, 640, 1, 5.3 * zoom, 1, false, ci.t);
+      drawChar(ctx, ch, { ...POSTER_POSE[ch.id] }, 190, 355, 1, 2.9, 1, false, ci.t);
     }
     ctx.restore();
     ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 6;
+    ctx.lineWidth = 5;
     ctx.beginPath();
-    ctx.moveTo(-120, 150);
-    ctx.lineTo(1080, 70);
-    ctx.moveTo(1080, 400);
-    ctx.lineTo(-120, 480);
+    ctx.moveTo(-200, 92);
+    ctx.lineTo(1160, 86);
+    ctx.moveTo(1160, 186);
+    ctx.lineTo(-200, 196);
     ctx.stroke();
     ctx.restore();
-    if (p < 0.06) {
-      ctx.fillStyle = `rgba(255,255,255,${1 - p / 0.06})`;
+    if (ci.t < 0.08) {
+      ctx.fillStyle = `rgba(255,255,255,${0.7 * (1 - ci.t / 0.08)})`;
       ctx.fillRect(-this.g.ox, 0, this.g.CW, 540);
     }
   }
 
   drawCutinText(ctx, ci) {
-    const f = ci.f, ch = f.char;
+    const ch = ci.f.char;
+    const ox = this.bannerOffset(ci);
     const p = ci.t / ci.dur;
-    let ox = 0;
-    if (p < 0.14) ox = -(1 - easeOut(p / 0.14)) * 1200;
-    else if (p > 0.86) ox = easeIn((p - 0.86) / 0.14) * 1200;
-    const pop = p < 0.25 ? 1.4 - easeOut((p - 0.1) / 0.15) * 0.4 : 1;
+    const pop = p < 0.2 ? 1.3 - easeOut((p - 0.08) / 0.12) * 0.3 : 1;
     ctx.save();
     ctx.translate(ox, 0);
-    txt(ctx, `大絕・${ch.superMove.name}`, 900, 130, { size: 26, weight: 900, color: '#fff', align: 'right', stroke: '#000', sw: 6 });
-    ctx.translate(650, 290);
-    ctx.rotate(-0.07);
+    txt(ctx, `大絕・${ch.superMove.name}`, 300, 178, { size: 15, weight: 900, color: '#ffe14a', align: 'left', stroke: '#000', sw: 5 });
+    ctx.translate(590, 146);
+    ctx.rotate(-0.03);
     ctx.scale(pop, pop);
     const q = `「${ch.quote}」`;
-    const lines = q.length > 10 ? splitQuote(q) : [q];
-    const size = lines.length > 1 ? 50 : 60;
+    const lines = q.length > 12 ? splitQuote(q) : [q];
+    const size = lines.length > 1 ? 27 : 36;
     lines.forEach((ln, i) => {
-      const yy = (i - (lines.length - 1) / 2) * (size * 1.15);
-      txt(ctx, ln, 0, yy, { size, weight: 900, color: '#fff', align: 'center', stroke: '#000', sw: 10, shadow: ch.color2 });
+      const yy = (i - (lines.length - 1) / 2) * (size * 1.12);
+      txt(ctx, ln, 0, yy, { size, weight: 900, color: '#fff', align: 'center', stroke: '#000', sw: 8, shadow: ch.color2 });
     });
     ctx.restore();
   }
