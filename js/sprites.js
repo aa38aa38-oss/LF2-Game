@@ -784,7 +784,9 @@ export function drawFighter(ctx, f, alpha = 1) {
   let img = f.state === 'special' ? charFrame(f.char.id, 'special_' + (f.spKind || 'fwd'), f.stateT, 10, false) : null;
   if (!img) img = charFrame(f.char.id, anim, loop ? f.animT : f.stateT, 10, loop);
   if (img) {
-    const h = ASSETS.spriteH || 128, w = (img.width * h) / img.height;
+    const sH = ASSETS.spriteH || 128, st = ASSETS.standH[f.char.id];
+    // 有站立高度：所有動作用同一個比例（腳底對齊）；沒有就整格縮成固定高度
+    const h = st ? img.height * (sH / st) : sH, w = (img.width * h) / img.height;
     ctx.save();
     ctx.translate(sx, sy);
     ctx.scale(f.facing, 1);
@@ -869,7 +871,7 @@ export function portrait(ch, size = 64) {
 export function drawPortrait(ctx, ch, x, y, size, border = '#c9a227') {
   const img = portrait(ch, size);
   ctx.save();
-  ctx.imageSmoothingEnabled = false;
+  ctx.imageSmoothingEnabled = !!ASSETS.portraits[ch.id];
   ctx.drawImage(img, x, y, size, size);
   ctx.restore();
   ctx.strokeStyle = border;

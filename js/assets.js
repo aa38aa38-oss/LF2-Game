@@ -2,7 +2,7 @@
 // assets/manifest.json 有列出的圖就用圖，沒有就用程式畫的暫時素材。
 // 素材規格與命名請看 docs/GEMINI_PROMPTS.md
 
-export const ASSETS = { chars: {}, posters: {}, portraits: {}, stages: {}, select: {} };
+export const ASSETS = { chars: {}, posters: {}, portraits: {}, stages: {}, select: {}, standH: {} };
 
 function chroma(img, hex, tol) {
   const c = document.createElement('canvas');
@@ -67,7 +67,10 @@ export async function loadAssets() {
   const jobs = [];
   for (const [cid, anims] of Object.entries(man.characters || {})) {
     ASSETS.chars[cid] = {};
+    // _standH：整理工具算出的「站立高度」，用來讓所有動作縮放比例一致
+    if (anims._standH) ASSETS.standH[cid] = anims._standH;
     for (const [anim, spec] of Object.entries(anims)) {
+      if (anim.startsWith('_')) continue;
       if (typeof spec === 'object' && spec.sheet) {
         // 一張橫向排列的動作條（sprite sheet），自動等分切格
         const n = spec.frames || 1;
@@ -96,7 +99,7 @@ export async function loadAssets() {
   }
   for (const group of ['posters', 'portraits', 'stages', 'select']) {
     for (const [id, path] of Object.entries(man[group] || {})) {
-      const ck = group === 'stages' ? null : key;
+      const ck = group === 'stages' || group === 'portraits' ? null : key;
       jobs.push(loadImg(path, ck, tol).then((im) => im && (ASSETS[group][id] = im)));
     }
   }

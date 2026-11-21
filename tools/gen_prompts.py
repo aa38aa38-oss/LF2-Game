@@ -234,7 +234,7 @@ def write_md(data, path):
     L.append("4. **之後每一張**：上傳**立繪＋三視圖**（不要再傳真人照片），一次只貼一段、只生一張。某張被拒絕就開新對話，貼第零步、上傳兩張參考圖，再貼那一張。")
     L.append("5. 動作圖是「一整條動作條」：一張圖裡由左到右排好幾格。格子要等寬，遊戲會自動平均切開。排不整齊時，可以改成一格一張（檔名 `idle_1.png`、`idle_2.png`…）。")
     L.append("6. 綠色背景 `#00FF00` 會被遊戲自動去背。")
-    L.append("7. 生好的圖照「存檔」那欄的路徑放進 repo，再登記到 `assets/manifest.json`（最下面有範例）。一個角色的動作建議**全部生完再一起登記**，不然會圖和程式畫的混在一起。\n")
+    L.append("7. 生好的圖照「存檔」那欄的路徑整理好（或直接壓成 zip 傳給 Claude），再執行 `python3 tools/prep_assets.py <資料夾>`：會自動去背、切格對齊、統一大小、壓縮，並更新 `assets/manifest.json`。\n")
     for c in data['chars']:
         L.append(f"---\n\n## {c['title']}（`{c['id']}`）　金句：「{c['quote']}」\n")
         g = None

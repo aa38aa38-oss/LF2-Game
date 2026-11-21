@@ -1,11 +1,304 @@
 {
   "chromaKey": "#00ff00",
   "chromaTolerance": 120,
-  "characters": {},
-  "posters": {},
-  "portraits": {},
-  "select": {
-    "han": "assets/select/han.png"
+  "spriteHeight": 140,
+  "characters": {
+    "han": {
+      "attack1": {
+        "sheet": "assets/characters/han/attack1.webp",
+        "frames": 3
+      },
+      "attack2": {
+        "sheet": "assets/characters/han/attack2.webp",
+        "frames": 3
+      },
+      "attack3": {
+        "sheet": "assets/characters/han/attack3.webp",
+        "frames": 4
+      },
+      "catch": {
+        "sheet": "assets/characters/han/catch.webp",
+        "frames": 2
+      },
+      "defend": {
+        "sheet": "assets/characters/han/defend.webp",
+        "frames": 1
+      },
+      "dizzy": {
+        "sheet": "assets/characters/han/dizzy.webp",
+        "frames": 3
+      },
+      "down": {
+        "sheet": "assets/characters/han/down.webp",
+        "frames": 1
+      },
+      "fall": {
+        "sheet": "assets/characters/han/fall.webp",
+        "frames": 3
+      },
+      "getup": {
+        "sheet": "assets/characters/han/getup.webp",
+        "frames": 2
+      },
+      "hurt": {
+        "sheet": "assets/characters/han/hurt.webp",
+        "frames": 2
+      },
+      "idle": {
+        "sheet": "assets/characters/han/idle.webp",
+        "frames": 4
+      },
+      "_standH": 244.5,
+      "jump": {
+        "sheet": "assets/characters/han/jump.webp",
+        "frames": 2
+      },
+      "jump_attack": {
+        "sheet": "assets/characters/han/jump_attack.webp",
+        "frames": 2
+      },
+      "roll": {
+        "sheet": "assets/characters/han/roll.webp",
+        "frames": 4
+      },
+      "run": {
+        "sheet": "assets/characters/han/run.webp",
+        "frames": 6
+      },
+      "run_attack": {
+        "sheet": "assets/characters/han/run_attack.webp",
+        "frames": 3
+      },
+      "special_down": {
+        "sheet": "assets/characters/han/special_down.webp",
+        "frames": 4
+      },
+      "special_fwd": {
+        "sheet": "assets/characters/han/special_fwd.webp",
+        "frames": 4
+      },
+      "special_up": {
+        "sheet": "assets/characters/han/special_up.webp",
+        "frames": 4
+      },
+      "super": {
+        "sheet": "assets/characters/han/super.webp",
+        "frames": 6
+      },
+      "victory": {
+        "sheet": "assets/characters/han/victory.webp",
+        "frames": 4
+      },
+      "walk": {
+        "sheet": "assets/characters/han/walk.webp",
+        "frames": 6
+      }
+    },
+    "wang": {
+      "attack1": {
+        "sheet": "assets/characters/wang/attack1.webp",
+        "frames": 3
+      },
+      "attack2": {
+        "sheet": "assets/characters/wang/attack2.webp",
+        "frames": 3
+      },
+      "attack3": {
+        "sheet": "assets/characters/wang/attack3.webp",
+        "frames": 4
+      },
+      "catch": {
+        "sheet": "assets/characters/wang/catch.webp",
+        "frames": 2
+      },
+      "defend": {
+        "sheet": "assets/characters/wang/defend.webp",
+        "frames": 1
+      },
+      "dizzy": {
+        "sheet": "assets/characters/wang/dizzy.webp",
+        "frames": 3
+      },
+      "down": {
+        "sheet": "assets/characters/wang/down.webp",
+        "frames": 1
+      },
+      "fall": {
+        "sheet": "assets/characters/wang/fall.webp",
+        "frames": 3
+      },
+      "getup": {
+        "sheet": "assets/characters/wang/getup.webp",
+        "frames": 2
+      },
+      "hurt": {
+        "sheet": "assets/characters/wang/hurt.webp",
+        "frames": 2
+      },
+      "idle": {
+        "sheet": "assets/characters/wang/idle.webp",
+        "frames": 4
+      },
+      "_standH": 247.0,
+      "jump": {
+        "sheet": "assets/characters/wang/jump.webp",
+        "frames": 2
+      },
+      "jump_attack": {
+        "sheet": "assets/characters/wang/jump_attack.webp",
+        "frames": 2
+      },
+      "roll": {
+        "sheet": "assets/characters/wang/roll.webp",
+        "frames": 4
+      },
+      "run": {
+        "sheet": "assets/characters/wang/run.webp",
+        "frames": 6
+      },
+      "run_attack": {
+        "sheet": "assets/characters/wang/run_attack.webp",
+        "frames": 3
+      },
+      "special_down": {
+        "sheet": "assets/characters/wang/special_down.webp",
+        "frames": 4
+      },
+      "special_fwd": {
+        "sheet": "assets/characters/wang/special_fwd.webp",
+        "frames": 4
+      },
+      "special_up": {
+        "sheet": "assets/characters/wang/special_up.webp",
+        "frames": 4
+      },
+      "super": {
+        "sheet": "assets/characters/wang/super.webp",
+        "frames": 6
+      },
+      "victory": {
+        "sheet": "assets/characters/wang/victory.webp",
+        "frames": 4
+      },
+      "walk": {
+        "sheet": "assets/characters/wang/walk.webp",
+        "frames": 6
+      }
+    },
+    "ko": {
+      "attack1": {
+        "sheet": "assets/characters/ko/attack1.webp",
+        "frames": 3
+      },
+      "attack2": {
+        "sheet": "assets/characters/ko/attack2.webp",
+        "frames": 3
+      },
+      "attack3": {
+        "sheet": "assets/characters/ko/attack3.webp",
+        "frames": 4
+      },
+      "catch": {
+        "sheet": "assets/characters/ko/catch.webp",
+        "frames": 2
+      },
+      "defend": {
+        "sheet": "assets/characters/ko/defend.webp",
+        "frames": 1
+      },
+      "dizzy": {
+        "sheet": "assets/characters/ko/dizzy.webp",
+        "frames": 3
+      },
+      "down": {
+        "sheet": "assets/characters/ko/down.webp",
+        "frames": 1
+      },
+      "fall": {
+        "sheet": "assets/characters/ko/fall.webp",
+        "frames": 3
+      },
+      "getup": {
+        "sheet": "assets/characters/ko/getup.webp",
+        "frames": 2
+      },
+      "hurt": {
+        "sheet": "assets/characters/ko/hurt.webp",
+        "frames": 2
+      },
+      "idle": {
+        "sheet": "assets/characters/ko/idle.webp",
+        "frames": 4
+      },
+      "_standH": 246.0,
+      "jump": {
+        "sheet": "assets/characters/ko/jump.webp",
+        "frames": 2
+      },
+      "jump_attack": {
+        "sheet": "assets/characters/ko/jump_attack.webp",
+        "frames": 2
+      },
+      "roll": {
+        "sheet": "assets/characters/ko/roll.webp",
+        "frames": 4
+      },
+      "run": {
+        "sheet": "assets/characters/ko/run.webp",
+        "frames": 6
+      },
+      "run_attack": {
+        "sheet": "assets/characters/ko/run_attack.webp",
+        "frames": 3
+      },
+      "special_down": {
+        "sheet": "assets/characters/ko/special_down.webp",
+        "frames": 4
+      },
+      "special_fwd": {
+        "sheet": "assets/characters/ko/special_fwd.webp",
+        "frames": 4
+      },
+      "special_up": {
+        "sheet": "assets/characters/ko/special_up.webp",
+        "frames": 4
+      },
+      "super": {
+        "sheet": "assets/characters/ko/super.webp",
+        "frames": 6
+      },
+      "victory": {
+        "sheet": "assets/characters/ko/victory.webp",
+        "frames": 4
+      },
+      "walk": {
+        "sheet": "assets/characters/ko/walk.webp",
+        "frames": 6
+      }
+    }
   },
-  "stages": {}
+  "posters": {
+    "han": "assets/posters/han.webp",
+    "wang": "assets/posters/wang.webp",
+    "ko": "assets/posters/ko.webp"
+  },
+  "portraits": {
+    "han": "assets/portraits/han.webp",
+    "wang": "assets/portraits/wang.webp",
+    "ko": "assets/portraits/ko.webp"
+  },
+  "select": {
+    "han": "assets/select/han.webp"
+  },
+  "stages": {
+    "intro_1": "assets/stages/intro_1.jpg",
+    "intro_2": "assets/stages/intro_2.jpg",
+    "intro_3": "assets/stages/intro_3.jpg",
+    "intro_4": "assets/stages/intro_4.jpg",
+    "intro_5": "assets/stages/intro_5.jpg",
+    "legislature": "assets/stages/legislature.jpg",
+    "rally": "assets/stages/rally.jpg",
+    "studio": "assets/stages/studio.jpg",
+    "title": "assets/stages/title.jpg"
+  }
 }
