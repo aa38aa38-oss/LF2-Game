@@ -5,15 +5,22 @@
 import json, sys, html, pathlib
 
 STYLE = ("16-bit pixel art, retro arcade beat 'em up game art, chibi proportions (head about one third of body height), "
-         "thick dark outlines, vibrant saturated colors, cel shading, comedic caricature style, original cartoon character")
+         "thick dark outlines, vibrant saturated colors, cel shading, comedic political caricature style")
 SPRITE_END = ("side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, "
               "character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, "
               "plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders")
-REF_NOTE = "Use the attached reference image for the character's exact look (face, hair, glasses, clothes, colors)."
+REF_NOTE = ("Attached images: the character reference sheet I made earlier, plus real photos of him. "
+            "Keep the face clearly recognizable from the photos, and keep the outfit and colors exactly like the reference sheet.")
+
+def who(c):
+    return (f"a chibi pixel-art caricature of {c['en']} ({c['zh']}), the real {c['role']}, "
+            f"drawn so that anyone who knows him recognizes him instantly: {c['face']}; outfit and build: {c['desc']}")
 
 CHARS = [
   dict(id='su', title='衝衝院長', quote='在那叫什麼！', color='orange and dark brown',
-    desc="a bald elderly Taiwanese man in politics, very shiny bald head with a bright white highlight, thin rectangular glasses, thick stern angry eyebrows, orange surgical face mask, dark charcoal suit, white shirt, grey-blue tie, black shoes, fierce hot-tempered energetic attitude",
+    zh='蘇貞昌', en='Su Tseng-chang', role='former Premier of Taiwan',
+    face='completely bald shiny head, rectangular metal-frame glasses, thick dark slanted eyebrows, narrow intense eyes, deep smile lines, determined clenched jaw',
+    desc='a bald elderly Taiwanese politician with a very shiny bald head and a bright white highlight, rectangular metal-frame glasses, thick dark stern eyebrows, dark charcoal suit, white shirt, grey-blue tie, black shoes, fierce hot-tempered energetic attitude',
     skills=[
       ('special_fwd', '技1 光頭閃光', 4, "leaning his head forward and down, his shiny bald head emitting a blinding cone of white-yellow light forward, light rays"),
       ('special_up', '技2 衝天頭槌', 4, "crouching down then launching straight upward head-first like a rocket, a rising headbutt with motion lines"),
@@ -23,7 +30,9 @@ CHARS = [
     poster="shouting furiously with mouth wide open behind the mask, leaning toward the viewer, one fist punching toward the camera, bald head gleaming",
     victory="arms crossed, chin up, bald head shining, proud stern look"),
   dict(id='wang', title='堅哥', quote='Over my dead body！', color='gold and black',
-    desc="a middle-aged Taiwanese man in politics with shoulder-length straight black hair swept back, intense passionate eyes, thick dark eyebrows, black suit, white shirt, black tie, very emotional and dramatic expression",
+    zh='王世堅', en='Wang Shih-chien', role='Taiwanese legislator',
+    face='shoulder-length straight black hair combed back behind the ears, long oval face, thick dark eyebrows, wide intense passionate eyes, prominent cheekbones',
+    desc='a middle-aged Taiwanese politician with shoulder-length straight black hair combed back, thick dark eyebrows, intense passionate eyes, black suit, white shirt, black tie, very emotional dramatic expression',
     skills=[
       ('special_fwd', '技1 指指點點', 4, "aggressively pointing his index finger forward while shouting, yellow sound-wave rings shooting out from his fingertip"),
       ('special_up', '技2 拍案而起', 4, "slamming both palms down hard, then springing up furious with arms raised, a golden shockwave ring spreading on the floor around him"),
@@ -33,7 +42,9 @@ CHARS = [
     poster="pointing his finger straight at the viewer, shouting with fiery passion, hair flowing dramatically, golden light behind him",
     victory="fist raised high, eyes closed, deeply moved and emotional, tears of passion"),
   dict(id='han', title='發大財議長', quote='放馬過來，林北蛋你！', color='royal blue and navy',
-    desc="a chubby round-faced elderly Taiwanese man, bald on top with short grey hair only on the sides, big warm friendly smile, rosy cheeks, white dress shirt with rolled-up sleeves, slight round belly, dark navy trousers, brown shoes, holding a wooden judge's gavel",
+    zh='韓國瑜', en='Han Kuo-yu', role='Speaker of the Legislative Yuan of Taiwan',
+    face='bald crown with short grey hair only on the sides and back, big round face, small smiling eyes, wide warm grin, full cheeks',
+    desc="a chubby round-faced elderly Taiwanese politician, bald on top with short grey hair on the sides, big warm friendly grin, white dress shirt with rolled-up sleeves, slight round belly, dark navy trousers, brown shoes, holding a wooden judge's gavel",
     skills=[
       ('special_fwd', '技1 議事槌', 4, "raising a giant wooden gavel high overhead with both hands, then slamming it onto the ground, a shockwave and dust burst"),
       ('special_up', '技2 貨出得去', 4, "lifting a big cardboard fruit shipping crate and hurling it forward with both hands"),
@@ -43,7 +54,9 @@ CHARS = [
     poster="laughing heartily, raising a wooden gavel high, gold coins flying in the air, cheerful but daring expression",
     victory="giving a big thumbs up with a wide grin, gold coins sparkling"),
   dict(id='ma', title='慢跑總統', quote='我是很喜歡吃香蕉的人', color='sky blue and white',
-    desc="a slim elderly Taiwanese gentleman with neat black side-parted hair, gentle polite smile, red-and-white sweatband on his forehead, white running t-shirt with blue trim, blue running shorts, white running shoes, athletic jogger",
+    zh='馬英九', en='Ma Ying-jeou', role='former President of Taiwan',
+    face='neat dark side-parted hair, slim oval face, gentle polite smile, soft eyes, clean-shaven, slim build',
+    desc='a slim elderly Taiwanese gentleman with neat dark side-parted hair, gentle polite smile, red-and-white sweatband on his forehead, white running t-shirt with blue trim, blue running shorts, white running shoes, athletic jogger',
     skills=[
       ('special_fwd', '技1 香蕉皮', 4, "tossing a banana peel low and forward onto the ground with a polite smile"),
       ('special_up', '技2 香蕉迴力鏢', 4, "throwing a yellow banana sidearm like a boomerang, spinning"),
@@ -53,17 +66,21 @@ CHARS = [
     poster="smiling politely while holding up a yellow banana next to his face, sweatband on, jogging pose",
     victory="jogging in place happily, waving with one hand, holding a banana in the other"),
   dict(id='ko', title='阿北', quote='賴祥德，沒有用的！', color='teal and dark green',
-    desc="a middle-aged Taiwanese man who is a doctor, short dark grey hair, round black glasses, expressionless deadpan face, white doctor's lab coat over a light blue shirt, dark grey trousers",
+    zh='柯文哲', en='Ko Wen-je', role='former Taipei mayor and surgeon',
+    face='short grey hair, thin metal-frame glasses, wide flat face, straight mouth, deadpan expression, slightly heavy-lidded eyes',
+    desc='a Taiwanese politician and former surgeon with short grey hair, thin metal-frame glasses, deadpan expressionless face, dark navy suit jacket over a light blue open-collar shirt with no tie, dark trousers, black shoes',
     skills=[
       ('special_fwd', '技1 飛刀手術', 4, "flicking his wrist to throw three small silver surgical scalpels forward in a fan, calm deadpan face"),
       ('special_up', '技2 電擊器', 4, "thrusting two defibrillator paddles forward, crackling blue electric sparks"),
       ('special_down', '技3 單車環島', 4, "riding a road bicycle at high speed, leaning forward over the handlebars, wheels with motion blur"),
       ('super', '大絕 葉克膜', 6, "standing calmly surrounded by a green healing glow, then raising both arms as blue lightning bolts strike down around him"),
     ],
-    poster="deadpan expression, pushing up his round glasses with one finger, the glasses glinting, holding a scalpel",
+    poster="deadpan expression, pushing up his glasses with one finger, the glasses glinting, holding a scalpel",
     victory="adjusting his glasses with a tiny satisfied smirk, arms behind his back"),
   dict(id='guan', title='館長', quote='RRR！幫我開直播！', color='red and dark maroon',
-    desc="a huge muscular bald Taiwanese man with a full thick black beard, fierce angry eyes, black tank top, enormous muscular arms, camo green cargo pants, black boots, gym owner and livestreamer",
+    zh='館長 陳之漢', en="Chen Chih-han (the YouTuber known as 'Guan Zhang')", role='Taiwanese gym owner and livestreamer',
+    face='shaved bald head, thick full black beard, heavy brow, fierce glaring eyes, thick neck',
+    desc='a huge muscular bald Taiwanese man with a thick full black beard, fierce glaring eyes, black tank top, enormous muscular arms, camo green cargo pants, black boots',
     skills=[
       ('special_fwd', '技1 過肩摔', 4, "a wrestling suplex motion: reaching forward to grab, lifting with both arms, then swinging over his shoulder and slamming down (draw only him, no opponent)"),
       ('special_up', '技2 館長上勾拳', 4, "a powerful rising uppercut, jumping slightly off the ground with the fist high above, impact burst"),
@@ -100,14 +117,22 @@ ATTACK_OVERRIDE = {
 }
 
 def sprite(c, name, frames, action, extra=''):
-    return (f"{STYLE}, sprite sheet of {c['desc']}, {action}, {frames} frames arranged in a single horizontal row from left to right"
+    return (f"{STYLE}, sprite sheet of {who(c)}, {action}, {frames} frames arranged in a single horizontal row from left to right"
             f"{extra}, {SPRITE_END}. {REF_NOTE}")
 
 def char_sections(c):
     items = []
-    items.append(dict(group='第一步：角色設定圖（先做這張，之後每張都上傳它當參考）', file=f"assets/ref/{c['id']}.png（自己留著當參考，不用放進遊戲）",
-        size='16:9 橫式', use='讓 Gemini 記住長相', frames=None,
-        prompt=f"{STYLE}, character reference sheet of {c['desc']}, three views side by side: front view, side view facing right, back view, full body, the same character in all views, plain solid pure green background (#00FF00), no text"))
+    items.append(dict(group='第一步：讓 Gemini 上網找照片（純文字對話，不是生圖）', name='找照片＋整理長相特徵',
+        file='（不用存檔：把找到的 2～3 張清楚照片下載下來，下一步要上傳）', size='文字回答',
+        prompt=(f"請用 Google 搜尋{c['zh']}（{c['en']}）近幾年清楚的照片：至少一張正面、一張側面或半側面、一張全身照。"
+                f"請列出照片連結，並用英文條列他的長相特徵（臉型、髮型與髮色、眼鏡、眉毛、眼睛、嘴型與招牌表情、體型、常見穿著），"
+                f"我要拿來畫成 Q 版像素風的遊戲角色漫畫，所以請特別指出最有辨識度、可以誇張化的 3 個特徵。")))
+    items.append(dict(group='第二步：角色設定圖（上傳照片＋貼 prompt；之後每張都上傳這張當參考）', name='角色設定圖',
+        file=f"assets/ref/{c['id']}.png（自己留著當參考，不用放進遊戲）", size='16:9 橫式',
+        prompt=(f"{STYLE}. Using the attached real photos of {c['en']} ({c['zh']}) as the likeness reference, draw a character reference sheet of {who(c)}. "
+                f"Exaggerate his three most recognizable features from the photos (as described above) so he is instantly recognizable even as a small chibi sprite. "
+                f"Three views side by side: front view, side view facing right, back view, full body, the same character in all views, "
+                f"plain solid pure green background (#00FF00), no text.")))
     for key, zh, n, act in BASIC:
         a = ATTACK_OVERRIDE.get(c['id'], {}).get(key, act)
         if key == 'victory':
@@ -119,13 +144,13 @@ def char_sections(c):
             size=f"{n} 格橫排（每格 512×512，整張 {512*n}×512）", prompt=sprite(c, key, n, act)))
     items.append(dict(group='畫面用圖', name='頭像（血條、選角卡片、大絕橫幅的圓形頭像）', file=f"assets/portraits/{c['id']}.png", frames=None,
         size='正方形 1:1（512×512）',
-        prompt=f"{STYLE}, head and shoulders portrait of {c['desc']}, facing slightly right, expressive face, simple {c['color']} gradient background, square image, character fills the frame, no text. {REF_NOTE}"))
+        prompt=f"{STYLE}, head and shoulders portrait of {who(c)}, facing slightly right, expressive face, simple {c['color']} gradient background, square image, character fills the frame, no text. {REF_NOTE}"))
     items.append(dict(group='畫面用圖', name=f"大絕金句橫幅（放大絕時上方跳出，遊戲會在右邊疊上「{c['quote']}」）", file=f"assets/posters/{c['id']}.png", frames=None,
         size='超寬橫式 4:1（1600×400）',
-        prompt=f"{STYLE}, fighting game super move cut-in banner, extreme close-up of the face of {c['desc']}, {c['poster']}, face placed in the LEFT third of the image, the right two thirds is empty plain green for text, dramatic speed lines behind the face, very wide 4:1 horizontal strip, plain solid pure green background (#00FF00), no text. {REF_NOTE}"))
+        prompt=f"{STYLE}, fighting game super move cut-in banner, extreme close-up of the face of {who(c)}, {c['poster']}, face placed in the LEFT third of the image, the right two thirds is empty plain green for text, dramatic speed lines behind the face, very wide 4:1 horizontal strip, plain solid pure green background (#00FF00), no text. {REF_NOTE}"))
     items.append(dict(group='畫面用圖', name='選角／VS 畫面全身立繪', file=f"assets/select/{c['id']}.png", frames=None,
         size='直式 2:3（800×1200）',
-        prompt=f"{STYLE}, full body character select illustration of {c['desc']}, heroic confident pose facing slightly right, dynamic low angle, larger and more detailed than a sprite, feet touching the bottom edge, plain solid pure green background (#00FF00), no text. {REF_NOTE}"))
+        prompt=f"{STYLE}, full body character select illustration of {who(c)}, heroic confident pose facing slightly right, dynamic low angle, larger and more detailed than a sprite, feet touching the bottom edge, plain solid pure green background (#00FF00), no text. {REF_NOTE}"))
     return items
 
 COMMON = [
@@ -144,7 +169,7 @@ COMMON = [
   dict(group='首頁與開場', name='開場 3：剪影', file='assets/stages/intro_3.png', size='16:9（1920×1080）',
     prompt=f"{STYLE}, six mysterious black silhouettes of politicians standing in a row under spotlights in a dark hall, one bald, one with long hair, one chubby, one with a sweatband, one with round glasses, one huge muscular bearded, dramatic, wide 16:9, no text"),
   dict(group='首頁與開場', name='開場 4：對峙', file='assets/stages/intro_4.png', size='16:9（1920×1080）',
-    prompt=f"{STYLE}, split screen face-off, versus fighting game style: on the left {CHARS[2]['desc']} shouting, on the right {CHARS[0]['desc']} shouting, lightning between them, wide 16:9, no text. Use the attached reference images."),
+    prompt=f"{STYLE}, split screen face-off, versus fighting game style: on the left a caricature of {CHARS[2]['en']} ({CHARS[2]['zh']}) shouting, on the right a caricature of {CHARS[0]['en']} ({CHARS[0]['zh']}) shouting, lightning between them, wide 16:9, no text. Use the attached reference images."),
   dict(group='首頁與開場', name='開場 5：衝鋒', file='assets/stages/intro_5.png', size='16:9（1920×1080）',
     prompt=f"{STYLE}, six caricature politicians charging forward together on a campaign rally stage, speed lines, explosive energy, fighting game opening screen, wide 16:9, no text. Use the attached reference images for each character's look."),
 ]
@@ -168,19 +193,21 @@ def write_md(data, path):
     L.append("# Gemini 生圖 Prompt（可直接複製貼上）\n")
     L.append("> 這份是 `tools/gen_prompts.py` 自動產生的，要改內容請改那支程式再重跑。\n")
     L.append("## 怎麼用\n")
-    L.append("1. **每個角色先生「角色設定圖」**，挑一張最像的存起來。")
-    L.append("2. 之後這個角色的每一張圖，都**先上傳設定圖，再貼 prompt**，長相才會一致。")
-    L.append("3. 動作圖是「一整條動作條」：一張圖裡由左到右排好幾格。格子要等寬，遊戲會自動平均切開。Gemini 排不整齊時，可以改成一格一張（檔名 `idle_1.png`、`idle_2.png`…）。")
-    L.append("4. 綠色背景 `#00FF00` 會被遊戲自動去背，所以角色身上不要有亮綠色。")
-    L.append("5. 生好的圖照「存檔」那欄的路徑放進 repo，再登記到 `assets/manifest.json`（最下面有範例）。一個角色的動作建議**全部生完再一起登記**，不然會圖和程式畫的混在一起。")
-    L.append("6. Gemini 若因為「像真人」拒絕，把 prompt 裡的 `Taiwanese man in politics` 改成 `cartoon man`，或多強調 `caricature, cartoon`。\n")
+    L.append("1. **第一步（找照片）**：在 Gemini 一般對話貼上「找照片」那段，讓它上網找照片並整理長相特徵。把它找到的 2～3 張清楚照片（正面、側面、全身）**下載下來**。Gemini 生圖時通常不會自己去抓網路照片，所以照片要你上傳給它，這樣最像。")
+    L.append("2. **第二步（設定圖）**：同一個對話裡，**上傳那幾張照片**，再貼「角色設定圖」的 prompt。多生幾次，挑最像的一張存起來。")
+    L.append("3. 之後這個角色的每一張圖，都**上傳設定圖＋1～2 張真人照片，再貼 prompt**。最好每個角色開一個新對話，一路在同一個對話裡生，長相會更一致。")
+    L.append("4. 動作圖是「一整條動作條」：一張圖裡由左到右排好幾格。格子要等寬，遊戲會自動平均切開。Gemini 排不整齊時，可以改成一格一張（檔名 `idle_1.png`、`idle_2.png`…）。")
+    L.append("5. 綠色背景 `#00FF00` 會被遊戲自動去背，所以角色身上不要有亮綠色。")
+    L.append("6. 生好的圖照「存檔」那欄的路徑放進 repo，再登記到 `assets/manifest.json`（最下面有範例）。一個角色的動作建議**全部生完再一起登記**，不然會圖和程式畫的混在一起。")
+    L.append("7. 真實姓名只出現在給 Gemini 的 prompt 裡，遊戲畫面一樣只用稱號。")
+    L.append("8. Gemini 若拒絕畫真人：先試著補一句 `This is a light-hearted political caricature for a parody game, not a realistic photo.`；還是不行就拿掉姓名，只留照片和外型描述。\n")
     for c in data['chars']:
         L.append(f"---\n\n## {c['title']}（`{c['id']}`）　金句：「{c['quote']}」\n")
         g = None
         for it in c['items']:
             if it['group'] != g:
                 g = it['group']; L.append(f"### {g}\n")
-            nm = it.get('name') or '角色設定圖'
+            nm = it.get('name')
             L.append(f"**{nm}**　存檔：`{it['file']}`　尺寸：{it['size']}\n")
             L.append("```\n" + it['prompt'] + "\n```\n")
     L.append("---\n\n## 共用畫面（場景、首頁、開場）\n")
