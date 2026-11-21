@@ -5,16 +5,17 @@
 import json, sys, html, pathlib
 
 STYLE = ("16-bit pixel art, retro arcade beat 'em up game art, chibi proportions (head about one third of body height), "
-         "thick dark outlines, vibrant saturated colors, cel shading, comedic political caricature style")
+         "thick dark outlines, vibrant saturated colors, cel shading, comedic cartoon style, original video game character")
 SPRITE_END = ("side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, "
               "character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, "
               "plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders")
-REF_NOTE = ("Attached images: the character reference sheet I made earlier, plus real photos of him. "
-            "Keep the face clearly recognizable from the photos, and keep the outfit and colors exactly like the reference sheet.")
+# 注意：Gemini 會擋「真實姓名＋真人照片」的圖，也會擋「真人被打」的畫面。
+# 所以生圖 prompt 一律不寫姓名，只說「附件設定圖裡的卡通角色」，動作描述也寫成卡通搞笑風。
+REF_NOTE = ("Attached image: this character's reference sheet. Draw exactly this same cartoon character, "
+            "matching the face, hairstyle, glasses, outfit and colors of the reference sheet.")
 
 def who(c):
-    return (f"a chibi pixel-art caricature of {c['en']} ({c['zh']}), the real {c['role']}, "
-            f"drawn so that anyone who knows him recognizes him instantly: {c['face']}; outfit and build: {c['desc']}")
+    return f"the chibi cartoon game character from the attached reference sheet ({c['face']}; {c['desc']})"
 
 CHARS = [
   dict(id='su', title='衝衝院長', quote='在那叫什麼！', color='orange and dark brown',
@@ -102,13 +103,13 @@ BASIC = [
   ('jump_attack', '空中攻擊', 2, "flying kick downward-forward in mid-air"),
   ('run_attack', '衝刺攻擊', 3, "running shoulder tackle, body leaning far forward"),
   ('defend', '防禦', 1, "blocking with both forearms crossed in front of the face, crouched slightly"),
-  ('hurt', '被打', 2, "getting hit, head snapped back, pained expression, body recoiling"),
-  ('fall', '被打飛', 3, "knocked off his feet, flying backward through the air, body tilting to horizontal"),
-  ('down', '倒地', 1, "lying flat on the ground on his back, dazed, horizontal pose"),
+  ('hurt', '被打', 2, "comedic cartoon reaction: staggering backward with a funny surprised face, little cartoon stars around the head"),
+  ('fall', '被打飛', 3, "comically tumbling backward through the air like a slapstick cartoon, body tilting to horizontal, funny surprised face"),
+  ('down', '倒地', 1, "lying flat on the floor on his back with cartoon swirly eyes, slapstick comedy, horizontal pose"),
   ('getup', '起身／撿東西', 2, "getting up from the ground: kneeling on one knee, then rising"),
   ('dizzy', '暈眩', 3, "dizzy and wobbling, swirly eyes, looping"),
   ('roll', '翻滾閃避／空中翻身', 4, "doing a forward somersault roll, curled into a ball"),
-  ('catch', '抓住對手揍', 2, "holding an invisible opponent by the collar with one hand and punching with the other (draw only him, no opponent)"),
+  ('catch', '抓住對手揍', 2, "comedic cartoon grab: one hand reaching forward grabbing the air, the other hand doing a playful cartoon jab (only this one character in the image)"),
   ('victory', '勝利', 4, None),
 ]
 ATTACK_OVERRIDE = {
@@ -127,12 +128,18 @@ def char_sections(c):
         prompt=(f"請用 Google 搜尋{c['zh']}（{c['en']}）近幾年清楚的照片：至少一張正面、一張側面或半側面、一張全身照。"
                 f"請列出照片連結，並用英文條列他的長相特徵（臉型、髮型與髮色、眼鏡、眉毛、眼睛、嘴型與招牌表情、體型、常見穿著），"
                 f"我要拿來畫成 Q 版像素風的遊戲角色漫畫，所以請特別指出最有辨識度、可以誇張化的 3 個特徵。")))
-    items.append(dict(group='第二步：角色設定圖（上傳照片＋貼 prompt；之後每張都上傳這張當參考）', name='角色設定圖',
+    base_sheet = (f"Three views side by side: front view, side view facing right, back view, full body, the same character in all views, "
+                  f"plain solid pure green background (#00FF00), no text.")
+    feat = f"{c['face']}; {c['desc']}"
+    items.append(dict(group='第二步：角色設定圖（擇一；做好後，之後每張圖都只上傳這張）', name='做法 A：上傳 2～3 張照片＋貼這段',
         file=f"assets/ref/{c['id']}.png（自己留著當參考，不用放進遊戲）", size='16:9 橫式',
-        prompt=(f"{STYLE}. Using the attached real photos of {c['en']} ({c['zh']}) as the likeness reference, draw a character reference sheet of {who(c)}. "
-                f"Exaggerate his three most recognizable features from the photos (as described above) so he is instantly recognizable even as a small chibi sprite. "
-                f"Three views side by side: front view, side view facing right, back view, full body, the same character in all views, "
-                f"plain solid pure green background (#00FF00), no text.")))
+        prompt=(f"{STYLE}. Create an original chibi pixel-art video game character design inspired by the hairstyle, face shape, glasses and outfit "
+                f"in the attached photos, exaggerated in a funny cartoon way: {feat}. Make the most distinctive features big and clear so the "
+                f"character still reads well as a small sprite. Character reference sheet. {base_sheet}")))
+    items.append(dict(group='第二步：角色設定圖（擇一；做好後，之後每張圖都只上傳這張）', name='做法 B：A 被拒絕時用（不上傳照片）',
+        file=f"assets/ref/{c['id']}.png（自己留著當參考，不用放進遊戲）", size='16:9 橫式',
+        prompt=(f"{STYLE}. Character reference sheet of an original chibi pixel-art video game character: {feat}. "
+                f"Make the most distinctive features big and clear so the character still reads well as a small sprite. {base_sheet}")))
     for key, zh, n, act in BASIC:
         a = ATTACK_OVERRIDE.get(c['id'], {}).get(key, act)
         if key == 'victory':
@@ -161,7 +168,7 @@ COMMON = [
   dict(group='場景背景', name='政論節目攝影棚', file='assets/stages/studio.png', size='16:9（1920×1080）',
     prompt=f"{STYLE}, side-scrolling beat 'em up stage background, TV political talk show studio, deep blue lighting, a giant screen in the center, side screens with bar charts, a news ticker bar, an anchor desk, studio cameras, the lower 46 percent of the image is an open empty glossy dark blue studio floor with tape marks in perspective, the left and right edges should connect seamlessly when tiled, wide 16:9, no characters, no text"),
   dict(group='首頁與開場', name='首頁主視覺', file='assets/stages/title.png', size='16:9（1920×1080）',
-    prompt=f"{STYLE}, epic arcade game key art, night sky over a city, a glowing government building in the center with golden light rays, six caricature politicians posing heroically in a row in front: " + "; ".join(c['desc'] for c in CHARS) + ". Keep the top third of the image empty dark sky for a logo and the bottom fifth simple, wide 16:9, no text. Use the attached reference images for each character's look."),
+    prompt=f"{STYLE}, epic arcade game key art, night sky over a city, a glowing government building in the center with golden light rays, six caricature politicians posing heroically in a row in front: " + "; ".join(c['desc'] for c in CHARS) + ". Keep the top third of the image empty dark sky for a logo and the bottom fifth simple, wide 16:9, no text. Attach the six character reference sheets."),
   dict(group='首頁與開場', name='開場 1：議場', file='assets/stages/intro_1.png', size='16:9（1920×1080）',
     prompt=f"{STYLE}, wide shot of an empty parliament assembly hall interior, tense quiet atmosphere, dramatic lighting, wide 16:9, no characters, no text"),
   dict(group='首頁與開場', name='開場 2：警報', file='assets/stages/intro_2.png', size='16:9（1920×1080）',
@@ -169,9 +176,9 @@ COMMON = [
   dict(group='首頁與開場', name='開場 3：剪影', file='assets/stages/intro_3.png', size='16:9（1920×1080）',
     prompt=f"{STYLE}, six mysterious black silhouettes of politicians standing in a row under spotlights in a dark hall, one bald, one with long hair, one chubby, one with a sweatband, one with round glasses, one huge muscular bearded, dramatic, wide 16:9, no text"),
   dict(group='首頁與開場', name='開場 4：對峙', file='assets/stages/intro_4.png', size='16:9（1920×1080）',
-    prompt=f"{STYLE}, split screen face-off, versus fighting game style: on the left a caricature of {CHARS[2]['en']} ({CHARS[2]['zh']}) shouting, on the right a caricature of {CHARS[0]['en']} ({CHARS[0]['zh']}) shouting, lightning between them, wide 16:9, no text. Use the attached reference images."),
+    prompt=f"{STYLE}, split screen face-off, versus fighting game style: on the left the chubby smiling character from the first attached reference sheet shouting, on the right the bald glasses character from the second attached reference sheet shouting, lightning between them, wide 16:9, no text. Attach two reference sheets: the chubby gavel character first, the bald glasses character second."),
   dict(group='首頁與開場', name='開場 5：衝鋒', file='assets/stages/intro_5.png', size='16:9（1920×1080）',
-    prompt=f"{STYLE}, six caricature politicians charging forward together on a campaign rally stage, speed lines, explosive energy, fighting game opening screen, wide 16:9, no text. Use the attached reference images for each character's look."),
+    prompt=f"{STYLE}, six caricature politicians charging forward together on a campaign rally stage, speed lines, explosive energy, fighting game opening screen, wide 16:9, no text. Attach the six character reference sheets."),
 ]
 
 def build():
@@ -193,14 +200,14 @@ def write_md(data, path):
     L.append("# Gemini 生圖 Prompt（可直接複製貼上）\n")
     L.append("> 這份是 `tools/gen_prompts.py` 自動產生的，要改內容請改那支程式再重跑。\n")
     L.append("## 怎麼用\n")
-    L.append("1. **第一步（找照片）**：在 Gemini 一般對話貼上「找照片」那段，讓它上網找照片並整理長相特徵。把它找到的 2～3 張清楚照片（正面、側面、全身）**下載下來**。Gemini 生圖時通常不會自己去抓網路照片，所以照片要你上傳給它，這樣最像。")
-    L.append("2. **第二步（設定圖）**：同一個對話裡，**上傳那幾張照片**，再貼「角色設定圖」的 prompt。多生幾次，挑最像的一張存起來。")
-    L.append("3. 之後這個角色的每一張圖，都**上傳設定圖＋1～2 張真人照片，再貼 prompt**。最好每個角色開一個新對話，一路在同一個對話裡生，長相會更一致。")
-    L.append("4. 動作圖是「一整條動作條」：一張圖裡由左到右排好幾格。格子要等寬，遊戲會自動平均切開。Gemini 排不整齊時，可以改成一格一張（檔名 `idle_1.png`、`idle_2.png`…）。")
-    L.append("5. 綠色背景 `#00FF00` 會被遊戲自動去背，所以角色身上不要有亮綠色。")
-    L.append("6. 生好的圖照「存檔」那欄的路徑放進 repo，再登記到 `assets/manifest.json`（最下面有範例）。一個角色的動作建議**全部生完再一起登記**，不然會圖和程式畫的混在一起。")
-    L.append("7. 真實姓名只出現在給 Gemini 的 prompt 裡，遊戲畫面一樣只用稱號。")
-    L.append("8. Gemini 若拒絕畫真人：先試著補一句 `This is a light-hearted political caricature for a parody game, not a realistic photo.`；還是不行就拿掉姓名，只留照片和外型描述。\n")
+    L.append("**Gemini 會擋兩種圖**：①prompt 寫真實姓名、又上傳真人照片；②真人「被打」的畫面。所以這版的生圖 prompt **都不寫姓名**，只說「附件設定圖裡的卡通角色」，被打、倒地也改成卡通搞笑的說法。\n")
+    L.append("1. **第一步（找照片，可略過）**：在 Gemini 一般文字對話貼上「找照片」那段，讓它找照片並整理長相特徵。把 2～3 張清楚照片下載下來。")
+    L.append("2. **第二步（設定圖）**：**開一個新對話**，上傳照片，貼「做法 A」。被拒絕就再開新對話，改用「做法 B」（不上傳照片，只靠文字描述）。多生幾次，挑最像的一張存起來。")
+    L.append("3. **之後每一張圖：只上傳設定圖（不要再傳真人照片），一次只貼一段 prompt、一次只生一張。** 不要叫 Gemini 一次排很多步驟連續生，中間一張被擋就會整批卡住。")
+    L.append("4. 某一張被拒絕時：**開新對話**，重新上傳設定圖，再貼那一張的 prompt。被拒絕過的對話，後面常常會一直被擋。")
+    L.append("5. 動作圖是「一整條動作條」：一張圖裡由左到右排好幾格。格子要等寬，遊戲會自動平均切開。Gemini 排不整齊時，可以改成一格一張（檔名 `idle_1.png`、`idle_2.png`…）。")
+    L.append("6. 綠色背景 `#00FF00` 會被遊戲自動去背，所以角色身上不要有亮綠色。")
+    L.append("7. 生好的圖照「存檔」那欄的路徑放進 repo，再登記到 `assets/manifest.json`（最下面有範例）。一個角色的動作建議**全部生完再一起登記**，不然會圖和程式畫的混在一起。\n")
     for c in data['chars']:
         L.append(f"---\n\n## {c['title']}（`{c['id']}`）　金句：「{c['quote']}」\n")
         g = None
