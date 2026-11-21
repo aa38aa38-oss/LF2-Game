@@ -1,5 +1,5 @@
 // 對戰場景：1v1、四人亂鬥、連戰生存
-import { ARENA, rand, pick, shuffle, sign, easeOut, easeIn, clamp } from './util.js';
+import { ARENA, WORLD_W, rand, pick, shuffle, sign, easeOut, easeIn, clamp } from './util.js';
 import { Fighter, ATK } from './fighter.js';
 import { CHARS, CHAR_BY_ID } from './characters.js';
 import { MOVES } from './moves.js';
@@ -41,21 +41,39 @@ export class BattleScene {
     this.wave = 0;
     this.timer = 99;
     this.announce = null;
-    this.player = this.addFighter(cfg.playerChar, { ctrl: this.g.input.p1, team: 0, x: 220, z: 95, facing: 1, label: 'P1' });
+    this.player = this.addFighter(cfg.playerChar, { ctrl: this.g.input.p1, team: 0, x: 760, z: 95, facing: 1, label: 'P1' });
     if (cfg.mode === '1v1') {
-      this.addFighter(cfg.cpuChars[0], { cpu: true, team: 1, x: 740, z: 95, facing: -1, label: 'CPU' });
+      this.addFighter(cfg.cpuChars[0], { cpu: true, team: 1, x: 1160, z: 95, facing: -1, label: 'CPU' });
       this.setPhase('intro');
     } else if (cfg.mode === 'brawl') {
-      this.player.x = 200;
+      this.player.x = 760;
       this.player.z = 50;
-      const pos = [[760, 50], [760, 150], [200, 150]];
-      cfg.cpuChars.slice(0, 3).forEach((id, i) => this.addFighter(id, { cpu: true, team: i + 1, x: pos[i][0], z: pos[i][1], facing: pos[i][0] > 480 ? -1 : 1, label: 'CPU' }));
+      const pos = [[1160, 50], [1160, 150], [760, 150]];
+      cfg.cpuChars.slice(0, 3).forEach((id, i) => this.addFighter(id, { cpu: true, team: i + 1, x: pos[i][0], z: pos[i][1], facing: pos[i][0] > 960 ? -1 : 1, label: 'CPU' }));
       this.setPhase('intro');
     } else {
       this.pool = shuffle(CHARS.map((c) => c.id).filter((id) => id !== cfg.playerChar));
       this.nextWave();
     }
+    this.cam = { x: 0, y: 0 };
+    this.updateCamera(0, true);
     this.g.audio.playBgm('battle');
+  }
+
+  // 跟隨玩家的鏡頭（手機會放大，並允許鏡頭超出場地邊界，讓角色保持在畫面中間、不被按鈕擋住）
+  updateCamera(dt, snap = false) {
+    const g = this.g;
+    const touch = document.body.classList.contains('touch');
+    this.zoom = touch ? 1.3 : 1;
+    const viewW = g.CW / this.zoom, viewH = 540 / this.zoom;
+    const P = this.player;
+    const focus = !P.dead ? P : this.fighters.find((f) => !f.dead) || P;
+    const margin = touch ? viewW * 0.5 : 0;
+    let tx = focus.x - viewW / 2;
+    tx = clamp(tx, -margin, WORLD_W + margin - viewW);
+    this.cam.x = snap ? tx : this.cam.x + (tx - this.cam.x) * Math.min(1, dt * 7);
+    this.cam.y = 540 - viewH;
+    this.viewW = viewW;
   }
 
   addFighter(cid, o) {
@@ -76,7 +94,7 @@ export class BattleScene {
     if (n > 1) {
       this.player.hp = Math.min(this.player.maxHp, this.player.hp + this.player.maxHp * 0.35);
       this.player.setState('idle');
-      this.player.x = 220;
+      this.player.x = 760;
       this.player.z = 95;
       this.player.y = 0;
       this.player.vx = this.player.vz = this.player.vy = 0;
@@ -87,7 +105,7 @@ export class BattleScene {
     for (let i = 0; i < count; i++) {
       const id = this.pool[(n - 1 + i * 2) % this.pool.length];
       this.addFighter(id, {
-        cpu: true, team: 1, x: 740 - i * 30, z: [95, 40, 160][i], facing: -1, label: 'CPU',
+        cpu: true, team: 1, x: 1160 - i * 30, z: [95, 40, 160][i], facing: -1, label: 'CPU',
         boost: n - 1, hpMul: 0.8 + (n - 1) * 0.06 - (count - 1) * 0.12,
       });
     }
@@ -216,7 +234,11 @@ export class BattleScene {
       this.itemTimer -= dt;
       if (this.itemTimer <= 0) {
         this.itemTimer = rand(6, 11);
-        if (this.items.length < 3) this.items.push(spawnRandomItem());
+        if (this.items.length < 3) {
+          const it = spawnRandomItem();
+          it.x = clamp(this.player.x + rand(-380, 380), ARENA.xMin + 40, ARENA.xMax - 40);
+          this.items.push(it);
+        }
       }
     }
     for (const it of this.items) {
@@ -227,6 +249,7 @@ export class BattleScene {
         if (it.y <= 0) {
           it.y = 0;
           if (it.vy < -300) this.fx.add({ type: 'dust', x: it.x, z: it.z, y: 0, life: 0.3 });
+          it.x = clamp(it.x, ARENA.xMin, ARENA.xMax);
           it.vy = 0;
         }
       }
@@ -314,6 +337,7 @@ export class BattleScene {
       return;
     }
     this.time += dt;
+    this.updateCamera(dt);
     if (this.cutin) {
       this.cutin.t += dt;
       if (this.cutin.t >= this.cutin.dur) {
@@ -473,6 +497,16 @@ export class BattleScene {
         }
         if (p.back && Math.abs(p.x - p.owner.x) < 20 && Math.abs(p.z - p.owner.z) < 30) p.dead = true;
       }
+      if (p.homing) {
+        const tg = p.homing;
+        if (!tg.dead && tg.hp > 0) {
+          const dx = tg.x - p.x, dz = tg.z - p.z, d = Math.hypot(dx, dz) || 1;
+          const k = Math.min(1, dt * 3.5);
+          p.vx += ((dx / d) * 460 - p.vx) * k;
+          p.vz += ((dz / d) * 300 - p.vz) * k;
+        }
+        p.y += (50 - p.y) * Math.min(1, dt * 4);
+      }
       if (p.gravity && !p.landed) p.vy -= p.gravity * dt;
       p.x += p.vx * dt;
       p.z += p.vz * dt;
@@ -554,15 +588,16 @@ export class BattleScene {
   // ───── 繪製 ─────
   draw() {
     const g = this.g;
-    const p = g.beginPix();
-    let ox = 0, oy = 0;
+    const p = g.beginPix(true);
+    let sx = 0, sy = 0;
     if (this.shakeT > 0 && !this.paused) {
-      ox = rand(-this.shakeAmt, this.shakeAmt);
-      oy = rand(-this.shakeAmt, this.shakeAmt) * 0.6;
+      sx = rand(-this.shakeAmt, this.shakeAmt);
+      sy = rand(-this.shakeAmt, this.shakeAmt) * 0.6;
     }
-    p.save();
-    p.translate(ox, oy);
-    this.stage.draw(p, this.time);
+    const z = this.zoom, cam = this.cam, vw = this.viewW;
+    const worldT = (c, k) => c.setTransform(k * z, 0, 0, k * z, k * (-cam.x * z + sx), k * (-cam.y * z + sy));
+    worldT(p, 0.5);
+    this.stage.draw(p, this.time, cam.x - 10, cam.x + vw + 10);
     for (const f of this.fighters) drawShadow(p, f.x, f.z, f.y);
     for (const pr of this.projs) if (pr.trap || pr.gravity) drawShadow(p, pr.x, pr.z, pr.y, 10);
     for (const it of this.items) drawShadow(p, it.x, it.z, it.y, 14);
@@ -571,12 +606,12 @@ export class BattleScene {
     const superOn = this.fighters.some((f) => f.state === 'super');
     if (superOn) {
       p.fillStyle = 'rgba(0,0,10,0.35)';
-      p.fillRect(0, 0, 960, 540);
+      p.fillRect(cam.x - 50, 0, vw + 100, 540);
     }
     for (const d of list) {
       if (d.f) {
         const f = d.f;
-        if (f.invuln > 0 && f.state === 'idle' && Math.floor(this.time * 20) % 2) continue;
+        if (f.invuln > 0 && ['idle', 'walk', 'run'].includes(f.state) && Math.floor(this.time * 20) % 2) continue;
         if (f.state === 'super') {
           p.save();
           p.globalCompositeOperation = 'lighter';
@@ -596,18 +631,53 @@ export class BattleScene {
       } else this.drawProj(p, d.pr);
     }
     this.fx.draw(p);
-    p.restore();
-    if (this.cutin) this.drawCutinArt(p, this.cutin);
+    if (this.cutin) {
+      p.setTransform(0.5, 0, 0, 0.5, g.ox / 2, 0);
+      this.drawCutinArt(p, this.cutin);
+    }
     g.flushPix();
 
     const ctx = g.ctx;
-    this.fx.drawUI(ctx, ox, oy);
-    this.drawPlayerTag(ctx, ox, oy);
+    ctx.save();
+    worldT(ctx, 1);
+    this.fx.drawUI(ctx, 'world');
+    this.drawPlayerTag(ctx);
+    ctx.restore();
+    this.drawOffscreen(ctx);
+    this.fx.drawUI(ctx, 'screen');
     this.drawHUD(ctx);
     this.drawCombo(ctx);
     if (this.cutin) this.drawCutinText(ctx, this.cutin);
     if (this.announce) this.drawAnnounce(ctx);
     if (this.paused) this.drawPause(ctx);
+  }
+
+  // 畫面外的角色：在畫面邊緣顯示箭頭
+  drawOffscreen(ctx) {
+    const z = this.zoom, cam = this.cam, CW = this.g.CW, ox = this.g.ox;
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    for (const f of this.fighters) {
+      if (f.dead) continue;
+      const x = (f.x - cam.x) * z;
+      if (x > -10 && x < CW + 10) continue;
+      const left = x < 0;
+      const ex = left ? 18 : CW - 18;
+      const ey = clamp((ARENA.floorY + f.z - 60 - cam.y) * z, 120, 500);
+      ctx.fillStyle = f === this.player ? '#5cff7a' : f.char.color;
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(left ? ex - 10 : ex + 10, ey);
+      ctx.lineTo(left ? ex + 8 : ex - 8, ey - 11);
+      ctx.lineTo(left ? ex + 8 : ex - 8, ey + 11);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      txt(ctx, f.char.title, left ? ex + 12 : ex - 12, ey + 22, { size: 11, weight: 900, color: '#fff', align: left ? 'left' : 'right', stroke: '#000', sw: 3 });
+    }
+    ctx.restore();
+    void ox;
   }
 
   drawProj(ctx, p) {
@@ -678,6 +748,7 @@ export class BattleScene {
         drawBanana(ctx, x, y - 4, 1.6, p.landed ? 0 : p.t * 12);
         break;
       case 'boomerang':
+      case 'homing':
         drawBanana(ctx, x, y, 2, p.t * 20);
         break;
       case 'item':
@@ -733,10 +804,10 @@ export class BattleScene {
     ctx.restore();
   }
 
-  drawPlayerTag(ctx, ox, oy) {
+  drawPlayerTag(ctx) {
     const f = this.player;
     if (f.dead) return;
-    const x = f.x + ox, y = ARENA.floorY + f.z - f.y - 140 + oy;
+    const x = f.x, y = ARENA.floorY + f.z - f.y - 140;
     txt(ctx, '1P', x, y, { size: 12, font: 'px', color: '#5cff7a', align: 'center', stroke: '#000', sw: 4 });
     ctx.fillStyle = '#5cff7a';
     ctx.beginPath();
@@ -751,9 +822,10 @@ export class BattleScene {
     g.addColorStop(0, 'rgba(8,8,20,0.96)');
     g.addColorStop(1, 'rgba(20,18,40,0.92)');
     ctx.fillStyle = g;
-    ctx.fillRect(0, 0, 960, 82);
+    const ox = this.g.ox;
+    ctx.fillRect(-ox, 0, this.g.CW, 82);
     ctx.fillStyle = '#c9a227';
-    ctx.fillRect(0, 82, 960, 2);
+    ctx.fillRect(-ox, 82, this.g.CW, 2);
     const fs = this.fighters;
     if (fs.length === 2) {
       this.hudPanel(ctx, fs[0], 10, 8, 400, false);
@@ -830,7 +902,7 @@ export class BattleScene {
     else if (p > 0.86) ox = easeIn((p - 0.86) / 0.14) * 1200;
     ctx.save();
     ctx.fillStyle = `rgba(0,0,0,${Math.min(0.65, p * 5)})`;
-    ctx.fillRect(0, 0, 960, 540);
+    ctx.fillRect(-this.g.ox, 0, this.g.CW, 540);
     ctx.translate(ox, 0);
     // 斜帶
     ctx.beginPath();
@@ -873,7 +945,7 @@ export class BattleScene {
     ctx.restore();
     if (p < 0.06) {
       ctx.fillStyle = `rgba(255,255,255,${1 - p / 0.06})`;
-      ctx.fillRect(0, 0, 960, 540);
+      ctx.fillRect(-this.g.ox, 0, this.g.CW, 540);
     }
   }
 
@@ -902,7 +974,7 @@ export class BattleScene {
 
   drawPause(ctx) {
     ctx.fillStyle = 'rgba(0,0,0,0.6)';
-    ctx.fillRect(0, 0, 960, 540);
+    ctx.fillRect(-this.g.ox, 0, this.g.CW, 540);
     panel(ctx, 330, 160, 300, 240);
     pixelText(ctx, 'PAUSE', 480, 200, { size: 32, scale: 2, font: 'px', color: '#ffd84a', outline: '#000' });
     const opts = ['繼續戰鬥', '重新開始', '回到標題'];

@@ -305,11 +305,16 @@ export class Fighter {
         b.sfx('jump');
       }
     } else if (st === 'down') {
+      // 倒地：時間到自動起身；按任何鍵可以提早起身
       this.invuln = 0.3;
-      if (T >= 0.75) this.setState('getup');
+      const quick = T > 0.2 && b.fightOn && (c.pressed('attack') || c.pressed('jump') || c.pressed('defend') || c.pressed('special'));
+      if (T >= 0.6 || quick) this.setState('getup');
     } else if (st === 'getup') {
       this.invuln = 0.45;
-      if (T >= 0.35) this.setState('idle');
+      if (T >= 0.3) {
+        this.setState('idle');
+        this.invuln = 0.8; // 起身後短暫無敵（角色會閃爍）
+      }
     } else if (st === 'dizzy') {
       if (T >= this.dizzyDur) this.setState('idle');
     } else if (st === 'land' || st === 'pick') {
@@ -446,6 +451,9 @@ export class Fighter {
   // 被打到。回傳 'hit' | 'block' | 'break' | 'armor' | null
   takeHit(src, h, b) {
     if (this.dead || this.invuln > 0 || ['down', 'getup', 'ko', 'roll'].includes(this.state)) return null;
+    // 空中追打上限：被打飛後最多再被打中 2 下，之後到落地前都打不到（避免一直爬不起來）
+    const wasFall = this.state === 'fall';
+    if (wasFall && (this.juggle || 0) >= 2) return null;
     if (this.state === 'grabbed' && src !== this.grabber) return null;
     if (this.state === 'caught' && src !== this.caughtBy && !h.knock) return null;
     const dir = h.dir || Math.sign(this.x - src.x) || src.facing;
@@ -490,6 +498,7 @@ export class Fighter {
       this.dizzyDur = h.dizzy;
       this.vx = this.vz = 0;
     } else if (knock) {
+      this.juggle = wasFall ? (this.juggle || 0) + 1 : 0;
       this.setState('fall');
       this.fallPts = 0;
       this.vy = h.launch || 320;

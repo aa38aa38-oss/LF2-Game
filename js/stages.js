@@ -1,5 +1,5 @@
 // 三個對戰場景（程式繪製的暫時背景；有圖檔時改用圖檔）
-import { FONT_TC, FONT_PX } from './util.js';
+import { FONT_TC, FONT_PX, WORLD_W } from './util.js';
 import { ASSETS } from './assets.js';
 
 function lin(ctx, y0, y1, stops) {
@@ -336,6 +336,16 @@ function studioAnim(ctx, t) {
   glow(ctx, 800, 0, 220, 'rgba(120,170,255,0.6)', a);
 }
 
+function drawFence(ctx, x) {
+  ctx.fillStyle = '#3a3a44';
+  ctx.fillRect(x - 6, 250, 12, 290);
+  ctx.fillStyle = '#ffd84a';
+  for (let y = 260; y < 540; y += 40) ctx.fillRect(x - 6, y, 12, 18);
+  ctx.strokeStyle = 'rgba(255,216,74,0.35)';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(x - 6, 250, 12, 290);
+}
+
 function makeStage(id, name, staticFn, animFn) {
   let cache = null;
   const st = {
@@ -352,14 +362,37 @@ function makeStage(id, name, staticFn, animFn) {
       }
       return cache;
     },
-    draw(ctx, t) {
+    // 畫出世界座標 x0~x1 範圍的背景（每 960 一段；場地外畫圍欄與暗區）
+    draw(ctx, t, x0 = 0, x1 = 960) {
       const img = ASSETS.stages[id];
-      if (img) {
-        ctx.drawImage(img, 0, 0, 960, 540);
-        return;
+      const n = Math.round(WORLD_W / 960);
+      for (let k = Math.floor(x0 / 960); k <= Math.floor((x1 - 1) / 960); k++) {
+        const ox = k * 960;
+        if (k < 0 || k >= n) {
+          ctx.fillStyle = '#07060c';
+          ctx.fillRect(ox, 0, 960, 540);
+          ctx.fillStyle = '#121018';
+          ctx.fillRect(ox, 292, 960, 248);
+          continue;
+        }
+        ctx.save();
+        ctx.translate(ox, 0);
+        if (img) {
+          if (k % 2) {
+            // 圖檔：奇數段左右翻轉，接縫比較自然
+            ctx.translate(960, 0);
+            ctx.scale(-1, 1);
+          }
+          ctx.drawImage(img, 0, 0, 960, 540);
+        } else {
+          ctx.drawImage(st.getCache(), 0, 0, 960, 540);
+          animFn(ctx, t + k * 1.7);
+        }
+        ctx.restore();
       }
-      ctx.drawImage(st.getCache(), 0, 0, 960, 540);
-      animFn(ctx, t);
+      // 場地邊界的圍欄
+      if (x1 > 0 && x0 < 0) drawFence(ctx, 0);
+      if (x1 > WORLD_W && x0 < WORLD_W) drawFence(ctx, WORLD_W);
     },
     thumb() {
       return ASSETS.stages[id] || st.getCache();

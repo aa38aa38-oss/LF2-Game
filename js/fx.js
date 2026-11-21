@@ -140,9 +140,12 @@ export class FX {
     }
   }
 
-  drawUI(ctx, ox = 0, oy = 0) {
+  // mode 'world'：飄字、傷害數字（鏡頭座標）；'screen'：彈幕、直播標示、閃光（螢幕座標）
+  drawUI(ctx, mode = 'world') {
+    const ox = 0, oy = 0;
     for (const e of this.list) {
       if (!UI_TYPES.has(e.type)) continue;
+      if ((mode === 'world') !== (e.type === 'text' || e.type === 'num')) continue;
       const p = e.t / e.life;
       switch (e.type) {
         case 'text':
@@ -152,7 +155,7 @@ export class FX {
           txt(ctx, e.text, e.x + ox, sy(e) - p * 36 + oy, { size: e.size || 18, color: e.color || '#fff', align: 'center', font: 'px', stroke: '#000', sw: 4, alpha: 1 - p * p });
           break;
         case 'comment': {
-          const x = 980 - p * 1200;
+          const x = 1100 - p * 1400;
           txt(ctx, e.text, x, e.y, { size: 24, color: '#fff', weight: 900, stroke: '#000', sw: 4 });
           break;
         }
@@ -170,7 +173,7 @@ export class FX {
         case 'screenflash':
           ctx.fillStyle = e.color || '#fff';
           ctx.globalAlpha = 1 - p;
-          ctx.fillRect(0, 0, 960, 540);
+          ctx.fillRect(-200, 0, 1400, 540);
           ctx.globalAlpha = 1;
           break;
       }

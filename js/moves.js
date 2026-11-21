@@ -27,36 +27,49 @@ export const MOVES = {
       pose: (f, T) => ({ tilt: 0.45, aF: [0.2, 0.9], aB: [0.1, 0.9], lF: [0.4, -0.5], lB: [-0.3, 0], expr: T > 0.18 ? 'shout' : 'normal' }),
     },
     super: {
-      dur: 3.2,
-      start(f) {
-        f.mv.dir = f.facing;
-        f.mv.pass = 0;
-      },
+      // 三段短衝：每段開始時可以用方向鍵改方向（類似小朋友齊打交的連續衝撞）
+      dur: 1.6,
       update(f, b) {
-        const sp = 980;
-        f.facing = f.mv.dir;
-        f.vx = f.mv.dir * sp;
-        const tgt = b.nearestEnemy(f);
-        f.vz = tgt ? sign(tgt.z - f.z) * 140 : 0;
-        if ((f.x <= ARENA.xMin + 4 && f.mv.dir < 0) || (f.x >= ARENA.xMax - 4 && f.mv.dir > 0)) {
-          f.mv.dir *= -1;
-          f.hitList.clear();
-          f.mv.pass++;
-          b.shake(7, 0.18);
-          b.sfx('heavy');
-          if (f.mv.pass >= 3) f.mv.done = true;
+        const c = f.ctrl;
+        const D = 0.3, P = 0.15;
+        const k = Math.floor(f.stateT / (D + P));
+        const local = f.stateT - k * (D + P);
+        if (k >= 3) {
+          f.vx *= 0.8;
+          f.vz = 0;
+          return;
         }
-        b.areaHit(f, { x0: -25, x1: 60, zr: 56, dmg: 32, knock: true, kb: 380, launch: 430, unblockable: true });
-        afterimage(b, f);
-        f.mv.dust = (f.mv.dust || 0) - 1 / 60;
-        if (f.mv.dust <= 0) {
-          f.mv.dust = 0.05;
-          b.fx.add({ type: 'dust', x: f.x - f.facing * 20, z: f.z, y: 0, life: 0.4 });
+        if (k !== f.mv.k) {
+          f.mv.k = k;
+          f.hitList.clear();
+          const dx = (c.held('right') ? 1 : 0) - (c.held('left') ? 1 : 0);
+          if (dx) f.facing = dx;
+          f.mv.dz = (c.held('down') ? 1 : 0) - (c.held('up') ? 1 : 0);
+          b.sfx('whiff');
+          b.fx.add({ type: 'text', x: f.x, z: f.z, y: 130, text: '衝！', color: '#f28c28', size: 24, life: 0.5 });
+        }
+        if (local < D) {
+          f.vx = f.facing * 760;
+          f.vz = f.mv.dz * 240;
+          b.areaHit(f, { x0: -20, x1: 60, zr: 32, dmg: k === 2 ? 26 : 16, knock: true, launch: k === 2 ? 500 : 320, kb: 300, unblockable: true, fall: 80, heavy: true });
+          afterimage(b, f, 0.04);
+          f.mv.dust = (f.mv.dust || 0) - 1 / 60;
+          if (f.mv.dust <= 0) {
+            f.mv.dust = 0.05;
+            b.fx.add({ type: 'dust', x: f.x - f.facing * 20, z: f.z, y: 0, life: 0.4 });
+          }
+        } else {
+          f.vx *= 0.6;
+          f.vz = 0;
         }
       },
       pose: (f, T, t) => {
-        const s = Math.sin(t * 22);
-        return { tilt: 0.55, lF: [s * 1.0 + 0.3, -1.3], lB: [-s * 1.0 + 0.3, -1.3], aF: [1.2, 0.4], aB: [1.0, 0.6], expr: 'shout' };
+        const k = Math.floor(T / 0.45), local = T - k * 0.45;
+        if (k < 3 && local < 0.3) {
+          const s = Math.sin(t * 24);
+          return { tilt: 0.7, lF: [s * 1.0 + 0.3, -1.3], lB: [-s * 1.0 + 0.3, -1.3], aF: [-0.4, 0.4], aB: [-0.6, 0.4], expr: 'shout' };
+        }
+        return { tilt: 0.2, aF: [0.6, 1.6], aB: [0.4, 1.6], lF: [0.5, -0.6], lB: [-0.5, 0], expr: 'shout' };
       },
     },
   },
@@ -88,7 +101,7 @@ export const MOVES = {
           b.shake(12, 0.7);
           for (const d of [-1, 1]) {
             b.spawnProj({
-              owner: f, kind: 'wave', x: f.x + d * 20, z: f.z, y: 0, vx: d * 620, life: 1.6, w: 44, zr: 999,
+              owner: f, kind: 'wave', x: f.x + d * 20, z: f.z, y: 0, vx: d * 620, life: 0.9, w: 44, zr: 999,
               h: 140, dmg: 42, knock: true, launch: 480, kb: 320, pierce: true, unblockable: true, dir: d,
             });
           }
@@ -127,7 +140,7 @@ export const MOVES = {
         f.vx = 0;
         f.vz = 0;
         f.mv.c = (f.mv.c || 0) - 1 / 60;
-        const foes = b.enemiesOf(f);
+        const foes = b.enemiesOf(f).filter((e) => Math.abs(e.x - f.x) < 650);
         if (f.mv.c <= 0 && f.stateT < 2.3 && foes.length) {
           f.mv.c = 0.045;
           const e = pick(foes);
@@ -170,46 +183,27 @@ export const MOVES = {
       pose: (f, T) => ({ aF: T < 0.2 ? [2.9, 0.3] : [1.4, 0], prop: T < 0.2 ? 'banana' : null, tilt: 0.15, expr: 'smile' }),
     },
     super: {
-      dur: 4.5,
-      start(f) {
-        const X0 = ARENA.xMin + 40, X1 = ARENA.xMax - 40, Z0 = ARENA.zMin + 12, Z1 = ARENA.zMax - 12;
-        const pts = [[X1, Z1], [X1, Z0], [X0, Z0], [X0, Z1], [X1, Z1]];
-        if (f.x > 480) pts.reverse();
-        f.mv.pts = pts;
-        f.mv.i = 0;
-      },
+      // 香蕉大放送：丟出 6 根會自動追人的香蕉（類似小朋友齊打交的追蹤氣功）
+      dur: 1.2,
       update(f, b) {
-        const [tx, tz] = f.mv.pts[f.mv.i];
-        const dx = tx - f.x, dz = tz - f.z;
-        const d = Math.hypot(dx, dz);
-        const sp = 820;
-        if (d < 18) {
-          f.mv.i++;
-          f.hitList.clear();
-          if (f.mv.i >= f.mv.pts.length) {
-            f.mv.done = true;
-            f.vx = f.vz = 0;
-            return;
-          }
-        } else {
-          f.vx = (dx / d) * sp;
-          f.vz = (dz / d) * sp;
-          if (Math.abs(dx) > 4) f.facing = sign(dx);
-        }
-        b.areaHit(f, { x0: -30, x1: 55, zr: 46, dmg: 26, knock: true, kb: 260, launch: 380, unblockable: true });
-        afterimage(b, f, 0.035);
-        f.mv.drop = (f.mv.drop || 0) - 1 / 60;
-        if (f.mv.drop <= 0) {
-          f.mv.drop = 0.22;
+        f.vx = f.vz = 0;
+        const n = f.mv.n || 0;
+        if (n < 6 && f.stateT > 0.25 + n * 0.1) {
+          f.mv.n = n + 1;
+          const foes = b.enemiesOf(f).filter((e) => Math.abs(e.x - f.x) < 750);
+          foes.sort((a, c) => Math.abs(a.x - f.x) - Math.abs(c.x - f.x));
+          const tgt = foes.length ? foes[n % foes.length] : null;
           b.spawnProj({
-            owner: f, kind: 'banana', x: f.x, z: f.z, y: 10, vy: 120, gravity: 1400, trap: true, life: 5, w: 20, h: 30,
-            dmg: 10, knock: true, launch: 300, kb: 60, slip: true, fromSuper: true,
+            owner: f, kind: 'homing', homing: tgt, x: f.x + f.facing * 20, z: f.z, y: f.y + 90,
+            vx: f.facing * rand(220, 340), vz: rand(-160, 160), life: 2.6, w: 22, h: 40,
+            dmg: 14, knock: true, launch: 320, kb: 160, unblockable: true, noClash: true, fall: 80,
           });
+          b.sfx('banana');
         }
       },
       pose: (f, T, t) => {
-        const s = Math.sin(t * 20);
-        return { tilt: 0.25, lF: [s * 0.9 + 0.2, -1.2], lB: [-s * 0.9 + 0.2, -1.2], aF: [0.3 - s * 0.8, 1.9], aB: [0.3 + s * 0.8, 1.9], expr: 'smile' };
+        const k = Math.floor(t * 10) % 2;
+        return { aF: k ? [2.6, 0.3] : [1.4, 0], aB: k ? [1.4, 0] : [2.6, 0.3], prop: k ? 'banana' : null, expr: 'smile', tilt: 0.1 };
       },
     },
   },
@@ -252,7 +246,7 @@ export const MOVES = {
           b.sfx('zap');
           b.shake(10, 0.4);
           b.fx.add({ type: 'screenflash', color: '#bff8ff', life: 0.25 });
-          for (const e of b.enemiesOf(f)) {
+          for (const e of b.enemiesOf(f).filter((e) => Math.abs(e.x - f.x) < 600)) {
             b.fx.add({ type: 'bolt', x: e.x, z: e.z, y: e.y, life: 0.5 });
             b.applyHit(f, e, { dmg: 32, knock: true, launch: 420, kb: 160, unblockable: true });
           }
@@ -331,14 +325,14 @@ export const MOVES = {
           f.vx = f.vz = 0;
           return;
         }
-        const e = b.nearestEnemy(f);
         if (T < 2.15) {
-          if (e) {
-            const dx = e.x - f.x, dz = e.z - f.z;
-            f.facing = sign(dx) || f.facing;
-            f.vx = Math.abs(dx) > 48 ? sign(dx) * 720 : 0;
-            f.vz = Math.abs(dz) > 6 ? sign(dz) * 300 : 0;
-          } else f.vx = f.vz = 0;
+          // 連打中可以用方向鍵慢慢移動、轉向
+          const c = f.ctrl;
+          const dx = (c.held('right') ? 1 : 0) - (c.held('left') ? 1 : 0);
+          const dz = (c.held('down') ? 1 : 0) - (c.held('up') ? 1 : 0);
+          if (dx) f.facing = dx;
+          f.vx = dx * 170;
+          f.vz = dz * 120;
           f.mv.pt = (f.mv.pt || 0) - 1 / 60;
           if (f.mv.pt <= 0) {
             f.mv.pt = 0.08;

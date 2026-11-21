@@ -44,4 +44,6 @@ export function inRect(px, py, r) {
 }
 
 // 2.5D 場地：x 左右、z 前後（越大越靠近鏡頭）、y 高度
-export const ARENA = { xMin: 34, xMax: 926, zMin: 0, zMax: 186, floorY: 322 };
+// 場地寬 1920（背景是兩張 960 拼起來），鏡頭跟著玩家移動
+export const WORLD_W = 1920;
+export const ARENA = { xMin: 40, xMax: WORLD_W - 40, zMin: 0, zMax: 186, floorY: 322 };

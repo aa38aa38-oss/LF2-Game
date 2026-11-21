@@ -18,6 +18,7 @@ import { LeaderboardScene } from './scenes/leaderboard.js';
 class Game {
   constructor() {
     this.canvas = document.getElementById('game');
+    this.CW = W; // 畫布寬度：跟著螢幕比例變寬（手機填滿全螢幕），高度固定 540
     this.canvas.width = W;
     this.canvas.height = H;
     this.ctx = this.canvas.getContext('2d');
@@ -35,7 +36,7 @@ class Game {
     this.canvas.addEventListener('pointerdown', (e) => {
       this.audio.unlock();
       const r = this.canvas.getBoundingClientRect();
-      const x = ((e.clientX - r.left) / r.width) * W;
+      const x = ((e.clientX - r.left) / r.width) * this.CW - this.ox;
       const y = ((e.clientY - r.top) / r.height) * H;
       if (this.scene && this.scene.onPointer) this.scene.onPointer(x, y);
     });
@@ -64,18 +65,30 @@ class Game {
     } else (document.exitFullscreen || document.webkitExitFullscreen || (() => {})).call(document);
   }
 
-  beginPix() {
+  // 選單畫面置中在 960 寬的區域；對戰畫面用滿整個寬度
+  get ox() {
+    return Math.round((this.CW - W) / 2);
+  }
+  setWidth(cw) {
+    cw = Math.max(W, Math.min(1280, Math.round(cw / 2) * 2));
+    if (cw === this.CW) return;
+    this.CW = cw;
+    this.canvas.width = cw;
+    this.pixCanvas.width = cw / 2;
+  }
+  beginPix(full = false) {
     const p = this.pix;
     p.setTransform(1, 0, 0, 1, 0, 0);
-    p.clearRect(0, 0, W / 2, H / 2);
-    p.setTransform(0.5, 0, 0, 0.5, 0, 0);
+    p.clearRect(0, 0, this.CW / 2, H / 2);
+    p.setTransform(0.5, 0, 0, 0.5, full ? 0 : this.ox / 2, 0);
     return p;
   }
   flushPix() {
     const c = this.ctx;
     c.save();
+    c.setTransform(1, 0, 0, 1, 0, 0);
     c.imageSmoothingEnabled = false;
-    c.drawImage(this.pixCanvas, 0, 0, W, H);
+    c.drawImage(this.pixCanvas, 0, 0, this.CW, H);
     c.restore();
   }
 
@@ -126,8 +139,10 @@ class Game {
       }
       this.ctx.setTransform(1, 0, 0, 1, 0, 0);
       this.ctx.fillStyle = '#000';
-      this.ctx.fillRect(0, 0, W, H);
+      this.ctx.fillRect(0, 0, this.CW, H);
+      this.ctx.setTransform(1, 0, 0, 1, this.ox, 0);
       this.scene.draw();
+      this.ctx.setTransform(1, 0, 0, 1, this.ox, 0);
       if (this.supBtn) {
         const P = this.scene.player;
         this.supBtn.classList.toggle('ready', !!(P && P.mp >= 100 && !P.dead));
@@ -135,7 +150,7 @@ class Game {
       if (this.audio.muted) txt(this.ctx, '🔇', 940, 528, { size: 14, align: 'right', alpha: 0.7 });
       if (this.fade > 0) {
         this.ctx.fillStyle = `rgba(0,0,0,${this.fade})`;
-        this.ctx.fillRect(0, 0, W, H);
+        this.ctx.fillRect(-this.ox, 0, this.CW, H);
       }
       requestAnimationFrame(frame);
     };
@@ -196,8 +211,11 @@ function fit() {
   const vv = window.visualViewport;
   const vw = vv ? Math.min(vv.width, wrap.clientWidth) : wrap.clientWidth;
   const vh = vv ? Math.min(vv.height, wrap.clientHeight) : wrap.clientHeight;
-  const s = Math.min(vw / W, vh / H);
-  c.style.width = `${Math.floor(W * s)}px`;
+  const g = window.__game;
+  if (g) g.setWidth((H * vw) / vh);
+  const CW = g ? g.CW : W;
+  const s = Math.min(vw / CW, vh / H);
+  c.style.width = `${Math.floor(CW * s)}px`;
   c.style.height = `${Math.floor(H * s)}px`;
 }
 
@@ -212,6 +230,7 @@ async function boot() {
   if (coarse || 'ontouchstart' in window) document.body.classList.add('touch');
   const game = new Game();
   window.__game = game;
+  fit();
   try {
     await Promise.race([
       Promise.all([document.fonts.load("900 20px 'Noto Sans TC'"), document.fonts.load("20px 'Press Start 2P'")]),
