@@ -4,7 +4,7 @@
 """
 import json, sys, html, pathlib
 
-STYLE = ("16-bit pixel art, retro arcade beat 'em up game art, chibi proportions (head about one third of body height), "
+STYLE = ("16-bit pixel art, retro arcade beat 'em up game art, adult body proportions about 5 heads tall (head about one fifth of body height, NOT chibi, NOT big-headed), detailed caricature face that keeps the real likeness, "
          "thick dark outlines, vibrant saturated colors, cel shading, comedic cartoon style, original video game character")
 SPRITE_END = ("side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, "
               "character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, "
@@ -15,7 +15,7 @@ REF_NOTE = ("Attached image: this character's reference sheet. Draw exactly this
             "matching the face, hairstyle, glasses, outfit and colors of the reference sheet.")
 
 def who(c):
-    return f"the chibi cartoon game character from the attached reference sheet ({c['face']}; {c['desc']})"
+    return f"the cartoon game character from the attached reference sheet ({c['face']}; {c['desc']})"
 
 CHARS = [
   dict(id='su', title='衝衝院長', quote='在那叫什麼！', color='orange and dark brown',
@@ -133,13 +133,13 @@ def char_sections(c):
     feat = f"{c['face']}; {c['desc']}"
     items.append(dict(group='第二步：角色設定圖（擇一；做好後，之後每張圖都只上傳這張）', name='做法 A：上傳 2～3 張照片＋貼這段',
         file=f"assets/ref/{c['id']}.png（自己留著當參考，不用放進遊戲）", size='16:9 橫式',
-        prompt=(f"{STYLE}. Create an original chibi pixel-art video game character design inspired by the hairstyle, face shape, glasses and outfit "
+        prompt=(f"{STYLE}. Create an original pixel-art video game character design inspired by the hairstyle, face shape, glasses and outfit "
                 f"in the attached photos, exaggerated in a funny cartoon way: {feat}. Make the most distinctive features big and clear so the "
                 f"character still reads well as a small sprite. Character reference sheet. {base_sheet}")))
     items.append(dict(group='第二步：角色設定圖（擇一；做好後，之後每張圖都只上傳這張）', name='做法 B：A 被拒絕時用（不上傳照片）',
         file=f"assets/ref/{c['id']}.png（自己留著當參考，不用放進遊戲）", size='16:9 橫式',
-        prompt=(f"{STYLE}. Character reference sheet of an original chibi pixel-art video game character: {feat}. "
-                f"Make the most distinctive features big and clear so the character still reads well as a small sprite. {base_sheet}")))
+        prompt=(f"{STYLE}. Character reference sheet of an original pixel-art video game character: {feat}. "
+                f"Make the most distinctive features big and clear so the character still reads well as a small sprite, but keep normal adult body proportions (about 5 heads tall). {base_sheet}")))
     for key, zh, n, act in BASIC:
         a = ATTACK_OVERRIDE.get(c['id'], {}).get(key, act)
         if key == 'victory':
