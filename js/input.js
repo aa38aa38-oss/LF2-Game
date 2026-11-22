@@ -1,22 +1,25 @@
 // 輸入系統：每位玩家一個 Controller。
 // 鍵盤、觸控、電腦 AI、以及之後的「手機搖桿」都只要操作 Controller 就能控制角色。
 
+// 鍵盤配置參考《英雄聯盟》：Q W E 技能、R 大絕、A 普攻、D 跳躍（閃現的位置）、F 防禦，方向鍵移動。
+// 舊的按鍵（J K L U I、Z X C V、1 2 3）也保留，習慣哪一套都可以。
 const KEYMAP = {
-  ArrowUp: 'up', KeyW: 'up',
-  ArrowDown: 'down', KeyS: 'down',
-  ArrowLeft: 'left', KeyA: 'left',
-  ArrowRight: 'right', KeyD: 'right',
-  KeyJ: 'attack', KeyZ: 'attack',
-  KeyK: 'jump', Space: 'jump',
-  KeyL: 'defend', KeyX: 'defend',
-  KeyU: 'special', KeyC: 'special',
-  KeyI: 'super', KeyV: 'super',
+  ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',
+  KeyA: 'attack', KeyJ: 'attack', KeyZ: 'attack',
+  KeyQ: 'sk1', KeyW: 'sk2', KeyE: 'sk3',
   Digit1: 'sk1', Digit2: 'sk2', Digit3: 'sk3',
   Numpad1: 'sk1', Numpad2: 'sk2', Numpad3: 'sk3',
+  KeyR: ['super', 'rank'], KeyI: 'super', KeyV: 'super',
+  KeyD: 'jump', Space: 'jump', KeyK: 'jump',
+  KeyF: 'defend', KeyL: 'defend', KeyX: 'defend',
+  KeyU: 'special', KeyC: 'special',
   Enter: 'start', NumpadEnter: 'start',
   KeyP: 'pause', Escape: 'pause',
   KeyM: 'mute',
-  KeyR: 'rank',
+};
+const btnsOf = (code) => {
+  const b = KEYMAP[code];
+  return b ? (Array.isArray(b) ? b : [b]) : null;
 };
 
 export class Controller {
@@ -87,16 +90,16 @@ export class Input {
     this.onAny = null;
     window.addEventListener('keydown', (e) => {
       if (e.target && e.target.tagName === 'INPUT') return;
-      const b = KEYMAP[e.code];
-      if (b) {
+      const bs = btnsOf(e.code);
+      if (bs) {
         e.preventDefault();
-        if (!e.repeat) this.p1.setBtn(b, true);
+        if (!e.repeat) for (const b of bs) this.p1.setBtn(b, true);
       }
       if (this.onAny) this.onAny(e);
     });
     window.addEventListener('keyup', (e) => {
-      const b = KEYMAP[e.code];
-      if (b) this.p1.setBtn(b, false);
+      const bs = btnsOf(e.code);
+      if (bs) for (const b of bs) this.p1.setBtn(b, false);
     });
     window.addEventListener('blur', () => this.p1.reset());
   }

@@ -290,7 +290,15 @@ export class BattleScene {
     this.fx.add({ type: 'num', x: t.x + rand(-10, 10), z: t.z, y: t.y + 105, text: String(Math.round(dealt)), life: 0.7, color: heavy ? '#ffd84a' : '#fff', size: heavy ? 20 : 15 });
     this.sfx(heavy ? 'heavy' : 'hit');
     if (h.slip) this.sfx('slip');
-    this.hitstop = Math.max(this.hitstop, heavy ? 0.09 : 0.05);
+    // 打中頓幀：讓打擊有手感，但多段小傷害（香蕉、金幣、連打）不頓，大絕只在重擊時短頓，
+    // 而且兩次頓幀至少隔 0.2 秒，避免畫面一卡一卡
+    let stop = heavy ? 0.09 : dealt >= 6 ? 0.05 : 0;
+    if (src.superDealt != null) stop = heavy && h.knock ? 0.05 : 0;
+    if (this.time - (this.lastStopT ?? -9) < 0.2) stop = 0;
+    if (stop > 0) {
+      this.hitstop = Math.max(this.hitstop, stop);
+      this.lastStopT = this.time;
+    }
     if (heavy) this.shake(5, 0.12);
     if (before > 0 && t.hp <= 0) {
       src.stats.kos++;
@@ -543,6 +551,17 @@ export class BattleScene {
           continue;
         } else if (p.vanishOnGround) {
           p.dead = true;
+          if (p.landBlast) {
+            // 落地衝擊波：附近的人也會被震倒
+            const lb = p.landBlast;
+            this.shake(6, 0.2);
+            this.fx.add({ type: 'ring', x: p.x, z: p.z, y: 0, life: 0.35, r: lb.r * 1.6, color: '#ffffff' });
+            for (const f of this.fighters) {
+              if (f.team === p.team || f.dead || p.hits.has(f) || f.y > 20) continue;
+              if (Math.abs(f.x - p.x) > lb.r || Math.abs(f.z - p.z) > lb.zr) continue;
+              this.applyHit(p.owner, f, { ...lb, dmg: lb.dmg * p.owner.char.mul.pow, dir: sign(f.x - p.x) || 1 });
+            }
+          }
           this.fx.add({ type: 'spark', x: p.x, z: p.z, y: 4, life: 0.15, color: '#ffd84a' });
           continue;
         }
@@ -1018,8 +1037,8 @@ export class BattleScene {
   drawSkillBar(ctx) {
     const P = this.player;
     if (!P || P.dead || document.body.classList.contains('touch')) return;
-    const keys = [['1', 'fwd', '防→攻'], ['2', 'up', '防↑攻'], ['3', 'down', '防↓攻']];
-    const x0 = 10 - this.g.ox, y = 496, w = 176;
+    const keys = [['Q', 'fwd', '防→攻'], ['W', 'up', '防↑攻'], ['E', 'down', '防↓攻']];
+    const x0 = 10 - this.g.ox, y = 496, w = 160;
     keys.forEach(([key, k, cmd], i) => {
       const def = specialDef(P.char.id, k);
       if (!def) return;
@@ -1042,6 +1061,20 @@ export class BattleScene {
       txt(ctx, cmd, x + 26, y + 26, { size: 10, color: '#9aa' });
       txt(ctx, ready ? 'OK' : left.toFixed(1), x + w - 8, y + 17, { size: ready ? 12 : 16, font: 'px', align: 'right', color: ready ? '#7fffa0' : '#fff' });
     });
+    // R 大絕：顯示集氣百分比
+    const x = x0 + 3 * (w + 6), rw = 172, full = P.mp >= 100;
+    ctx.fillStyle = full ? 'rgba(80,60,0,0.85)' : 'rgba(8,8,20,0.78)';
+    ctx.fillRect(x, y, rw, 36);
+    ctx.fillStyle = full ? '#ffd84a' : 'rgba(255,216,74,0.45)';
+    ctx.fillRect(x, y + 32, (rw * Math.min(100, P.mp)) / 100, 4);
+    ctx.strokeStyle = full && Math.floor(this.time * 4) % 2 ? '#fff' : full ? '#ffd84a' : '#444';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, rw, 36);
+    txt(ctx, 'R', x + 12, y + 17, { size: 14, font: 'px', align: 'center', color: '#ffd84a' });
+    txt(ctx, P.char.superMove.name, x + 26, y + 12, { size: 13, weight: 900, color: full ? '#ffe14a' : '#888' });
+    txt(ctx, full ? '可以放大絕！' : '大絕', x + 26, y + 26, { size: 10, color: full ? '#fff' : '#9aa' });
+    txt(ctx, full ? 'OK' : `${Math.floor(P.mp)}%`, x + rw - 8, y + 17, { size: full ? 12 : 13, font: 'px', align: 'right', color: full ? '#7fffa0' : '#fff' });
+    txt(ctx, 'A 普攻　D 跳　F 防', x + rw + 10, y + 18, { size: 12, weight: 700, color: '#cfd3e6', stroke: '#000', sw: 3 });
   }
 
   drawPause(ctx) {

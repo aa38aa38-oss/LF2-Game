@@ -174,7 +174,7 @@ export class AI {
         if (sp.ai === 'proj') good = adz < 22 && adx > 90 && adx < 480;
         else if (sp.ai === 'close') good = adx < (sp.range || 120) && adz < 26;
         else if (sp.ai === 'mid') good = adx > 60 && adx < (sp.range || 250) && adz < 18;
-        else if (sp.ai === 'grab') good = adx < 52 && adz < 18;
+        else if (sp.ai === 'grab') good = adx < (sp.range || 60) && adz < 22;
         else if (sp.ai === 'trap') good = adx > 70 && adx < 240 && adz < 30;
         else if (sp.ai === 'heal') good = f.hp < f.maxHp * 0.45;
         else if (sp.ai === 'crowd') good = b.enemiesOf(f).filter((e) => Math.abs(e.x - f.x) < 110 && Math.abs(e.z - f.z) < 40).length >= (b.fighters.length > 2 ? 2 : 1) && adx < 90;

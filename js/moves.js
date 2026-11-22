@@ -292,27 +292,39 @@ export const MOVES = {
   // ───────── 館長 ─────────
   guan: {
     special: {
-      cost: 25, dur: 0.75, ai: 'grab',
+      // 撲抓過肩摔：往前撲 0.22 秒，途中碰到對手就抓起來摔（被打到搖晃的人也抓得到）
+      cost: 25, cd: 7, dur: 0.95, ai: 'grab', range: 110,
       start(f, b) {
-        const t = b.enemiesOf(f).find((e) => {
-          const dx = (e.x - f.x) * f.facing;
-          return dx > -5 && dx < 62 && Math.abs(e.z - f.z) < 24 && e.y < 10 && !['down', 'getup', 'fall', 'grabbed', 'caught', 'roll', 'flip'].includes(e.state) && e.invuln <= 0;
-        });
-        if (t) {
-          f.mv.t = t;
-          t.setState('grabbed');
-          t.grabber = f;
-          t.vx = t.vz = t.vy = 0;
-          b.sfx('throw');
-        } else {
-          f.mv.whiff = true;
-          b.sfx('whiff');
-        }
+        f.mv.lunge = true;
       },
       update(f, b) {
+        if (f.mv.lunge) {
+          const t = b.enemiesOf(f).find((e) => {
+            const dx = (e.x - f.x) * f.facing;
+            return dx > -5 && dx < 70 && Math.abs(e.z - f.z) < 30 && e.y < 20 && !['down', 'getup', 'fall', 'grabbed', 'caught', 'roll', 'flip'].includes(e.state) && e.invuln <= 0;
+          });
+          if (t) {
+            f.mv.lunge = false;
+            f.mv.t = t;
+            f.mv.t0 = f.stateT;
+            t.setState('grabbed');
+            t.grabber = f;
+            t.vx = t.vz = t.vy = 0;
+            b.sfx('throw');
+          } else if (f.stateT < 0.22) {
+            f.vx = f.facing * 520;
+            f.vz = 0;
+            afterimage(b, f, 0.05);
+            return;
+          } else {
+            f.mv.lunge = false;
+            f.mv.whiff = true;
+            b.sfx('whiff');
+          }
+        }
         f.vx = f.vz = 0;
         if (f.mv.whiff) {
-          if (f.stateT > 0.35) f.mv.done = true;
+          if (f.stateT > 0.45) f.mv.done = true;
           return;
         }
         const t = f.mv.t;
@@ -320,7 +332,7 @@ export const MOVES = {
           f.mv.done = true;
           return;
         }
-        const p = Math.min(1, f.stateT / 0.5);
+        const p = Math.min(1, (f.stateT - f.mv.t0) / 0.45);
         t.x = f.x + f.facing * (24 - 52 * p);
         t.z = f.z;
         t.y = 30 + Math.sin(p * Math.PI) * 70;
@@ -332,18 +344,18 @@ export const MOVES = {
           t.y = 1;
           b.shake(10, 0.3);
           b.fx.add({ type: 'text', x: t.x, z: t.z, y: 40, text: '碰！', color: '#ff5a5a', size: 32, life: 0.8 });
-          b.applyHit(f, t, { dmg: 24, knock: true, launch: 260, kb: 180, unblockable: true, dir: -f.facing, heavy: true });
+          b.applyHit(f, t, { dmg: 25, knock: true, launch: 260, kb: 180, unblockable: true, dir: -f.facing, heavy: true });
         }
       },
       pose: (f, T) => (f.mv.whiff ? { aF: [1.6, 0.3], aB: [1.4, 0.4], tilt: 0.2 } : { aF: [2.9, 0.3], aB: [2.8, 0.3], tilt: -0.25 - Math.min(1, T * 2) * 0.3, expr: 'shout' }),
     },
     super: {
       // 開直播狂打（近身型，打中傷害最高）：先往最近的對手撲過去，再連打，連打中可以移動，最後上勾拳
-      dur: 2.1, aiRange: 260,
+      dur: 2.1, aiRange: 380,
       start(f, b) {
         b.fx.add({ type: 'live', life: 2.1 });
         b.sfx('camera');
-        f.mv.tgt = nearestFoe(f, b, 300);
+        f.mv.tgt = nearestFoe(f, b, 420);
       },
       update(f, b) {
         const T = f.stateT, m = f.mv;
@@ -556,13 +568,15 @@ const EXTRA = {
   },
   guan: {
     specialUp: {
-      name: '館長上勾拳', cost: 20, dur: 0.55, ai: 'close', range: 70,
+      name: '館長上勾拳', cost: 20, dur: 0.55, ai: 'close', range: 120,
       start(f) {
-        f.vy = 300;
+        f.vy = 320;
         f.y = 1;
       },
       update(f, b) {
-        if (f.stateT > 0.05 && f.stateT < 0.3) b.areaHit(f, { x0: -5, x1: 62, zr: 22, dmg: 20, knock: true, launch: 580, kb: 110, fall: 80, heavy: true });
+        // 往前衝的上勾拳
+        if (f.stateT < 0.25) f.vx = f.facing * 300;
+        if (f.stateT > 0.04 && f.stateT < 0.32) b.areaHit(f, { x0: -10, x1: 84, zr: 30, dmg: 21, knock: true, launch: 600, kb: 130, fall: 80, heavy: true });
         if (f.stateT > 0.1 && f.y <= 0) f.mv.done = true;
       },
       pose: () => ({ aF: [2.9, 0], aB: [0.4, 1.6], tilt: -0.2, expr: 'shout', lF: [0.2, -0.1], lB: [-0.3, -0.6] }),
@@ -574,8 +588,9 @@ const EXTRA = {
           f.mv.fired = true;
           b.sfx('throw');
           b.spawnProj({
-            owner: f, kind: 'dumbbell', x: f.x + f.facing * 30, z: f.z, y: 80, vx: f.facing * 430, vy: 280, gravity: 1400,
-            life: 2, w: 26, h: 50, dmg: 22, knock: true, launch: 300, kb: 180, vanishOnGround: true,
+            owner: f, kind: 'dumbbell', x: f.x + f.facing * 30, z: f.z, y: 80, vx: f.facing * 560, vy: 200, gravity: 1100,
+            life: 2, w: 30, zr: 26, h: 60, dmg: 22, knock: true, launch: 300, kb: 180, vanishOnGround: true,
+            landBlast: { r: 75, zr: 34, dmg: 12, knock: true, launch: 280, kb: 160 },
           });
         }
       },

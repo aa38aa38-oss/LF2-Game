@@ -100,7 +100,7 @@ export const CHARS = [
     color: '#2ec4b6',
     color2: '#053a35',
     stats: { pow: 3, spd: 3, def: 3 },
-    mul: { pow: 0.94, spd: 1.0, def: 0.96 },
+    mul: { pow: 1.0, spd: 1.02, def: 1.0 },
     look: {
       skin: '#f0c29a', hair: 'short', hairColor: '#3b3b40', glasses: 'round', brows: 'flat', expr: 'flat',
       top: 'coat', topColor: '#fbfbfb', shirt: '#4b7bd1', tie: null,
@@ -121,7 +121,7 @@ export const CHARS = [
     color: '#e0393e',
     color2: '#3a0608',
     stats: { pow: 5, spd: 3, def: 5 },
-    mul: { pow: 1.0, spd: 0.92, def: 1.0 },
+    mul: { pow: 0.97, spd: 0.94, def: 0.98 },
     look: {
       skin: '#d9a173', hair: 'bald', hairColor: '#222', glasses: null, brows: 'angry', beard: '#1d1712',
       top: 'tank', topColor: '#141414', tie: null, muscle: true,
