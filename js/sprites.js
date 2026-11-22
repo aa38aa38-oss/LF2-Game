@@ -829,7 +829,8 @@ export function drawShadow(ctx, x, z, y, w = 26) {
 
 // 選角／VS 畫面的全身立繪（有登記 select 圖才會用），腳底對齊 (x, y)
 export function drawArt(ctx, ch, x, y, h, facing = 1) {
-  const img = ASSETS.select[ch.id];
+  // 沒有選角立繪時，用 Gemini 生的站立動作圖頂替（畫風才會一致）
+  const img = ASSETS.select[ch.id] || charFrame(ch.id, 'idle', 0, 8, true);
   if (!img) return false;
   const w = (img.width * h) / img.height;
   ctx.save();
