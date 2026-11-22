@@ -122,7 +122,7 @@ export class TitleScene {
     }
     txt(ctx, '法案卡關、協商破裂……剩下的，只能用拳頭解決！', 480, 392, { size: 20, weight: 900, color: '#fff', align: 'center', stroke: '#000', sw: 5 });
     if (blink(t, 1.2)) pixelText(ctx, 'PRESS ENTER', 480, 432, { size: 28, scale: 2, font: 'px', color: '#ffd84a', color2: '#ff9a1a', outline: '#2a1000' });
-    txt(ctx, '方向鍵 移動　A 攻擊　D 跳　R 大招　｜　→＋A 前衝　跳中 A 從天而降　↑↓＋A 迴旋', 480, 470, { size: 15, weight: 700, color: '#fff', align: 'center', stroke: '#000', sw: 4 });
+    txt(ctx, '方向鍵 移動　X 攻擊　空白 跳　C 大絕　｜　→＋X 前衝　跳中 X 從天而降　↓＋X 迴旋', 480, 470, { size: 15, weight: 700, color: '#fff', align: 'center', stroke: '#000', sw: 4 });
     ctx.fillStyle = 'rgba(0,0,0,0.6)';
     ctx.fillRect(0, 490, 960, 50);
     txt(ctx, `HI-SCORE ${String(g.hi).padStart(8, '0')}　|　搞笑二創同人作品，角色與劇情純屬虛構，與真實人物無關`, 480, 507, { size: 13, color: '#9a9ab0', align: 'center' });

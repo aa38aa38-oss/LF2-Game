@@ -137,7 +137,7 @@ BASIC = [
   ('getup', '起身／撿東西', 2, "getting up from the ground: kneeling on one knee, then rising"),
   ('dizzy', '暈眩', 3, "dizzy and wobbling, swirly eyes, looping"),
   ('roll', '翻滾閃避／空中翻身', 4, "doing a forward somersault roll, curled into a ball"),
-  ('spin', '迴旋攻擊（↑↓＋攻）', 4, "a spinning whirlwind attack hitting all around: winding up, spinning around with arms or a kick sweeping in a full circle, motion swirl lines, recover"),
+  ('spin', '迴旋攻擊（↓＋攻）', 4, "a spinning whirlwind attack hitting all around: winding up, spinning around with arms or a kick sweeping in a full circle, motion swirl lines, recover"),
   ('catch', '抓住對手揍', 2, "comedic cartoon grab: one hand reaching forward grabbing the air, the other hand doing a playful cartoon jab (only this one character in the image)"),
   ('victory', '勝利', 4, None),
 ]

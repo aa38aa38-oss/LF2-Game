@@ -174,7 +174,7 @@ export class AI {
       const crowd = b.enemiesOf(f).filter((e) => Math.abs(e.x - f.x) < 100 && Math.abs(e.z - f.z) < 40).length;
       if (f.spinCD <= 0 && (crowd >= 2 || (adx < 90 && adz < 30 && Math.random() < 0.3))) {
         this.mx = 0;
-        this.mz = -1;
+        this.mz = 1;
         c.tap('attack');
         return;
       }

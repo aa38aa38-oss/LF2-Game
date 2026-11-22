@@ -1208,7 +1208,7 @@ export class BattleScene {
   drawSkillBar(ctx) {
     const P = this.player;
     if (!P || P.dead || document.body.classList.contains('touch')) return;
-    const cmds = [['A', '連按＝三段連招'], ['→＋A', '前衝攻擊'], ['跳中 A', '從天而降'], ['↑↓＋A', '迴旋攻擊', P.spinCD]];
+    const cmds = [['X', '連按＝三段連招'], ['→＋X', '前衝攻擊'], ['跳中 X', '從天而降'], ['↓＋X', '迴旋攻擊', P.spinCD]];
     const y = 500, x0 = 10 - this.g.ox;
     let x = x0;
     for (const [k, name, cd] of cmds) {
@@ -1233,7 +1233,7 @@ export class BattleScene {
     ctx.strokeStyle = full && Math.floor(this.time * 4) % 2 ? '#fff' : full ? '#ffd84a' : '#444';
     ctx.lineWidth = 2;
     ctx.strokeRect(x, y - 6, rw, 36);
-    txt(ctx, 'R', x + 12, y + 11, { size: 14, font: 'px', align: 'center', color: '#ffd84a' });
+    txt(ctx, 'C', x + 12, y + 11, { size: 14, font: 'px', align: 'center', color: '#ffd84a' });
     txt(ctx, P.char.superMove.name, x + 26, y + 6, { size: 13, weight: 900, color: full ? '#ffe14a' : '#888' });
     txt(ctx, full ? '可以放大招！' : '大招', x + 26, y + 20, { size: 10, color: full ? '#fff' : '#9aa' });
     txt(ctx, full ? 'OK' : `${Math.floor(P.mp)}%`, x + rw - 8, y + 11, { size: full ? 12 : 13, font: 'px', align: 'right', color: full ? '#7fffa0' : '#fff' });

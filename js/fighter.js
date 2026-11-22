@@ -193,8 +193,8 @@ export class Fighter {
     if (this.char.npc && this.readSpecial(b)) return;
     if (c.pressed('attack')) {
       if (this.tryCatch(b)) return;
-      if (dz && !dx && this.spinCD <= 0) {
-        // ↑ 或 ↓ ＋攻擊：迴旋攻擊
+      if (dz > 0 && !dx && this.spinCD <= 0) {
+        // 按著 ↓ ＋攻擊：迴旋攻擊
         this.startAttack('spin');
         this.spinCD = 2.5;
       } else if (this.state === 'run' || (dx && dx === this.facing)) {
