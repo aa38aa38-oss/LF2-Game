@@ -187,6 +187,94 @@ def char_sections(c):
         prompt=f"{REF_NOTE} Draw a fighting game super move cut-in banner: extreme close-up of this character's face, {c['poster']}, the face placed in the LEFT third of the image, the right two thirds left as empty plain green for text, dramatic speed lines behind the face, very wide 4:1 horizontal strip, plain solid pure green background (#00FF00), no text. Art style: {STYLE}."))
     return items
 
+
+# ───────── 劇情模式的敵人（原創角色，不像任何真實人物） ─────────
+NPC_BRIEF = """我正在做一款原創的網頁格鬥小遊戲（2.5D 橫向清版亂鬥），風格是輕鬆搞笑的政治諷刺漫畫。接下來要畫「劇情模式」裡的敵人，他們都是原創的虛構角色，代表選舉時會遇到的各種麻煩，不像任何真實人物。請記住以下規則：
+
+【美術風格】
+- 乾淨的手繪諷刺漫畫插畫風：粗黑外框線、平塗上色加簡單陰影（跟我遊戲主角們的畫風一致）
+- 正常成人比例，大約六頭身，不要 Q 版、不要大頭
+- 誇張、好笑、一眼看得出是什麼角色
+
+【圖片規格】
+- 背景一律是純綠色 #00FF00（遊戲會自動去背），角色身上不要用亮綠色
+- 角色一律「側面、面向右邊」、全身、腳底貼齊圖片下緣
+- 動作圖是「動作條」：同一個角色的連續動作由左到右排成一列，每格一樣寬、角色大小一樣、位置置中，格子之間不要畫框線
+- 圖上不要有任何文字、數字、浮水印、地面陰影
+- 被打、倒地要畫成搞笑的卡通反應，不要畫成真的受傷
+
+【一致性】
+- 我會上傳這個角色的三視圖，每一張都要跟它的臉、髮型、服裝、配色、比例、畫風完全一樣
+- 一次只畫一張圖，畫完等我確認
+
+"""
+NPC_REF = ("Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, "
+           "same body proportions and the same comic illustration style.")
+
+NPCS = [
+  dict(id='gang', title='陣頭小弟', stage='第 1 關小怪', color='yellow and black',
+    brief="這次要畫的是「陣頭小弟」（廟口陣頭的小混混）。外型：瘦瘦的年輕人、染成金黃色的刺蝟頭、細眉、嚼檳榔的囂張表情、白色無袖背心、黑色運動褲、藍白拖。手上拿著一串紅色鞭炮。招式：用拳頭亂打、把點燃的鞭炮丟出去。",
+    desc="a skinny cocky young temple-procession gang punk, bleached golden spiky hair, thin eyebrows, smug face, white sleeveless tank top, black track pants, blue-and-white plastic slippers, holding a string of red firecrackers",
+    special=("special", "丟鞭炮", 4, "lighting a string of red firecrackers and tossing it forward underhand, sparks on the fuse"),
+    victory=None),
+  dict(id='protester', title='抗議群眾', stage='第 1 關小怪', color='beige and red',
+    brief="這次要畫的是「抗議群眾」（喊司法不公的抗議民眾）。外型：中年大叔、灰色旁分頭髮、圓框眼鏡、額頭綁白色布條（上面不要有可讀的字）、米色 T 恤、深灰長褲。手上拿著手寫抗議牌（牌子上用色塊代替文字）和一個小擴音器。招式：拿牌子揮人、對著擴音器大喊放出音波。",
+    desc="an angry middle-aged male protester, grey side-parted hair, round glasses, white cloth headband with red marks (no readable text), beige t-shirt, dark grey trousers, holding a handmade protest placard with color blocks instead of text and a small megaphone",
+    special=("special", "大聲公", 4, "shouting furiously into a small megaphone, visible sound-wave rings coming out"),
+    victory=None),
+  dict(id='paparazzi', title='偷拍狗仔', stage='第 1 關小王', color='tan and dark brown',
+    brief="這次要畫的是「偷拍狗仔」（專門偷拍、做假緋聞照的狗仔記者）。外型：鬼鬼祟祟的中年男子、反戴棒球帽、深色墨鏡、米色風衣、脖子上掛一台裝長鏡頭的大相機、奸笑。招式：舉相機閃光偷拍、丟出打了馬賽克的「合成照片」、往後開溜。",
+    desc="a sneaky paparazzi photographer, backwards baseball cap, dark sunglasses, beige trench coat, a big DSLR camera with a long zoom lens hanging from his neck, sly grin",
+    special=("special_fwd", "閃光偷拍", 4, "raising the camera to his eye and firing a blinding white flash forward"),
+    extra=[("special_up", "丟合成照", 4, "flicking a printed photo with a pink mosaic blur forward like a frisbee, sneaky grin"),
+           ("special_down", "開溜", 4, "scurrying backward away from the viewer's right side, hunched, clutching the camera")],
+    victory=None),
+  dict(id='kingpin', title='角頭樁腳王', stage='第 1 關 Boss', color='purple and gold',
+    brief="這次要畫的是第一關 Boss「角頭樁腳王」（地方角頭兼樁腳，專門喬選票）。外型：高大魁梧、大肚子、油頭往後梳、金框墨鏡、粗金項鍊、紫色花襯衫釦子開到胸口、手戴金戒指、金色皮鞋、得意又兇的笑。招式：一次丟三串鞭炮、低頭衝撞、拍手叫小弟、讓鞭炮像雨一樣落下。金句：「這區的票，攏是阮在喬的！」",
+    desc="a big burly local gang boss and vote broker, slicked-back black hair, gold-framed sunglasses, thick gold chain, purple flower-pattern silk shirt unbuttoned to the chest, big belly, gold rings, gold shoes, smug intimidating grin",
+    special=("special_fwd", "鞭炮陣", 4, "throwing three strings of lit red firecrackers forward at once in a wide spread"),
+    extra=[("special_up", "角頭衝撞", 4, "lowering his head and charging forward like a bull, dust clouds, belly first"),
+           ("special_down", "叫小弟", 4, "clapping his hands and pointing forward commandingly, shouting orders"),
+           ("super", "鞭炮雨", 6, "raising both arms and laughing as many lit firecrackers rain down from the sky around him, sparks everywhere")],
+    victory="arms crossed laughing smugly, flashing a fat red envelope", boss=True),
+]
+NPC_BASIC = [
+  ('idle', '站立待機', 4, "fighting stance, slight breathing bob, looping idle animation"),
+  ('walk', '走路', 6, "walking forward with a swagger, looping walk animation"),
+  ('attack1', '攻擊第一下', 3, "a quick jab punch: wind-up, full extension, recover"),
+  ('attack2', '攻擊第二下', 3, "a wide hook punch: wind-up, full extension, recover"),
+  ('hurt', '被打', 2, "comedic cartoon reaction: staggering backward with a funny surprised face"),
+  ('fall', '被打飛', 3, "comically tumbling backward through the air like a slapstick cartoon"),
+  ('down', '倒地', 1, "lying flat on the floor on his back with cartoon swirly eyes, horizontal pose"),
+  ('getup', '起身', 2, "getting up from the ground: kneeling on one knee, then rising"),
+  ('dizzy', '暈眩', 3, "dizzy and wobbling with cartoon stars around the head, looping"),
+]
+
+def npc_sprite(n, frames, action):
+    return (f"{NPC_REF} Draw a sprite strip of this character for a 2D fighting game: {action}. "
+            f"{frames} frames arranged in a single horizontal row from left to right, {SPRITE_END}. Art style: {STYLE}.")
+
+def npc_sections(n):
+    items = []
+    items.append(dict(group='第零步：每次開新對話，先貼這段', name='遊戲說明＋這個角色的說明', file='（不用存檔）', size='文字',
+        prompt=NPC_BRIEF + n['brief'] + "\n\n如果了解了，請回答「了解」，然後等我下一步的指示。"))
+    items.append(dict(group='第一步：三視圖（之後每張都上傳它）', name='三視圖設定圖', file=f"assets/ref/{n['id']}.png（自己留著當參考）", size='16:9 橫式',
+        prompt=(f"Character reference sheet of an original video game enemy character: {n['desc']}. Three views side by side: front view, "
+                f"side view facing right, back view, full body, the same character in all views, plain solid pure green background (#00FF00), no text. Art style: {STYLE}.")))
+    for key, zh, fr, act in NPC_BASIC:
+        items.append(dict(group='動作（每張都上傳三視圖，一次只生一張）', name=zh, file=f"assets/characters/{n['id']}/{key}.png", frames=fr,
+            size=f"{fr} 格橫排（每格 512×512）", prompt=npc_sprite(n, fr, act)))
+    for key, zh, fr, act in [n['special']] + n.get('extra', []):
+        items.append(dict(group='招式（同上）', name=zh, file=f"assets/characters/{n['id']}/{key}.png", frames=fr,
+            size=f"{fr} 格橫排（每格 512×512）", prompt=npc_sprite(n, fr, act)))
+    if n.get('victory'):
+        items.append(dict(group='招式（同上）', name='勝利', file=f"assets/characters/{n['id']}/victory.png", frames=4,
+            size='4 格橫排（每格 512×512）', prompt=npc_sprite(n, 4, f"victory pose animation: {n['victory']}")))
+    if n.get('boss'):
+        items.append(dict(group='畫面用圖（同上）', name='頭像（Boss 血條用）', file=f"assets/portraits/{n['id']}.png", size='正方形 1:1（512×512）',
+            prompt=f"{NPC_REF} Draw a head and shoulders portrait of this character, facing slightly right, menacing smug expression, simple {n['color']} gradient background, square image, the face fills most of the frame, no text. Art style: {STYLE}."))
+    return items
+
 COMMON = [
   dict(group='場景背景', name='立法院議場', file='assets/stages/legislature.png', size='16:9（1920×1080）',
     prompt=f"{STYLE}, side-scrolling beat 'em up stage background, interior of a parliament assembly hall, wooden walls, a raised speaker's podium in the center, two electronic voting result boards, rows of wooden desks with microphones along the back, press gallery balcony with camera flashes, the lower 46 percent of the image is an open empty teal carpet floor in perspective with a few scattered papers, the left and right edges should connect seamlessly when tiled, wide 16:9, no characters, no text"),
@@ -212,6 +300,8 @@ def build():
     data = {'chars': [], 'common': COMMON}
     for c in CHARS:
         data['chars'].append({'id': c['id'], 'title': c['title'], 'quote': c['quote'], 'items': char_sections(c)})
+    for n in NPCS:
+        data['chars'].append({'id': n['id'], 'title': f"{n['stage']}：{n['title']}", 'quote': '', 'items': npc_sections(n)})
     return data
 
 def manifest_example(c):
@@ -236,7 +326,7 @@ def write_md(data, path):
     L.append("6. 綠色背景 `#00FF00` 會被遊戲自動去背。")
     L.append("7. 生好的圖照「存檔」那欄的路徑整理好（或直接壓成 zip 傳給 Claude），再執行 `python3 tools/prep_assets.py <資料夾>`：會自動去背、切格對齊、統一大小、壓縮，並更新 `assets/manifest.json`。\n")
     for c in data['chars']:
-        L.append(f"---\n\n## {c['title']}（`{c['id']}`）　金句：「{c['quote']}」\n")
+        L.append(f"---\n\n## {c['title']}（`{c['id']}`）" + (f"　金句：「{c['quote']}」" if c['quote'] else '') + "\n")
         g = None
         for it in c['items']:
             if it['group'] != g:
