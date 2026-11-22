@@ -774,6 +774,12 @@ const ANIM_MAP = {
   djatk: 'jump_attack', roll: 'roll', flip: 'roll', pick: 'getup', catch: 'catch', caught: 'hurt', land: 'idle',
   super: 'super', superwait: 'super',
 };
+const FALLBACK = {
+  run: ['walk', 'idle'], jump: ['idle'], jump_attack: ['attack1', 'idle'], run_attack: ['attack1', 'idle'],
+  attack2: ['attack1', 'idle'], attack3: ['attack2', 'attack1', 'idle'], defend: ['idle'], roll: ['fall', 'idle'],
+  catch: ['attack1', 'idle'], getup: ['idle'], dizzy: ['hurt', 'idle'], victory: ['idle'], down: ['fall', 'hurt'],
+  fall: ['hurt', 'idle'], special: ['attack1', 'idle'], super: ['special', 'attack1', 'idle'], hurt: ['idle'],
+};
 const LOOP_ANIMS = new Set(['idle', 'walk', 'run', 'dizzy', 'victory', 'defend']);
 
 export function drawFighter(ctx, f, alpha = 1) {
@@ -783,10 +789,18 @@ export function drawFighter(ctx, f, alpha = 1) {
   // 三招技能可以各有一組圖（special_fwd / special_up / special_down），沒有就用共用的 special
   let img = f.state === 'special' ? charFrame(f.char.id, 'special_' + (f.spKind || 'fwd'), f.stateT, 10, false) : null;
   if (!img) img = charFrame(f.char.id, anim, loop ? f.animT : f.stateT, 10, loop);
+  // 這個角色有圖、但缺這個動作：用最接近的動作頂替（避免圖和程式畫的混在一起）
+  if (!img && ASSETS.chars[f.char.id] && ASSETS.chars[f.char.id].idle) {
+    for (const alt of FALLBACK[anim] || ['idle']) {
+      const lp = LOOP_ANIMS.has(alt);
+      img = charFrame(f.char.id, alt, lp ? f.animT : f.stateT, 10, lp);
+      if (img) break;
+    }
+  }
   if (img) {
     const sH = ASSETS.spriteH || 128, st = ASSETS.standH[f.char.id];
     // 有站立高度：所有動作用同一個比例（腳底對齊）；沒有就整格縮成固定高度
-    const h = st ? img.height * (sH / st) : sH, w = (img.width * h) / img.height;
+    const h = (st ? img.height * (sH / st) : sH) * (f.scale || 1), w = (img.width * h) / img.height;
     ctx.save();
     ctx.translate(sx, sy);
     ctx.scale(f.facing, 1);
@@ -795,7 +809,7 @@ export function drawFighter(ctx, f, alpha = 1) {
     ctx.drawImage(img, -w / 2, -h, w, h);
     ctx.restore();
   } else {
-    drawChar(ctx, f.char, poseFor(f), sx, sy, f.facing, SC, alpha, f.flash > 0, f.animT);
+    drawChar(ctx, f.char, poseFor(f), sx, sy, f.facing, SC * (f.scale || 1), alpha, f.flash > 0, f.animT);
   }
   if (f.hold && f.hold.def && f.hold.def.type === 'heavy') drawItem(ctx, f.hold.kind, sx, sy - 112, 0, 1.2);
   if (f.state === 'dizzy') {

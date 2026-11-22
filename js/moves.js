@@ -172,7 +172,7 @@ export const MOVES = {
             if (n >= 9) continue;
             m.n.set(e, n + 1);
             b.spawnProj({
-              owner: f, kind: 'coin', x: e.x + rand(-12, 12), z: Math.max(ARENA.zMin, Math.min(ARENA.zMax, e.z + rand(-8, 8))),
+              owner: f, kind: 'coin', x: e.x + rand(-12, 12), z: Math.max((e.bounds || ARENA).zMin, Math.min((e.bounds || ARENA).zMax, e.z + rand(-8, 8))),
               y: 420, vy: -300, gravity: 1300, life: 3, w: 22, zr: 24, h: 30, dmg: 3.2, stun: 0.32, kb: 10, fall: 0, vanishOnGround: true, unblockable: true,
             });
           }

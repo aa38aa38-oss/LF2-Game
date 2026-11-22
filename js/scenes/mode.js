@@ -5,9 +5,9 @@ import { txt, pixelText, panel, Hotspots } from '../ui.js';
 import { menuBg, poseOf } from './common.js';
 
 const MODES = [
+  { id: 'story', name: '劇情模式', desc: ['從議員一路打到總統！', '打倒對手拉選票。'], chars: [2] },
   { id: '1v1', name: '單挑模式', desc: ['自己挑對手，', '一對一打到剩一個！'], chars: [0, 2] },
   { id: 'brawl', name: '四人大亂鬥', desc: ['四位政治人物同場混戰，', '誰都可以打！'], chars: [1, 3, 4, 5] },
-  { id: 'survival', name: '連戰生存', desc: ['一波接一波打到倒下為止，', '挑戰排行榜！'], chars: [5] },
 ];
 const DIFFS = [['easy', '簡單'], ['normal', '普通'], ['hard', '困難']];
 

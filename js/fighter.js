@@ -42,6 +42,11 @@ export class Fighter {
     this.y = 0;
     this.vx = this.vz = this.vy = 0;
     this.facing = o.facing || 1;
+    // 劇情模式：每個人有自己的活動範圍（不同樓層），以及體型、打倒後的得票
+    this.bounds = o.bounds || null;
+    this.floor = o.floor != null ? o.floor : null;
+    this.scale = o.scale || 1;
+    this.votes = o.votes || 0;
     this.maxHp = Math.round(420 * (o.hpMul || 1));
     this.hp = this.maxHp;
     this.cap = this.maxHp; // 可回復上限（深紅色那段）
@@ -432,8 +437,9 @@ export class Fighter {
       this.onLand(b);
     }
     if (this.y < 0) this.y = 0;
-    this.x = clamp(this.x, ARENA.xMin, ARENA.xMax);
-    this.z = clamp(this.z, ARENA.zMin, ARENA.zMax);
+    const bd = this.bounds || ARENA;
+    this.x = clamp(this.x, bd.xMin, bd.xMax);
+    this.z = clamp(this.z, bd.zMin, bd.zMax);
     if (!this.airborne && !NO_FRICTION.has(this.state)) {
       const k = Math.exp(-9 * dt);
       this.vx *= k;

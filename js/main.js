@@ -5,6 +5,7 @@ import { Input } from './input.js';
 import { Sound } from './audio.js';
 import { loadAssets, ASSETS } from './assets.js';
 import { clearTextCache, txt } from './ui.js';
+import { StoryScene } from './story.js';
 import { BattleScene } from './battle.js';
 import { IntroScene } from './scenes/intro.js';
 import { TitleScene } from './scenes/title.js';
@@ -31,7 +32,7 @@ class Game {
     this.input = new Input();
     this.audio = new Sound();
     this.hi = store.get('tpb_hiscore', 0);
-    this.flow = { mode: '1v1', difficulty: 'normal' };
+    this.flow = { mode: 'story', difficulty: 'normal' };
     this.scene = null;
     this.fade = 0;
     this.input.onAny = () => this.audio.unlock();
@@ -152,6 +153,7 @@ class Game {
   goStageSelect() { this.setScene(new StageSelectScene(this)); }
   goVS(cfg) { this.setScene(new VSScene(this, cfg)); }
   startBattle(cfg) { this.setScene(new BattleScene(this, cfg)); }
+  startStory(cfg) { this.setScene(new StoryScene(this, cfg)); }
   goResult(data) { this.setScene(new ResultScene(this, data)); }
   goLeaderboard(highlight) { this.setScene(new LeaderboardScene(this, highlight)); }
 

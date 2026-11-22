@@ -10,6 +10,8 @@ export const ITEM_DEFS = {
   mic: { name: '麥克風', type: 'light', dur: 8, dmg: 4, reach: 10, throwDmg: 14, weight: 2 },
   egg: { name: '雞蛋', type: 'throw', throwDmg: 9, weight: 3 },
   chair: { name: '議場椅子', type: 'heavy', throwDmg: 28, weight: 2 },
+  // 劇情模式：紅包（政治獻金）。回很多血，但會被爆料扣票
+  redenv: { name: '紅包', type: 'food', hp: 120, cap: 80, votes: -2500, weight: 0 },
 };
 
 export function randomItemKind() {
@@ -36,6 +38,20 @@ export function drawItem(ctx, kind, x, y, rot = 0, s = 1) {
   ctx.lineWidth = 2;
   ctx.strokeStyle = '#15121a';
   switch (kind) {
+    case 'redenv':
+      ctx.fillStyle = '#d8202a';
+      ctx.fillRect(-11, -26, 22, 26);
+      ctx.strokeRect(-11, -26, 22, 26);
+      ctx.fillStyle = '#ffd84a';
+      ctx.beginPath();
+      ctx.arc(0, -15, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#d8202a';
+      ctx.font = "900 9px 'Noto Sans TC',sans-serif";
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('$', 0, -15);
+      break;
     case 'bento':
       ctx.fillStyle = '#c0392b';
       ctx.fillRect(-15, -14, 30, 14);

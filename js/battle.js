@@ -11,7 +11,7 @@ import { ASSETS } from './assets.js';
 import { ITEM_DEFS, spawnRandomItem, newItem, drawItem } from './items.js';
 import { txt, pixelText, segBar, panel, blink, Hotspots } from './ui.js';
 
-export const MODE_NAME = { '1v1': '單挑模式', brawl: '四人大亂鬥', survival: '連戰生存' };
+export const MODE_NAME = { '1v1': '單挑模式', brawl: '四人大亂鬥', survival: '連戰生存', story: '劇情模式' };
 const DIFF_MUL = { easy: 0.8, normal: 1, hard: 1.3 };
 
 export class BattleScene {
@@ -70,7 +70,7 @@ export class BattleScene {
     const focus = !P.dead ? P : this.fighters.find((f) => !f.dead) || P;
     const margin = touch ? viewW * 0.5 : 0;
     let tx = focus.x - viewW / 2;
-    tx = clamp(tx, -margin, WORLD_W + margin - viewW);
+    tx = clamp(tx, -margin, (this.worldW || WORLD_W) + margin - viewW);
     this.cam.x = snap ? tx : this.cam.x + (tx - this.cam.x) * Math.min(1, dt * 7);
     this.cam.y = 540 - viewH;
     this.viewW = viewW;
@@ -130,7 +130,8 @@ export class BattleScene {
     this.shakeT = Math.max(this.shakeT, t);
   }
   enemiesOf(f) {
-    return this.fighters.filter((e) => e !== f && e.team !== f.team && !e.dead && e.hp > 0);
+    // 劇情模式有樓層：只會打到同一層的人
+    return this.fighters.filter((e) => e !== f && e.team !== f.team && !e.dead && e.hp > 0 && (f.floor == null || e.floor === f.floor));
   }
   nearestEnemy(f) {
     let best = null, bd = 1e9;
@@ -184,6 +185,7 @@ export class BattleScene {
     if (D.type === 'food') {
       if (D.hp) f.heal(D.hp, D.cap);
       if (D.mp) f.mp = Math.min(100, f.mp + D.mp);
+      if (D.votes && this.onVotes) this.onVotes(f, D.votes, '收紅包！貪污疑雲');
       this.sfx('heal');
       this.fx.add({ type: 'text', x: f.x, z: f.z, y: 120, text: D.hp ? `${D.name} +${D.hp}` : `${D.name} 氣+${D.mp}`, color: D.hp ? '#5cff7a' : '#6ab8ff', size: 20, life: 0.9 });
     } else {
@@ -223,14 +225,14 @@ export class BattleScene {
       return;
     }
     if (it.def.type === 'light' && it.dur <= 0) return;
-    it.x = Math.max(ARENA.xMin, Math.min(ARENA.xMax, x));
+    it.x = Math.max(ARENA.xMin, Math.min((this.worldW || WORLD_W) - 40, x));
     it.z = z;
     it.y = 30;
     it.vy = 150;
     this.items.push(it);
   }
   updateItems(dt) {
-    if (this.fightOn) {
+    if (this.fightOn && !this.noRandomItems) {
       this.itemTimer -= dt;
       if (this.itemTimer <= 0) {
         this.itemTimer = rand(6, 11);
@@ -249,7 +251,7 @@ export class BattleScene {
         if (it.y <= 0) {
           it.y = 0;
           if (it.vy < -300) this.fx.add({ type: 'dust', x: it.x, z: it.z, y: 0, life: 0.3 });
-          it.x = clamp(it.x, ARENA.xMin, ARENA.xMax);
+          it.x = clamp(it.x, ARENA.xMin, (this.worldW || WORLD_W) - 40);
           it.vy = 0;
         }
       }
@@ -303,7 +305,9 @@ export class BattleScene {
     if (before > 0 && t.hp <= 0) {
       src.stats.kos++;
       t.killer = src;
+      if (this.onKO) this.onKO(t, src);
     }
+    if (h.scandal && this.onScandal) this.onScandal(t, h.scandal, src);
     return r;
   }
   spawnProj(o) {
@@ -387,6 +391,11 @@ export class BattleScene {
         }
       }
       if (f.ai && this.fightOn) f.ai.update(sdt, this);
+      if (f.climb) {
+        // 爬樓梯中：由劇情模式控制位置
+        f.animT += sdt;
+        continue;
+      }
       f.update(sdt, this);
       if (f.ai) f.ai.ctrl.endFrame();
     }
@@ -566,7 +575,7 @@ export class BattleScene {
           continue;
         }
       }
-      if (p.kind !== 'wave' && (p.x < -50 || p.x > WORLD_W + 50)) {
+      if (p.kind !== 'wave' && (p.x < -50 || p.x > (this.worldW || WORLD_W) + 50)) {
         p.dead = true;
         if (p.kind === 'item') this.landItem(p.item, p.x, p.z);
         continue;
@@ -580,7 +589,7 @@ export class BattleScene {
           if (f.y > 4 || f.state === 'down' || f.state === 'getup') continue;
         } else if (p.y < f.y - 10 || p.y > f.y + p.h + 70) continue;
         const dir = p.dir || sign(p.vx) || sign(f.x - p.x) || 1;
-        const h = { dmg: p.dmg * p.owner.char.mul.pow, kb: p.kb, stun: p.stun, knock: p.knock, launch: p.launch, unblockable: p.unblockable, dizzy: p.dizzy, slip: p.slip, fall: p.fall, dir: p.slip ? f.facing : dir };
+        const h = { dmg: p.dmg * p.owner.char.mul.pow, kb: p.kb, stun: p.stun, knock: p.knock, launch: p.launch, unblockable: p.unblockable, dizzy: p.dizzy, slip: p.slip, fall: p.fall, scandal: p.scandal, dir: p.slip ? f.facing : dir };
         const r = this.applyHit(p.owner, f, h);
         if (r) {
           p.hits.add(f);
@@ -638,7 +647,7 @@ export class BattleScene {
     const worldT = (c, k) => c.setTransform(k * z, 0, 0, k * z, k * (-cam.x * z + sx), k * (-cam.y * z + sy));
     worldT(p, g.pixScale);
     this.stage.draw(p, this.time, cam.x - 10, cam.x + vw + 10);
-    for (const f of this.fighters) drawShadow(p, f.x, f.z, f.y);
+    for (const f of this.fighters) if (!f.climb) drawShadow(p, f.x, f.z, f.y);
     for (const pr of this.projs) if (pr.trap || pr.gravity) drawShadow(p, pr.x, pr.z, pr.y, 10);
     for (const it of this.items) drawShadow(p, it.x, it.z, it.y, 14);
     const list = [...this.fighters.map((f) => ({ z: f.z, f })), ...this.projs.map((pr) => ({ z: pr.z + 0.5, pr })), ...this.items.map((it) => ({ z: it.z - 0.5, it }))];
@@ -646,7 +655,7 @@ export class BattleScene {
     const superOn = this.fighters.some((f) => f.state === 'super');
     if (superOn) {
       p.fillStyle = 'rgba(0,0,10,0.35)';
-      p.fillRect(cam.x - 50, 0, vw + 100, 540);
+      p.fillRect(cam.x - 50, cam.y - 50, vw + 100, 700);
     }
     for (const d of list) {
       if (d.f) {
@@ -675,7 +684,7 @@ export class BattleScene {
       // 大絕發動瞬間：其他東西變暗，只有發動者亮著
       const f = this.cutin.f;
       p.fillStyle = 'rgba(0,0,12,0.6)';
-      p.fillRect(cam.x - 50, 0, vw + 100, 540);
+      p.fillRect(cam.x - 50, cam.y - 50, vw + 100, 700);
       const fy = ARENA.floorY + f.z - f.y - 55;
       p.save();
       p.globalCompositeOperation = 'lighter';
@@ -809,6 +818,74 @@ export class BattleScene {
       case 'item':
         drawItem(ctx, p.item.kind, x, y + 10, p.item.def.type === 'heavy' ? p.t * 4 : p.t * 14 * sign(p.vx), 1.15);
         break;
+      case 'firecracker': {
+        // 一串鞭炮：紅色小炮竹＋引信火花
+        ctx.translate(x, y - 12);
+        ctx.rotate(p.t * 8);
+        for (let i = -2; i <= 2; i++) {
+          ctx.fillStyle = i % 2 ? '#e8262b' : '#c81a20';
+          ctx.fillRect(i * 6 - 3, -7, 6, 14);
+          ctx.fillStyle = '#ffd84a';
+          ctx.fillRect(i * 6 - 3, -2, 6, 2);
+        }
+        ctx.fillStyle = Math.floor(p.t * 20) % 2 ? '#fff6a0' : '#ff9a1a';
+        ctx.beginPath();
+        ctx.arc(17, -8, 4, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+      }
+      case 'photo': {
+        // 緋聞合成照：白框照片＋馬賽克
+        ctx.translate(x, y - 20);
+        ctx.rotate(Math.sin(p.t * 14) * 0.4);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(-16, -14, 32, 28);
+        ctx.strokeStyle = '#222';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(-16, -14, 32, 28);
+        const cols = ['#f2b8a0', '#e89a8a', '#d98070', '#f6c8b0'];
+        for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) {
+          ctx.fillStyle = cols[(i + j * 2) % 4];
+          ctx.fillRect(-13 + i * 6.5, -11 + j * 6.5, 6.5, 6.5);
+        }
+        ctx.fillStyle = '#ff2a40';
+        ctx.font = "900 8px 'Noto Sans TC',sans-serif";
+        ctx.textAlign = 'center';
+        ctx.fillText('合成', 0, 12);
+        break;
+      }
+      case 'taxi': {
+        // 計程車（小黃）
+        const d = sign(p.vx) || 1;
+        ctx.translate(x, y);
+        ctx.scale(d, 1);
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fillRect(-62, -4, 124, 8);
+        ctx.fillStyle = '#f4c20d';
+        ctx.fillRect(-60, -44, 120, 34);
+        ctx.fillRect(-30, -66, 66, 24);
+        ctx.fillStyle = '#9fd4ff';
+        ctx.fillRect(-24, -62, 24, 17);
+        ctx.fillRect(6, -62, 24, 17);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(-10, -74, 26, 9);
+        ctx.fillStyle = '#222';
+        ctx.font = "900 8px 'Noto Sans TC',sans-serif";
+        ctx.textAlign = 'center';
+        ctx.fillText('TAXI', 3, -67);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(56, -36, 6, 8);
+        ctx.fillStyle = '#1a1a1a';
+        for (const wx of [-36, 36]) {
+          ctx.beginPath();
+          ctx.arc(wx, -8, 11, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.strokeStyle = '#15121a';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(-60, -44, 120, 34);
+        break;
+      }
       case 'crate':
         ctx.translate(x, y - 16);
         ctx.rotate(p.t * 5);
@@ -945,7 +1022,10 @@ export class BattleScene {
     ctx.save();
     ctx.translate(480, 270);
     ctx.scale(0.6 + s * 0.4, 0.6 + s * 0.4);
-    pixelText(ctx, a.text, 0, 0, { size: 72, scale: 4, font: 'px', color: a.color, color2: '#ff7a1a', outline: '#200800', alpha });
+    // 中文長句（劇情提示）用小一點的字，避免超出畫面
+    const cjk = /[^\x00-\x7f]/.test(a.text);
+    if (cjk && a.text.length > 5) txt(ctx, a.text, 0, 0, { size: Math.min(44, Math.floor(820 / a.text.length)), weight: 900, color: a.color, align: 'center', stroke: '#200800', sw: 8, alpha });
+    else pixelText(ctx, a.text, 0, 0, { size: 72, scale: 4, font: 'px', color: a.color, color2: '#ff7a1a', outline: '#200800', alpha });
     ctx.restore();
   }
 

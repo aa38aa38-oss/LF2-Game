@@ -109,7 +109,7 @@ export class ResultScene {
     if (!d.win && d.playerChar !== hero) drawChar(p, d.playerChar, poseOf(d.playerChar, 'ko', t), 430, 525, 1, 1.6, 1, false, t);
     g.flushPix();
     const ctx = g.ctx;
-    const title = d.cfg.mode === 'survival' ? 'GAME OVER' : d.win ? 'YOU WIN!' : 'YOU LOSE…';
+    const title = d.cfg.mode === 'story' ? '當選！' : d.cfg.mode === 'survival' ? 'GAME OVER' : d.win ? 'YOU WIN!' : 'YOU LOSE…';
     pixelText(ctx, title, 480, 48, { size: 56, scale: 3, font: 'px', color: d.win ? '#ffe14a' : '#ff6a5a', color2: d.win ? '#ff9a1a' : '#a0201a', outline: '#100400' });
     // 勝利台詞
     ctx.save();

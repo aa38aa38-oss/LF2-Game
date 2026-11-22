@@ -160,7 +160,7 @@ export class AI {
       return;
     }
     const sup = MOVES[f.char.id].super;
-    if (f.mp >= 100 && adx < (sup.aiRange || 420) && adz < (sup.aiZ || (sup.aiRange < 300 ? 40 : 999)) && Math.random() < this.p.special) {
+    if (sup && f.mp >= 100 && adx < (sup.aiRange || 420) && adz < (sup.aiZ || (sup.aiRange < 300 ? 40 : 999)) && Math.random() < this.p.special) {
       c.tap('super');
       return;
     }
@@ -177,6 +177,7 @@ export class AI {
         else if (sp.ai === 'grab') good = adx < (sp.range || 60) && adz < 22;
         else if (sp.ai === 'trap') good = adx > 70 && adx < 240 && adz < 30;
         else if (sp.ai === 'heal') good = f.hp < f.maxHp * 0.45;
+        else if (sp.ai === 'summon') good = f.hp < f.maxHp * 0.8;
         else if (sp.ai === 'crowd') good = b.enemiesOf(f).filter((e) => Math.abs(e.x - f.x) < 110 && Math.abs(e.z - f.z) < 40).length >= (b.fighters.length > 2 ? 2 : 1) && adx < 90;
         else if (sp.ai === 'escape') good = f.hp < f.maxHp * 0.4 && adx < 80 && ATTACKING.has(t.state);
         else if (sp.ai === 'defensive') good = ATTACKING.has(t.state) && adx < 100 && adz < 20;

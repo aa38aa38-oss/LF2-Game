@@ -32,6 +32,9 @@ export class CharSelectScene {
     if (this.step === 0) {
       this.picked = ch.id;
       g.flow.playerChar = ch.id;
+      if (g.flow.mode === 'story') {
+        return g.startStory({ playerChar: ch.id, difficulty: g.flow.difficulty });
+      }
       if (g.flow.mode === '1v1') {
         this.step = 1;
         this.sel = (this.sel + 1) % CHARS.length;

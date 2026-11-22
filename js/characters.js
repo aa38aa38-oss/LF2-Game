@@ -131,3 +131,45 @@ export const CHARS = [
 ];
 
 export const CHAR_BY_ID = Object.fromEntries(CHARS.map((c) => [c.id, c]));
+
+// ───────── 劇情模式的敵人（不出現在選角畫面） ─────────
+// 都是虛構的「選舉路上會遇到的麻煩」，不對應任何真實人物
+export const NPCS = [
+  {
+    id: 'gang', title: '陣頭小弟', npc: true, quote: '', color: '#e0b040', color2: '#3a2a00',
+    specials: [{ name: '丟鞭炮' }], superMove: { name: '' }, stats: { pow: 2, spd: 3, def: 1 },
+    mul: { pow: 0.5, spd: 0.95, def: 0.9 },
+    look: {
+      skin: '#d8a070', hair: 'short', hairColor: '#e2b13c', glasses: null, brows: 'angry',
+      top: 'tank', topColor: '#f2f2f2', tie: null, bottom: '#2f2f35', shoes: '#2a64c8', tw: 19, hr: 13,
+    },
+  },
+  {
+    id: 'protester', title: '抗議群眾', npc: true, quote: '', color: '#9a8c6a', color2: '#2a2618',
+    specials: [{ name: '大聲公' }], superMove: { name: '' }, stats: { pow: 2, spd: 2, def: 2 },
+    mul: { pow: 0.5, spd: 0.85, def: 0.95 },
+    look: {
+      skin: '#e8b88c', hair: 'side', hairColor: '#8a8a8a', glasses: 'round', brows: 'angry', headband: '#ffffff',
+      top: 'tee', topColor: '#e9e2cc', trim: '#c0392b', bottom: '#4a4a52', shoes: '#222', tw: 20, hr: 13.5,
+    },
+  },
+  {
+    id: 'paparazzi', title: '偷拍狗仔', npc: true, quote: '', color: '#b59a6a', color2: '#2e2414',
+    specials: [{ name: '閃光偷拍' }, { name: '緋聞合成照' }, { name: '開溜' }], superMove: { name: '' }, stats: { pow: 3, spd: 4, def: 2 },
+    mul: { pow: 0.85, spd: 1.1, def: 0.95 },
+    look: {
+      skin: '#e2b088', hair: 'short', hairColor: '#2a2420', glasses: 'rect', brows: 'flat', mask: null,
+      top: 'coat', topColor: '#b59a6a', shirt: '#3a3a3a', tie: null, bottom: '#3a3530', shoes: '#1a1a1a', tw: 20, hr: 13.5, prop: 'phone',
+    },
+  },
+  {
+    id: 'kingpin', title: '角頭樁腳王', npc: true, boss: true, quote: '這區的票，攏是阮在喬的！', color: '#8a1fb0', color2: '#2a0636',
+    specials: [{ name: '鞭炮陣' }, { name: '角頭衝撞' }, { name: '叫小弟' }], superMove: { name: '鞭炮雨' }, stats: { pow: 5, spd: 2, def: 5 },
+    mul: { pow: 1.0, spd: 0.9, def: 1.1 },
+    look: {
+      skin: '#c98d5e', hair: 'short', hairColor: '#141210', glasses: 'rect', brows: 'angry', beard: null,
+      top: 'shirt', topColor: '#7a1fa0', shirt: '#7a1fa0', tie: null, belly: true, bottom: '#1d1d22', shoes: '#c8a030', tw: 27, hr: 15,
+    },
+  },
+];
+for (const n of NPCS) CHAR_BY_ID[n.id] = n;
