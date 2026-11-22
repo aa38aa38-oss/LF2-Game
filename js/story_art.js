@@ -212,7 +212,55 @@ function railing(ctx, x0, x1, F) {
   ctx.stroke();
 }
 
-// 鷹架樓梯
+// 斜坡（樓梯式）：從下層後緣 (xb, yb) 斜斜通到上層前緣 (xt, yt)
+export function ramp(ctx, xb, yb, xt, yt) {
+  const w = 46;
+  ctx.fillStyle = '#9a948a';
+  ctx.beginPath();
+  ctx.moveTo(xb - w, yb + 16);
+  ctx.lineTo(xb + w, yb + 16);
+  ctx.lineTo(xt + w, yt);
+  ctx.lineTo(xt - w, yt);
+  ctx.closePath();
+  ctx.fill();
+  // 斜坡側面（厚度）
+  ctx.fillStyle = '#6a645a';
+  const side = Math.sign(xt - xb) > 0 ? 1 : -1;
+  ctx.beginPath();
+  ctx.moveTo(xb - side * w, yb + 16);
+  ctx.lineTo(xt - side * w, yt);
+  ctx.lineTo(xt - side * w, yt + 22);
+  ctx.lineTo(xb - side * w, yb + 30);
+  ctx.closePath();
+  ctx.fill();
+  // 階梯線
+  ctx.strokeStyle = 'rgba(60,55,50,0.6)';
+  ctx.lineWidth = 2;
+  const n = Math.max(6, Math.round(Math.abs(yb - yt) / 14));
+  for (let i = 1; i < n; i++) {
+    const k = i / n, x = xb + (xt - xb) * k, y = yb + 16 + (yt - yb - 16) * k;
+    ctx.beginPath();
+    ctx.moveTo(x - w, y);
+    ctx.lineTo(x + w, y);
+    ctx.stroke();
+  }
+  // 扶手
+  ctx.strokeStyle = '#d8d8d8';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(xb + side * w, yb - 22);
+  ctx.lineTo(xt + side * w, yt - 38);
+  ctx.stroke();
+  for (let i = 0; i <= 4; i++) {
+    const k = i / 4, x = xb + side * w + (xt - xb) * k, y = yb + 16 + (yt - yb - 16) * k;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y - 38 + 0 * k);
+    ctx.stroke();
+  }
+}
+
+// 鷹架樓梯（舊版，保留備用）
 export function ladder(ctx, x, yTop, yBot, hi = false) {
   ctx.strokeStyle = hi ? '#ffe14a' : '#c9c9c9';
   ctx.lineWidth = 4;
@@ -351,7 +399,7 @@ export function drawStage1(ctx, t, x0, x1, L, cam, gateOpen) {
   slab(ctx, x0, x1, L.floors[1], '#8c867c');
   slab(ctx, x0, x1, L.floors[2], '#7d776d');
   railing(ctx, x0, x1, L.floors[1]);
-  for (const ld of L.ladders) ladder(ctx, ld.x, FY + L.floors[ld.top].zMax - 4, FY + L.floors[ld.bot].zMin + 14);
+  for (const r of L.ramps) ramp(ctx, r.xb, FY + L.floors[r.bot].zMin, r.xt, FY + L.floors[r.top].zMax);
   if (x0 < L.floors[0].xMax + 200 && x1 > L.floors[0].xMax - 200) roadblock(ctx, L.floors[0].xMax + 40);
   gateLine(ctx, L.gateX, gateOpen, t);
 }

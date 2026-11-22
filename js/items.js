@@ -10,6 +10,10 @@ export const ITEM_DEFS = {
   mic: { name: '麥克風', type: 'light', dur: 8, dmg: 4, reach: 10, throwDmg: 14, weight: 2 },
   egg: { name: '雞蛋', type: 'throw', throwDmg: 9, weight: 3 },
   chair: { name: '議場椅子', type: 'heavy', throwDmg: 28, weight: 2 },
+  flag: { name: '競選旗', type: 'light', dur: 10, dmg: 8, reach: 40, throwDmg: 14, weight: 3 },
+  broom: { name: '掃把', type: 'light', dur: 10, dmg: 7, reach: 32, throwDmg: 12, weight: 2 },
+  slipper: { name: '藍白拖', type: 'throw', throwDmg: 10, weight: 2 },
+  stool: { name: '塑膠椅', type: 'heavy', throwDmg: 22, weight: 2 },
   // 劇情模式：紅包（政治獻金）。回很多血，但會被爆料扣票
   redenv: { name: '紅包', type: 'food', hp: 120, cap: 80, votes: -2500, weight: 0 },
 };
@@ -110,6 +114,50 @@ export function drawItem(ctx, kind, x, y, rot = 0, s = 1) {
       ctx.ellipse(0, -7, 6, 8, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
+      break;
+    case 'flag':
+      ctx.fillStyle = '#c8c8c8';
+      ctx.fillRect(-1.5, -62, 3, 62);
+      ctx.fillStyle = '#ff5a3c';
+      ctx.fillRect(1, -62, 26, 34);
+      ctx.strokeRect(1, -62, 26, 34);
+      ctx.fillStyle = '#fff';
+      ctx.font = "900 11px 'Noto Sans TC',sans-serif";
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('凍', 14, -52);
+      ctx.fillText('蒜', 14, -38);
+      break;
+    case 'broom':
+      ctx.fillStyle = '#c89a5a';
+      ctx.fillRect(-1.5, -58, 3, 44);
+      ctx.fillStyle = '#e2c46a';
+      ctx.beginPath();
+      ctx.moveTo(-3, -16);
+      ctx.lineTo(3, -16);
+      ctx.lineTo(10, 0);
+      ctx.lineTo(-10, 0);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      break;
+    case 'slipper':
+      ctx.fillStyle = '#2a64c8';
+      ctx.beginPath();
+      ctx.ellipse(0, -4, 13, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(-4, -9, 9, 4);
+      break;
+    case 'stool':
+      ctx.fillStyle = '#d8202a';
+      ctx.fillRect(-14, -26, 28, 6);
+      ctx.strokeRect(-14, -26, 28, 6);
+      ctx.fillRect(-12, -20, 4, 20);
+      ctx.fillRect(8, -20, 4, 20);
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.fillRect(-10, -25, 20, 2);
       break;
     case 'chair':
       ctx.fillStyle = '#7b4f2a';

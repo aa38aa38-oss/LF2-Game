@@ -156,14 +156,8 @@ export class BattleScene {
       if (Math.abs(t.y - f.y) > 70) continue;
       f.hitList.add(t);
       const r = this.applyHit(f, t, h);
-      if (r && W) {
-        W.dur--;
-        if (W.dur <= 0) {
-          f.hold = null;
-          this.fx.add({ type: 'text', x: f.x, z: f.z, y: 110, text: `${W.def.name}壞了！`, color: '#ccc', size: 18, life: 0.8 });
-          this.sfx('block');
-        }
-      }
+      // 武器不會壞（參考吞食天地）：一直拿在手上打，直到被打倒才掉落
+      if (r && W) this.shake(3, 0.06);
     }
   }
   // ───── 道具 ─────
@@ -172,7 +166,7 @@ export class BattleScene {
     for (const it of this.items) {
       if (it.y > 5) continue;
       const d = Math.abs(it.x - f.x) + Math.abs(it.z - f.z) * 1.5;
-      if (Math.abs(it.x - f.x) < 38 && Math.abs(it.z - f.z) < 20 && d < bd) {
+      if (Math.abs(it.x - f.x) < 52 && Math.abs(it.z - f.z) < 28 && d < bd) {
         bd = d;
         best = it;
       }
@@ -661,6 +655,24 @@ export class BattleScene {
       if (d.f) {
         const f = d.f;
         if (f.invuln > 0 && ['idle', 'walk', 'run'].includes(f.state) && Math.floor(this.time * 20) % 2) continue;
+        if (f.state === 'defend') {
+          // 集氣光：腳下光圈＋往上飄的光
+          const cy = ARENA.floorY + f.z - f.y;
+          p.save();
+          p.globalCompositeOperation = 'lighter';
+          p.globalAlpha = 0.5 + Math.sin(this.time * 18) * 0.15;
+          p.strokeStyle = f.mp >= 100 ? '#ffe14a' : '#6ab8ff';
+          p.lineWidth = 4;
+          p.beginPath();
+          p.ellipse(f.x, cy, 46, 12, 0, 0, Math.PI * 2);
+          p.stroke();
+          for (let i = 0; i < 6; i++) {
+            const k = (this.time * 1.6 + i / 6) % 1;
+            p.fillStyle = f.mp >= 100 ? '#ffe14a' : '#9fd4ff';
+            p.fillRect(f.x - 36 + i * 14, cy - k * 130, 3, 18);
+          }
+          p.restore();
+        }
         if (f.state === 'super') {
           p.save();
           p.globalCompositeOperation = 'lighter';
@@ -939,6 +951,14 @@ export class BattleScene {
   drawPlayerTag(ctx) {
     const f = this.player;
     if (f.dead) return;
+    // 腳邊有道具：提示可以撿
+    if (!f.hold) {
+      const it = this.items.find((it) => it.y <= 5 && Math.abs(it.x - f.x) < 52 && Math.abs(it.z - f.z) < 28);
+      if (it) {
+        const k = document.body.classList.contains('touch') ? '攻' : 'A';
+        txt(ctx, `${k} 撿起${it.def.name}`, it.x, ARENA.floorY + it.z - 70, { size: 14, weight: 900, color: '#ffe14a', align: 'center', stroke: '#000', sw: 4, alpha: blink(this.time, 3) ? 1 : 0.6 });
+      }
+    }
     const x = f.x, y = ARENA.floorY + f.z - f.y - 140;
     txt(ctx, '1P', x, y, { size: 12, font: 'px', color: '#5cff7a', align: 'center', stroke: '#000', sw: 4 });
     ctx.fillStyle = '#5cff7a';
@@ -1154,7 +1174,7 @@ export class BattleScene {
     txt(ctx, P.char.superMove.name, x + 26, y + 12, { size: 13, weight: 900, color: full ? '#ffe14a' : '#888' });
     txt(ctx, full ? '可以放大絕！' : '大絕', x + 26, y + 26, { size: 10, color: full ? '#fff' : '#9aa' });
     txt(ctx, full ? 'OK' : `${Math.floor(P.mp)}%`, x + rw - 8, y + 17, { size: full ? 12 : 13, font: 'px', align: 'right', color: full ? '#7fffa0' : '#fff' });
-    txt(ctx, 'A 普攻　D 跳　F 防', x + rw + 10, y + 18, { size: 12, weight: 700, color: '#cfd3e6', stroke: '#000', sw: 3 });
+    txt(ctx, 'A 普攻　D 跳　F 集氣', x + rw + 10, y + 18, { size: 12, weight: 700, color: '#cfd3e6', stroke: '#000', sw: 3 });
   }
 
   drawPause(ctx) {

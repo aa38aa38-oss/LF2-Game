@@ -16,7 +16,7 @@ export const CHARS = [
     color: '#f28c28',
     color2: '#5a2a00',
     stats: { pow: 3, spd: 5, def: 3 },
-    mul: { pow: 1.02, spd: 1.12, def: 1.0 },
+    mul: { pow: 0.95, spd: 1.1, def: 0.98 },
     look: {
       skin: '#f0bd8c', hair: 'bald', hairColor: '#5b4636', glasses: 'rect', brows: 'angry',
       mask: '#f39a2b', top: 'suit', topColor: '#2a2e38', shirt: '#eeeeee', tie: '#9aa3b5',

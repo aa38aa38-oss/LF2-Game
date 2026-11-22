@@ -461,14 +461,22 @@ const EXTRA = {
     specialDown: {
       name: '躺地抗議', cost: 18, dur: 1.6, ai: 'defensive',
       start(f, b) {
-        f.armor = 1.6;
-        b.fx.add({ type: 'text', x: f.x, z: f.z, y: 120, text: '除非踏過我！', color: '#fff', size: 22, life: 1.2 });
+        // 躺地期間無敵，周圍金色光圈＝有攻擊判定，誰踩進來就跌倒
+        f.invuln = 1.6;
+        b.fx.add({ type: 'text', x: f.x, z: f.z, y: 120, text: '除非踏過我！', color: '#ffe14a', size: 24, life: 1.2 });
       },
       update(f, b) {
         f.vx = f.vz = 0;
+        f.invuln = Math.max(f.invuln, 0.05);
+        f.mv.r = (f.mv.r || 0) - 1 / 60;
+        if (f.mv.r <= 0) {
+          f.mv.r = 0.28;
+          b.fx.add({ type: 'ring', x: f.x, z: f.z, y: 0, life: 0.4, r: 120, color: '#ffd84a' });
+          b.fx.add({ type: 'spark', x: f.x + rand(-40, 40), z: f.z, y: 14, life: 0.2, color: '#ffd84a' });
+        }
         for (const e of b.enemiesOf(f)) {
           if (f.hitList.has(e) || e.y > 6) continue;
-          if (Math.abs(e.x - f.x) < 46 && Math.abs(e.z - f.z) < 18) {
+          if (Math.abs(e.x - f.x) < 62 && Math.abs(e.z - f.z) < 24) {
             f.hitList.add(e);
             b.applyHit(f, e, { dmg: 12, knock: true, launch: 260, kb: 120, slip: true, dir: e.facing });
           }
@@ -601,8 +609,11 @@ const EXTRA = {
 for (const [id, ex] of Object.entries(EXTRA)) Object.assign(MOVES[id], ex);
 
 // 技能冷卻秒數：沒特別指定就依原本的耗氣換算（耗 25 氣 ≈ 6 秒）
+// 可選角色的技能冷卻整體縮短（敵人的招式 cost 是 0，不受影響）
+export const CD_SCALE = 0.65;
 export function specialCD(def) {
-  return def.cd != null ? def.cd : Math.round(def.cost * 0.24 * 2) / 2;
+  const base = def.cd != null ? def.cd : def.cost * 0.24;
+  return Math.round((def.cost > 0 ? base * CD_SCALE : base) * 2) / 2;
 }
 
 // 依方向取得特技定義

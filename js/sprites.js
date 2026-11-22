@@ -491,7 +491,7 @@ export function poseFor(f) {
       p.aF = [2.95, 0.15];
       p.aB = [2.85, 0.15];
       p.prop = null;
-    } else p.prop = H.kind === 'mic' ? 'mic' : H.kind;
+    } else p.prop = ['mic', 'sign', 'egg'].includes(H.kind) ? H.kind : null;
   }
   switch (st) {
     case 'idle': {
@@ -811,7 +811,16 @@ export function drawFighter(ctx, f, alpha = 1) {
   } else {
     drawChar(ctx, f.char, poseFor(f), sx, sy, f.facing, SC * (f.scale || 1), alpha, f.flash > 0, f.animT);
   }
-  if (f.hold && f.hold.def && f.hold.def.type === 'heavy') drawItem(ctx, f.hold.kind, sx, sy - 112, 0, 1.2);
+  if (f.hold && f.hold.def && f.hold.def.type === 'heavy') drawItem(ctx, f.hold.kind, sx, sy - 112 * (f.scale || 1), 0, 1.2);
+  // 手上的武器：插畫角色、或程式畫沒有內建的道具，都在手的位置畫出來
+  else if (f.hold && f.hold.def && (img || !['mic', 'sign', 'egg'].includes(f.hold.kind)) && f.state !== 'down' && f.state !== 'fall') {
+    const atk = ['a1', 'a2', 'a3', 'jatk', 'djatk', 'ratk'].includes(f.state);
+    ctx.save();
+    ctx.translate(sx + f.facing * (atk ? 40 : 24), sy - 66 * (f.scale || 1));
+    ctx.scale(f.facing, 1);
+    drawItem(ctx, f.hold.kind, 0, 18, atk ? 1.2 : 0.35, 1.05);
+    ctx.restore();
+  }
   if (f.state === 'dizzy') {
     for (let i = 0; i < 3; i++) {
       const a = f.animT * 5 + (i * Math.PI * 2) / 3;

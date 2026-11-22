@@ -134,6 +134,7 @@ export class ResultScene {
       ['擊倒數', s.kos],
       ['最高連段', `${s.maxCombo} HITS`],
     ];
+    if (d.clearTime != null) rows.splice(1, 0, ['通關時間', `${Math.floor(d.clearTime / 60)} 分 ${(d.clearTime % 60).toFixed(1)} 秒`]);
     rows.forEach(([k, v], i) => {
       txt(ctx, k, 548, 136 + i * 34, { size: 17, weight: 900, color: '#aaa' });
       txt(ctx, String(v), 892, 136 + i * 34, { size: 18, weight: 900, color: '#fff', align: 'right' });

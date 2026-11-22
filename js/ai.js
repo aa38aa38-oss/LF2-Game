@@ -192,10 +192,15 @@ export class AI {
         return;
       }
     }
-    if (ATTACKING.has(t.state) && adx < 95 && adz < 26 && Math.random() < this.p.block) {
+    // 防禦改成集氣：被攻擊時跳開閃避；離對手遠、氣沒滿時原地集氣
+    if (ATTACKING.has(t.state) && adx < 95 && adz < 26 && Math.random() < this.p.block * 0.5) {
+      this.mx = -sign(dx);
+      c.tap('jump');
+      return;
+    }
+    if (adx > 300 && f.mp < 100 && f.mp > 40 && Math.random() < 0.35) {
       this.def = true;
       this.mx = this.mz = 0;
-      f.facing = sign(dx) || f.facing;
       return;
     }
     if (adx < 64 && adz < 15) {

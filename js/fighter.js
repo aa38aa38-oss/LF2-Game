@@ -303,6 +303,9 @@ export class Fighter {
     const T = this.stateT;
     const c = this.ctrl;
     if (st === 'defend') {
+      // 防禦鍵改成「集氣」：按住原地集氣，大絕更快能放（集氣時不能擋，被打就中斷）
+      this.vx = this.vz = 0;
+      if (b.fightOn) this.mp = Math.min(100, this.mp + 32 * dt);
       if (b.fightOn && this.readSpecial(b)) return;
       if (b.fightOn && c.pressed('super') && this.mp >= 100) return b.startSuper(this);
       if (!c.held('defend') || !b.fightOn) this.setState('idle');
@@ -480,7 +483,8 @@ export class Fighter {
     if (this.state === 'caught' && src !== this.caughtBy && !h.knock) return null;
     const dir = h.dir || Math.sign(this.x - src.x) || src.facing;
     // 防禦（只擋正面）
-    if (this.state === 'defend' && this.facing === -dir && !h.unblockable && !this.airborne) {
+    // （防禦已改成集氣，不再能擋；保留舊的格擋程式碼但不會觸發）
+    if (this.state === 'block' && this.facing === -dir && !h.unblockable && !this.airborne) {
       this.bdef += h.bdef != null ? h.bdef : h.knock ? 45 : 20;
       const d = h.dmg * DMG_SCALE * 0.12;
       this.hp = Math.max(1, this.hp - d);

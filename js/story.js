@@ -28,44 +28,56 @@ export const STAGE1 = {
   ],
   apt: { x0: 2300, x1: 3960, roofZ: -470 },
   temple: { x: 5000 },
-  // 樓梯：bot 樓層的後緣 ↔ top 樓層的前緣
-  ladders: [
-    { x: 2480, bot: 0, top: 1 },
-    { x: 3360, bot: 1, top: 2 },
-    { x: 3880, bot: 3, top: 2 },
+  // 斜坡：從 bot 樓層後緣的 xb，斜斜走到 top 樓層前緣的 xt
+  ramps: [
+    { bot: 0, top: 1, xb: 2390, xt: 2580 },
+    { bot: 1, top: 2, xb: 3240, xt: 3450 },
+    { bot: 3, top: 2, xb: 4020, xt: 3830 },
   ],
   checkpoints: [
     { floor: 0, x: 200, z: 95 },
-    { floor: 1, x: 2480, z: -150 },
-    { floor: 3, x: 3880, z: 40 },
+    { floor: 1, x: 2620, z: -150 },
+    { floor: 3, x: 4080, z: 40 },
   ],
   gateX: 4700,
   // 波次：玩家走到 x 就出敵人，並鎖住畫面直到打完
   waves: [
     { floor: 0, x: 480, lock: [60, 1060], cp: 0, spawn: [['gang', 'R'], ['gang', 'R'], ['protester', 'R']] },
     { floor: 0, x: 1300, lock: [860, 1860], cp: 0, spawn: [['gang', 'R'], ['protester', 'L'], ['gang', 'R'], ['protester', 'R']] },
-    { floor: 0, x: 2100, lock: [1760, 2760], cp: 0, spawn: [['gang', 'R'], ['gang', 'R'], ['gang', 'L'], ['protester', 'R']], after: '↑ 走到鷹架前按「上」爬上去' },
+    { floor: 0, x: 2100, lock: [1760, 2760], cp: 0, spawn: [['gang', 'R'], ['gang', 'R'], ['gang', 'L'], ['protester', 'R']], after: '↗ 走到右邊的斜坡，按「上」走上去' },
     { floor: 1, x: 2700, lock: [2330, 3330], cp: 1, spawn: [['gang', 'R'], ['protester', 'R'], ['gang', 'R']] },
-    { floor: 2, x: 3200, lock: [2960, 3930], cp: 1, spawn: [['paparazzi', 'R', { mid: true }], ['gang', 'L']], title: '小王登場：偷拍狗仔', after: '從右邊的鷹架爬下去' },
-    { floor: 3, x: 4050, lock: [3800, 4700], cp: 2, spawn: [['gang', 'R'], ['protester', 'R'], ['gang', 'R'], ['gang', 'L']] },
+    { floor: 2, x: 3200, lock: [2960, 3930], cp: 1, spawn: [['paparazzi', 'R', { mid: true }], ['gang', 'L']], title: '小王登場：偷拍狗仔', after: '↘ 從右邊的斜坡走下去' },
+    { floor: 3, x: 4150, lock: [3800, 4700], cp: 2, spawn: [['gang', 'R'], ['protester', 'R'], ['gang', 'R'], ['gang', 'L']] },
   ],
   // 得票不夠時，在封鎖線前出現的「拉票」波次（可以重複）
   rally: { floor: 3, lock: [3800, 4700], spawn: [['gang', 'R'], ['protester', 'R'], ['gang', 'L']] },
   boss: { floor: 3, x: 4950, lock: [4620, 5620], id: 'kingpin' },
+  // 路上的道具：補血（便當、珍奶）、武器（拿著一直打，被打倒才掉）、紅包（回血但扣票）
   items: [
-    ['chair', 0, 860, 140],
+    ['flag', 0, 420, 60],
+    ['bento', 0, 760, 150],
+    ['chair', 0, 900, 120],
+    ['broom', 0, 1250, 40],
     ['redenv', 0, 1640, 160],
-    ['bento', 1, 3150, -170],
+    ['bento', 0, 1980, 70],
+    ['slipper', 0, 2200, 130],
+    ['bento', 1, 2950, -170],
+    ['stool', 1, 3150, -150],
+    ['boba', 2, 3150, -440],
     ['redenv', 2, 3600, -420],
-    ['boba', 3, 4300, 120],
+    ['bento', 2, 3780, -440],
+    ['flag', 3, 4150, 60],
+    ['bento', 3, 4350, 120],
     ['redenv', 3, 4500, 60],
     ['bento', 3, 4620, 150],
+    ['boba', 3, 5100, 90],
   ],
   taxi: { floor: 0, from: 1850, to: 2700 },
 };
 
 const VOTES = { gang: 1200, protester: 1000, paparazzi: 5000, kingpin: 12000, rival: 6000 };
-const HPMUL = { gang: 0.3, protester: 0.28, paparazzi: 0.8, kingpin: 1.9 };
+// 小怪血很少（兩三下就倒，打起來爽）；小王、Boss 才耐打
+const HPMUL = { gang: 0.08, protester: 0.08, paparazzi: 0.42, kingpin: 1.55 };
 
 // 環境傷害（計程車）的來源
 const ENV = { team: 9, x: 0, facing: 1, state: 'idle', combo: 0, comboT: 0, mp: 0, superDealt: null, char: { id: 'env', mul: { pow: 1 }, color: '#f4c20d' }, stats: { dmg: 0, maxCombo: 0, kos: 0 } };
@@ -85,6 +97,9 @@ export class StoryScene extends BattleScene {
     this.items = [];
     this.votes = cfg.votes || 0;
     this.cp = cfg.cp || 0;
+    // 排行榜看通關時間：從中途點重來也接著算
+    this.clock = cfg.clock || 0;
+    this.kneels = cfg.kneels || 0;
     this.taxiT = 4;
     this.gateOpen = false;
     this.wavesDone = new Set();
@@ -186,7 +201,25 @@ export class StoryScene extends BattleScene {
   // ───── 得票 ─────
   gainVotes(t) {
     if (t.team === 0) return;
-    this.addVotes(t.votes || 1000, t.npcKind === 'rival' ? '對手倒了！' : '');
+    this.addVotes(t.votes || 1000, '');
+    // 越南大戰式的爽快倒地：小怪慘叫著飛出去，偶爾掉補血或武器
+    if (t.npcKind !== 'kingpin') {
+      const dir = Math.sign(t.x - this.player.x) || 1;
+      t.vx = dir * 620;
+      t.vy = Math.max(t.vy, 560);
+      t.y = Math.max(t.y, 2);
+      this.fx.add({ type: 'spark', x: t.x, z: t.z, y: 60, life: 0.35, big: true, color: '#ffffff' });
+      this.fx.add({ type: 'ring', x: t.x, z: t.z, y: 0, life: 0.4, r: 140, color: '#ffd84a' });
+      this.fx.add({ type: 'text', x: t.x, z: t.z, y: 150, text: pick(['啊～～！', '哇啊！', '救命啊！', '我錯了！', '下次不敢了！']), color: '#ffffff', size: 22, life: 0.9 });
+      this.shake(6, 0.15);
+      this.hitstop = Math.max(this.hitstop, 0.06);
+      if (Math.random() < 0.35) {
+        const kind = pick(['bento', 'bento', 'boba', 'flag', 'broom', 'slipper']);
+        const it = newItem(kind, t.x, t.z, 160);
+        it.floor = t.floor;
+        this.items.push(it);
+      }
+    }
   }
   addVotes(n, msg = '') {
     this.votes = Math.max(0, this.votes + n);
@@ -244,7 +277,9 @@ export class StoryScene extends BattleScene {
       }
       return;
     }
+    if (this.phase === 'kneel') return this.updateKneel(dt);
     // fight
+    this.clock += dt;
     this.runQueue();
     for (const p of this.popups) p.t += dt;
     this.popups = this.popups.filter((p) => p.t < 1.4);
@@ -258,7 +293,7 @@ export class StoryScene extends BattleScene {
         f.goneT = (f.goneT || 0) + dt;
       }
     }
-    this.fighters = this.fighters.filter((f) => !(f.goneT > 2.2));
+    this.fighters = this.fighters.filter((f) => !(f.goneT > 1.3));
     if (P.hp <= 0) {
       this.setPhase('dead');
       this.say('落選…', 1.8, '#ff5a5a');
@@ -275,9 +310,8 @@ export class StoryScene extends BattleScene {
     const P = this.player, L = this.L;
     if (this.waveActive) {
       const w = this.waveActive;
-      if (!this.enemiesAlive().length && !this.queue.length) {
-        // Boss 戰第二階段：對手倒了，角頭樁腳王才下場
-        if (w.boss && !this.boss) return this.bossEnters();
+      const bossDown = w.boss && this.boss && this.boss.hp <= 0;
+      if (bossDown || (!this.enemiesAlive().length && !this.queue.length)) {
         this.waveActive = null;
         this.setFloor(P, P.floor);
         if (w.boss) return this.winStage();
@@ -341,25 +375,12 @@ export class StoryScene extends BattleScene {
     const w = { floor: 3, lock: L.boss.lock, boss: true, spawn: [] };
     this.waveActive = w;
     P.bounds = { ...P.bounds, xMin: w.lock[0], xMax: w.lock[1] };
-    // 第一階段：對手陣營的候選人＋小弟（Boss 在廟口嗆聲）
-    const rivals = CHARS.filter((c) => c.id !== P.char.id);
-    const rc = pick(rivals).id;
-    this.rival = this.spawnEnemy('rival', 'R', 3, { cid: rc, x: L.boss.x + 320 });
-    this.rival.npcKind = 'rival';
-    this.rival.votes = VOTES.rival;
-    this.later(0.5, () => this.spawnEnemy('gang', 'L', 3));
-    this.say(`對手陣營：${this.rival.char.title}`, 2, '#ffd84a');
-    this.popups.push({ t: -0.6, text: '角頭樁腳王：「先讓我的人跟你玩玩！」', color: '#ff9a3a', x: L.boss.x + 300, z: 20, big: true });
-    this.refill(0.4, '支持者應援：回血！');
-    this.sfx('cutin');
-  }
-  bossEnters() {
-    const L = this.L;
+    // 只有一個有長血條的 Boss，打到一半會叫小弟
     this.boss = this.spawnEnemy('kingpin', 'R', 3, { x: Math.min(L.boss.lock[1] - 40, this.cam.x + this.viewW + 60) });
-    this.later(1.2, () => this.spawnEnemy('gang', 'L', 3));
+    this.later(3, () => this.boss && !this.boss.dead && this.spawnEnemy('gang', 'L', 3));
     this.say('BOSS：角頭樁腳王', 2, '#ff5a3c');
-    this.popups.push({ t: 0, text: `「${CHAR_BY_ID.kingpin.quote}」`, color: '#ff9a3a', x: this.boss.x - 100, z: this.boss.z, big: true });
-    this.refill(0.3, '支持者應援：回血！');
+    this.popups.push({ t: 0, text: `「${CHAR_BY_ID.kingpin.quote}」`, color: '#ff9a3a', x: L.boss.x + 200, z: 20, big: true });
+    this.refill(0.4, '支持者應援：回血！');
     this.sfx('cutin');
   }
 
@@ -372,37 +393,35 @@ export class StoryScene extends BattleScene {
     if (!this.player.airborne) this.player.setState('victory');
   }
 
-  // ───── 樓梯 ─────
-  nearLadder() {
+  // ───── 斜坡 ─────
+  nearRamp() {
     const P = this.player;
-    for (const ld of this.L.ladders) {
-      if (Math.abs(P.x - ld.x) > 44) continue;
-      if (P.floor === ld.bot) {
-        const F = this.L.floors[ld.bot];
-        if (P.z <= F.zMin + 26) return { ld, dir: 'up' };
-      }
-      if (P.floor === ld.top) {
-        const F = this.L.floors[ld.top];
-        if (P.z >= F.zMax - 26) return { ld, dir: 'down' };
-      }
+    for (const r of this.L.ramps) {
+      const B = this.L.floors[r.bot], T = this.L.floors[r.top];
+      if (P.floor === r.bot && Math.abs(P.x - r.xb) < 55 && P.z <= B.zMin + 30) return { r, dir: 'up', toward: Math.sign(r.xt - r.xb) };
+      if (P.floor === r.top && Math.abs(P.x - r.xt) < 55 && P.z >= T.zMax - 30) return { r, dir: 'down', toward: Math.sign(r.xb - r.xt) };
     }
     return null;
   }
   ladderHint() {
     if (this.waveActive || this.player.climb) return null;
-    const n = this.nearLadder();
-    return n ? (n.dir === 'up' ? '↑ 按「上」爬上去' : '↓ 按「下」爬下去') : null;
+    const n = this.nearRamp();
+    if (!n) return null;
+    const arrow = n.dir === 'up' ? (n.toward > 0 ? '↗' : '↖') : n.toward > 0 ? '↘' : '↙';
+    return n.dir === 'up' ? `${arrow} 按「上」走上斜坡` : `${arrow} 按「下」走下斜坡`;
   }
   updateLadders(dt) {
     const P = this.player, c = P.ctrl;
     if (P.climb) {
+      // 沿著斜坡斜斜地走過去（x 和前後深度一起變）
       const k = P.climb;
       k.t += dt;
       const p = Math.min(1, k.t / k.dur);
-      P.x = k.x;
+      P.x = k.x0 + (k.x1 - k.x0) * p;
       P.z = k.z0 + (k.z1 - k.z0) * p;
       P.y = 0;
       P.state = 'walk';
+      P.facing = Math.sign(k.x1 - k.x0) || P.facing;
       if (p >= 1) {
         P.climb = null;
         this.setFloor(P, k.to);
@@ -412,18 +431,18 @@ export class StoryScene extends BattleScene {
       return;
     }
     if (this.waveActive || !['idle', 'walk', 'run'].includes(P.state)) return;
-    const n = this.nearLadder();
+    const n = this.nearRamp();
     if (!n) return;
-    if ((n.dir === 'up' && c.held('up')) || (n.dir === 'down' && c.held('down'))) {
-      const { ld } = n;
-      const to = n.dir === 'up' ? ld.top : ld.bot;
-      const T = this.L.floors[to], F = this.L.floors[P.floor];
-      const z1 = n.dir === 'up' ? T.zMax - 12 : T.zMin + 12;
-      P.climb = { t: 0, dur: Math.abs(z1 - P.z) / 360 + 0.2, x: ld.x, z0: P.z, z1, to };
+    const dx = (c.held('right') ? 1 : 0) - (c.held('left') ? 1 : 0);
+    const go = n.dir === 'up' ? c.held('up') : c.held('down');
+    if (go || (dx === n.toward && Math.abs(P.vz) < 1 && ((n.dir === 'up' && P.z <= this.L.floors[n.r.bot].zMin + 8) || (n.dir === 'down' && P.z >= this.L.floors[n.r.top].zMax - 8)))) {
+      const { r } = n;
+      const to = n.dir === 'up' ? r.top : r.bot;
+      const T = this.L.floors[to];
+      const x0 = P.x, x1 = n.dir === 'up' ? r.xt : r.xb;
+      const z1 = n.dir === 'up' ? T.zMax - 10 : T.zMin + 10;
+      P.climb = { t: 0, dur: Math.hypot(x1 - x0, z1 - P.z) / 280 + 0.1, x0, x1, z0: P.z, z1, to };
       P.vx = P.vz = P.vy = 0;
-      P.facing = 1;
-      this.sfx('jump');
-      void F;
     }
   }
 
@@ -449,12 +468,56 @@ export class StoryScene extends BattleScene {
     }
   }
 
+  // ───── 選前驚天一跪：原地滿血復活（多算 10 秒時間） ─────
+  kneel() {
+    const P = this.player;
+    this.kneels++;
+    this.clock += 10;
+    this.setPhase('kneel');
+    P.dead = false;
+    P.hp = 1;
+    P.setState('pick');
+    P.vx = P.vz = P.vy = 0;
+    P.y = 0;
+    this.say('選前驚天一跪！', 2, '#ffe14a');
+    this.sfx('cutin');
+  }
+  updateKneel(dt) {
+    const P = this.player, T = this.phaseT;
+    P.state = 'pick';
+    P.stateT = 0.05;
+    P.mv.kneelT = T;
+    if (Math.random() < 0.035) this.popups.push({ t: 0, text: pick(['拜託！拜託！', '請給我一個機會！', '凍蒜！', '同情票灌進來！', '含淚下跪…']), color: '#ffffff', x: P.x + rand(-160, 160), z: P.z + rand(-20, 20) });
+    for (const p of this.popups) p.t += dt;
+    this.popups = this.popups.filter((p) => p.t < 1.4);
+    if (T > 2) {
+      P.hp = P.maxHp;
+      P.cap = P.maxHp;
+      P.mp = 100;
+      P.invuln = 2.5;
+      P.setState('idle');
+      // 起身震開身邊的敵人
+      this.fx.add({ type: 'ring', x: P.x, z: P.z, y: 0, life: 0.6, r: 320, color: '#ffe14a' });
+      this.shake(10, 0.4);
+      for (const e of this.enemiesOf(P)) {
+        if (Math.abs(e.x - P.x) < 260) this.applyHit(P, e, { dmg: 0.1, knock: true, launch: 360, kb: 380, unblockable: true, dir: Math.sign(e.x - P.x) || 1 });
+      }
+      this.setPhase('fight');
+      this.say('滿血復活！', 1.2, '#5cff7a');
+      this.sfx('confirm');
+    }
+  }
+
   // ───── 接關 ─────
   update(dt) {
     if (this.phase === 'lost') {
       const c = this.g.input.p1;
-      if (c.pressed('up') || c.pressed('down') || c.pressed('left') || c.pressed('right')) {
-        this.lostSel = 1 - this.lostSel;
+      if (c.pressed('up') || c.pressed('left')) {
+        this.lostSel = (this.lostSel + 2) % 3;
+        this.sfx('move');
+      }
+      if (c.pressed('down') || c.pressed('right')) {
+        this.lostSel = (this.lostSel + 1) % 3;
         this.sfx('move');
       }
       if (c.confirm) this.lostChoose(this.lostSel);
@@ -473,13 +536,17 @@ export class StoryScene extends BattleScene {
   }
   lostChoose(i) {
     this.sfx('confirm');
-    if (i === 0) this.g.setScene(new StoryScene(this.g, { ...this.cfg, cp: this.cp, votes: this.cpVotes != null ? this.cpVotes : this.cfg.votes || 0 }));
+    if (i === 0) this.kneel();
+    else if (i === 1) this.restartCp();
     else this.g.goTitle();
+  }
+  restartCp() {
+    this.g.setScene(new StoryScene(this.g, { ...this.cfg, cp: this.cp, votes: this.cpVotes != null ? this.cpVotes : this.cfg.votes || 0, clock: this.clock, kneels: this.kneels }));
   }
   pauseChoose(i) {
     this.sfx('confirm');
     if (i === 0) this.paused = false;
-    else if (i === 1) this.lostChoose(0);
+    else if (i === 1) this.restartCp();
     else this.g.goTitle();
   }
   checkEnd() {}
@@ -489,15 +556,15 @@ export class StoryScene extends BattleScene {
     if (this.done) return;
     this.done = true;
     const P = this.player;
+    // 排行榜依通關速度：越快分數越高（5 分鐘破關約 7 萬分）
     this.g.goResult({
-      cfg: { ...this.cfg, mode: 'story' }, win: true, score: Math.round(this.votes + P.stats.maxCombo * 100), wave: 1,
+      cfg: { ...this.cfg, mode: 'story' }, win: true, score: Math.max(1000, Math.round(100000 - this.clock * 100)), wave: 1, clearTime: this.clock,
       stats: { ...P.stats }, playerChar: P.char, winnerChar: P.char, stage: 'legislature',
     });
   }
   onPointer(x, y) {
     if (this.phase === 'lost') {
-      if (y > 280 && y < 330) this.lostChoose(0);
-      else if (y >= 330 && y < 380) this.lostChoose(1);
+      for (let i = 0; i < 3; i++) if (y > 268 + i * 46 && y < 312 + i * 46) this.lostChoose(i);
       return;
     }
     if (this.phase === 'won' && this.wonT > 2) return this.finish();
@@ -562,6 +629,8 @@ export class StoryScene extends BattleScene {
     ctx.strokeRect(gx, 30, gw, 18);
     txt(ctx, r >= 1 ? '過當選門檻！去打倒 Boss' : `當選門檻 ${L.goal.toLocaleString()} 票`, gx + gw / 2, 39, { size: 12, weight: 900, color: '#fff', align: 'center', stroke: '#000', sw: 3 });
     txt(ctx, `打倒敵人加票；被偷拍、收紅包會扣票`, gx, 64, { size: 11, color: '#9a9ab0' });
+    const m = Math.floor(this.clock / 60), sec = Math.floor(this.clock % 60);
+    txt(ctx, `⏱ ${m}:${String(sec).padStart(2, '0')}${this.kneels ? `　跪了 ${this.kneels} 次` : ''}`, gx + gw, 64, { size: 13, weight: 900, color: '#ffd84a', align: 'right' });
     // Boss 血條
     const B = this.boss;
     if (B && this.bossOn && this.phase === 'fight') {
@@ -619,17 +688,19 @@ export class StoryScene extends BattleScene {
   drawLost(ctx) {
     ctx.fillStyle = 'rgba(0,0,0,0.7)';
     ctx.fillRect(-this.g.ox, 0, this.g.CW, 540);
-    panel(ctx, 300, 150, 360, 260);
-    txt(ctx, '落選', 480, 200, { size: 52, weight: 900, color: '#ff5a5a', align: 'center', stroke: '#000', sw: 8 });
-    txt(ctx, `目前得票 ${(this.cpVotes != null ? this.cpVotes : this.votes).toLocaleString()}（中途點）`, 480, 248, { size: 14, color: '#cfd3e6', align: 'center' });
-    ['從中途點重來', '回到標題'].forEach((o, i) => {
-      const y = 305 + i * 50;
+    panel(ctx, 260, 130, 440, 310);
+    txt(ctx, '落選', 480, 180, { size: 52, weight: 900, color: '#ff5a5a', align: 'center', stroke: '#000', sw: 8 });
+    txt(ctx, '要使出選前驚天一跪嗎？', 480, 228, { size: 18, weight: 900, color: '#ffe14a', align: 'center' });
+    const opts = [['選前驚天一跪', '原地滿血復活（通關時間 +10 秒）'], ['從中途點重來', '得票回到中途點'], ['回到標題', '']];
+    opts.forEach(([o, d], i) => {
+      const y = 290 + i * 46;
       const sel = i === this.lostSel;
       if (sel) {
         ctx.fillStyle = 'rgba(255,216,74,0.18)';
-        ctx.fillRect(340, y - 20, 280, 40);
+        ctx.fillRect(290, y - 21, 380, 42);
       }
-      txt(ctx, (sel ? '▶ ' : '　') + o, 480, y, { size: 22, weight: 900, align: 'center', color: sel ? '#ffd84a' : '#fff' });
+      txt(ctx, (sel ? '▶ ' : '　') + o, 300, y - (d ? 6 : 0), { size: 20, weight: 900, color: sel ? '#ffd84a' : '#fff' });
+      if (d) txt(ctx, d, 330, y + 13, { size: 11, color: '#aab' });
     });
   }
 
