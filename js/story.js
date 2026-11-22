@@ -18,7 +18,7 @@ export const STAGE1 = {
   id: 1,
   name: '議員選舉',
   sub: '廟口老街 → 菜市場公寓 → 宮廟廣場',
-  goal: 30000,
+  goal: 25000,
   worldW: 6000,
   floors: [
     { id: 0, name: '老街', xMin: 40, xMax: 2760, ...STREET },
@@ -52,21 +52,15 @@ export const STAGE1 = {
   // 得票不夠時，在封鎖線前出現的「拉票」波次（可以重複）
   rally: { floor: 3, lock: [3800, 4700], spawn: [['gang', 'R'], ['protester', 'R'], ['gang', 'L'], ['gang', 'R'], ['gang', 'L']] },
   boss: { floor: 3, x: 4950, lock: [4620, 5620], id: 'kingpin' },
-  // 路上的道具：補血（便當、珍奶）、武器（拿著一直打，被打倒才掉）、紅包（回血但扣票）
+  // 路上的道具：補血（便當、珍奶）、紅包（回血但扣票），走過去就自動吃
   items: [
-    ['flag', 0, 420, 60],
     ['bento', 0, 760, 150],
-    ['chair', 0, 900, 120],
-    ['broom', 0, 1250, 40],
     ['redenv', 0, 1640, 160],
     ['bento', 0, 1980, 70],
-    ['slipper', 0, 2200, 130],
     ['bento', 1, 2950, -170],
-    ['stool', 1, 3150, -150],
     ['boba', 2, 3150, -440],
     ['redenv', 2, 3600, -420],
     ['bento', 2, 3780, -440],
-    ['flag', 3, 4150, 60],
     ['bento', 3, 4350, 120],
     ['redenv', 3, 4500, 60],
     ['bento', 3, 4620, 150],
@@ -77,7 +71,7 @@ export const STAGE1 = {
 
 const VOTES = { gang: 1200, protester: 1000, paparazzi: 5000, kingpin: 12000, rival: 6000 };
 // 小怪血很少（兩三下就倒，打起來爽）；小王、Boss 才耐打
-const HPMUL = { gang: 0.08, protester: 0.08, paparazzi: 0.42, kingpin: 1.55 };
+const HPMUL = { gang: 0.05, protester: 0.05, paparazzi: 0.35, kingpin: 1.2 };
 
 // 環境傷害（計程車）的來源
 const ENV = { team: 9, x: 0, facing: 1, state: 'idle', combo: 0, comboT: 0, mp: 0, superDealt: null, char: { id: 'env', mul: { pow: 1 }, color: '#f4c20d' }, stats: { dmg: 0, maxCombo: 0, kos: 0 } };
@@ -186,10 +180,7 @@ export class StoryScene extends BattleScene {
     f.mob = id === 'gang' || id === 'protester';
     f.mp = id === 'kingpin' ? 40 : 0;
     this.setFloor(f, floorId);
-    if (id === 'protester') {
-      const it = newItem('sign', x, z, 0);
-      f.hold = it;
-    }
+
     return f;
   }
   summon(id, n, near) {
@@ -215,7 +206,7 @@ export class StoryScene extends BattleScene {
       this.shake(6, 0.15);
       t.hitstop = Math.max(t.hitstop || 0, 0.06);
       if (Math.random() < 0.35) {
-        const kind = pick(['bento', 'bento', 'boba', 'flag', 'broom', 'slipper']);
+        const kind = pick(['bento', 'bento', 'boba']);
         const it = newItem(kind, t.x, t.z, 160);
         it.floor = t.floor;
         this.items.push(it);

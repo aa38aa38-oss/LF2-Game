@@ -1,18 +1,13 @@
 // 輸入系統：每位玩家一個 Controller。
 // 鍵盤、觸控、電腦 AI、以及之後的「手機搖桿」都只要操作 Controller 就能控制角色。
 
-// 鍵盤配置參考《英雄聯盟》：Q W E 技能、R 大絕、A 普攻、D 跳躍（閃現的位置）、F 防禦，方向鍵移動。
-// 舊的按鍵（J K L U I、Z X C V、1 2 3）也保留，習慣哪一套都可以。
+// 鍵盤只有三個動作鍵：A 攻擊、D 跳（空白鍵也可以）、R 大招；方向鍵移動。
+// 舊的 J／K／I、Z／X／V 也保留。招式都用「方向＋攻擊」組合出來。
 const KEYMAP = {
   ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',
   KeyA: 'attack', KeyJ: 'attack', KeyZ: 'attack',
-  KeyQ: 'sk1', KeyW: 'sk2', KeyE: 'sk3',
-  Digit1: 'sk1', Digit2: 'sk2', Digit3: 'sk3',
-  Numpad1: 'sk1', Numpad2: 'sk2', Numpad3: 'sk3',
+  KeyD: 'jump', Space: 'jump', KeyK: 'jump', KeyX: 'jump',
   KeyR: ['super', 'rank'], KeyI: 'super', KeyV: 'super',
-  KeyD: 'jump', Space: 'jump', KeyK: 'jump',
-  KeyF: 'defend', KeyL: 'defend', KeyX: 'defend',
-  KeyU: 'special', KeyC: 'special',
   Enter: 'start', NumpadEnter: 'start',
   KeyP: 'pause', Escape: 'pause',
   KeyM: 'mute',

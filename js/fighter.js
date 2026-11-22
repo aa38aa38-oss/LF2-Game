@@ -22,14 +22,19 @@ export const ATK = {
   jatk: { dur: 9, on: 0.05, off: 0.6, x0: -12, x1: 76, zr: 30, dmg: 11, kb: 120, stun: 0.38, air: true, fall: 40, bdef: 25 },
   djatk: { dur: 9, on: 0.05, off: 0.7, x0: -12, x1: 88, zr: 34, dmg: 16, kb: 280, launch: 300, air: true, heavy: true, fall: 75, bdef: 50 },
   ratk: { dur: 0.5, on: 0.06, off: 0.36, x0: -10, x1: 90, zr: 32, dmg: 15, kb: 320, launch: 300, heavy: true, fall: 75, bdef: 60 },
+  // ───── 共用的簡易指令招式（每個角色範圍、效果都一樣，只有外觀不同）─────
+  // 從天而降：空中按攻擊，往下猛砸（落地時另有一圈衝擊波）
+  dive: { dur: 9, on: 0, off: 9, x0: -30, x1: 60, zr: 34, dmg: 9, kb: 120, stun: 0.4, air: true, fall: 40, bdef: 30 },
+  // 迴旋攻擊：↑ 或 ↓ ＋攻擊，前後一圈都打得到
+  spin: { dur: 0.46, on: 0.08, off: 0.3, x0: -96, x1: 96, zr: 40, dmg: 11, kb: 260, launch: 300, heavy: true, fall: 80, bdef: 45 },
   cpunch: { dur: 0.26, on: 0.08, off: 0.14, x0: -5, x1: 60, zr: 20, dmg: 8, fall: 0, bdef: 0 },
 };
 const NEXT = { a1: 'a2', a2: 'a3' };
 // 全體傷害倍率：原本一拳 7 點、血 420，要打 60 拳才倒，常常打到 time out。
 // 小朋友齊打交大約 25 拳倒一個人，所以整體攻擊力提高。
 export const DMG_SCALE = 1.5;
-const AIR_STATES = new Set(['fall', 'jump', 'jatk', 'djatk', 'flip']);
-const NO_FRICTION = new Set(['walk', 'run', 'jump', 'jatk', 'djatk', 'ratk', 'fall', 'special', 'super', 'grabbed', 'roll', 'flip', 'caught']);
+const AIR_STATES = new Set(['fall', 'jump', 'jatk', 'djatk', 'flip', 'dive']);
+const NO_FRICTION = new Set(['walk', 'run', 'jump', 'jatk', 'djatk', 'ratk', 'dive', 'fall', 'special', 'super', 'grabbed', 'roll', 'flip', 'caught']);
 
 export class Fighter {
   constructor(char, o) {
@@ -54,6 +59,7 @@ export class Fighter {
     this.mp = o.mp != null ? o.mp : 30;
     // 技能冷卻（傳說對決式）：秒數到了就能再放，不耗氣；氣只給大絕用
     this.cd = { fwd: 0, up: 0, down: 0 };
+    this.spinCD = 0;
     this.state = 'idle';
     this.stateT = 0;
     this.animT = Math.random() * 3;
@@ -114,6 +120,7 @@ export class Fighter {
     if (this.invuln > 0) this.invuln -= dt;
     if (this.armor > 0) this.armor -= dt;
     if (this.flash > 0) this.flash -= dt;
+    if (this.spinCD > 0) this.spinCD -= dt;
     if (b.fightOn) for (const k in this.cd) if (this.cd[k] > 0) this.cd[k] = Math.max(0, this.cd[k] - dt);
     if (this.comboT > 0) {
       this.comboT -= dt;
@@ -182,26 +189,19 @@ export class Fighter {
       b.startSuper(this);
       return;
     }
-    if (this.readSpecial(b)) return;
-    if (c.pressed('defend') && this.state === 'run') {
-      // 跑步中按防禦：翻滾（無敵閃避）
-      this.setState('roll');
-      this.invuln = 0.42;
-      this.vx = this.facing * 430;
-      b.sfx('jump');
-      return;
-    }
+    // 劇情模式的敵人才有自己的特技；可選角色只用共用的簡易指令
+    if (this.char.npc && this.readSpecial(b)) return;
     if (c.pressed('attack')) {
-      const H = this.hold;
-      if (H && (H.def.type === 'heavy' || H.def.type === 'throw' || this.state === 'run')) {
-        b.throwHeld(this, this.state === 'run');
-        return;
-      }
-      if (!H && b.tryPickup(this)) return;
       if (this.tryCatch(b)) return;
-      if (this.state === 'run') {
+      if (dz && !dx && this.spinCD <= 0) {
+        // ↑ 或 ↓ ＋攻擊：迴旋攻擊
+        this.startAttack('spin');
+        this.spinCD = 2.5;
+      } else if (this.state === 'run' || (dx && dx === this.facing)) {
+        // 往前＋攻擊（或跑步中攻擊）：前衝攻擊
         this.setState('ratk');
-        this.vx = this.facing * 360 * this.spd;
+        this.vx = this.facing * 560;
+        this.vz = 0;
       } else this.startAttack('a1');
       b.sfx('whiff');
       return;
@@ -217,7 +217,7 @@ export class Fighter {
       b.sfx('jump');
       return;
     }
-    if (c.held('defend')) {
+    if (c.held('defend') && this.char.npc) {
       this.setState('defend');
       this.vx = this.vz = 0;
       return;
@@ -266,9 +266,12 @@ export class Fighter {
       this.state = 'jump';
       return;
     }
-    const dash = this.mv.dash;
-    this.state = dash ? 'djatk' : 'jatk';
+    // 從天而降：往下猛砸，落地放出衝擊波
+    this.state = 'dive';
     this.stateT = 0;
+    this.vy = Math.min(this.vy, -700);
+    this.vx = this.facing * 120;
+    this.vz = 0;
     this.hitList.clear();
     b.sfx('whiff');
   }
@@ -453,7 +456,17 @@ export class Fighter {
 
   onLand(b) {
     const st = this.state;
-    if (st === 'jump' || st === 'jatk' || st === 'djatk' || st === 'flip') {
+    if (st === 'dive') {
+      // 從天而降落地：一圈衝擊波
+      this.vx = this.vz = 0;
+      this.setState('land');
+      this.hitList.clear();
+      b.areaHit(this, { x0: -120, x1: 120, zr: 52, dmg: 13, knock: true, launch: 340, kb: 240, heavy: true, fall: 80 });
+      b.fx.add({ type: 'ring', x: this.x, z: this.z, y: 0, life: 0.45, r: 250, color: this.char.color });
+      b.fx.add({ type: 'dust', x: this.x, z: this.z, y: 0, life: 0.5, big: true });
+      b.shake(6, 0.15);
+      b.sfx('heavy');
+    } else if (st === 'jump' || st === 'jatk' || st === 'djatk' || st === 'flip') {
       this.vx = this.vz = 0;
       this.setState('land');
       b.sfx('land');

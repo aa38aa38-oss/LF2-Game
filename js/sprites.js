@@ -772,11 +772,11 @@ const ANIM_MAP = {
   jatk: 'jump_attack', ratk: 'run_attack', defend: 'defend', hurt: 'hurt', fall: 'fall', down: 'down',
   ko: 'down', getup: 'getup', dizzy: 'dizzy', victory: 'victory', grabbed: 'fall', special: 'special',
   djatk: 'jump_attack', roll: 'roll', flip: 'roll', pick: 'getup', catch: 'catch', caught: 'hurt', land: 'idle',
-  super: 'super', superwait: 'super',
+  super: 'super', superwait: 'super', dive: 'jump_attack', spin: 'spin',
 };
 const FALLBACK = {
   run: ['walk', 'idle'], jump: ['idle'], jump_attack: ['attack1', 'idle'], run_attack: ['attack1', 'idle'],
-  attack2: ['attack1', 'idle'], attack3: ['attack2', 'attack1', 'idle'], defend: ['idle'], roll: ['fall', 'idle'],
+  attack2: ['attack1', 'idle'], spin: ['attack3', 'attack1', 'idle'], attack3: ['attack2', 'attack1', 'idle'], defend: ['idle'], roll: ['fall', 'idle'],
   catch: ['attack1', 'idle'], getup: ['idle'], dizzy: ['hurt', 'idle'], victory: ['idle'], down: ['fall', 'hurt'],
   fall: ['hurt', 'idle'], special: ['attack1', 'idle'], super: ['special', 'attack1', 'idle'], hurt: ['idle'],
 };

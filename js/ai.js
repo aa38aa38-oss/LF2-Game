@@ -8,7 +8,7 @@ const DIFF = {
   normal: { react: 0.3, aggr: 0.65, block: 0.22, special: 0.45, flip: 0.45, item: 0.6 },
   hard: { react: 0.16, aggr: 0.85, block: 0.42, special: 0.7, flip: 0.8, item: 0.85 },
 };
-const ATTACKING = new Set(['a1', 'a2', 'a3', 'jatk', 'djatk', 'ratk', 'special', 'super']);
+const ATTACKING = new Set(['a1', 'a2', 'a3', 'jatk', 'djatk', 'ratk', 'dive', 'spin', 'special', 'super']);
 const KINDS = ['fwd', 'up', 'down'];
 
 export class AI {
@@ -55,6 +55,11 @@ export class AI {
         if (Math.random() < this.p.flip) c.tap('jump');
       }
     } else this.flipTried = false;
+    // 跳起來後按攻擊＝從天而降
+    if (this.diveT > 0) {
+      this.diveT -= dt;
+      if (this.diveT <= 0 && f.state === 'jump') c.tap('attack');
+    }
     this.t -= dt;
     this.retarget -= dt;
     if (!this.target || this.target.dead || this.retarget <= 0) {
@@ -164,8 +169,31 @@ export class AI {
       c.tap('super');
       return;
     }
-    // 特技
-    if (Math.random() < this.p.special * 0.7) {
+    // 可選角色：用共用的簡易指令招式（迴旋、前衝、從天而降）
+    if (!f.char.npc && Math.random() < this.p.special * 0.9) {
+      const crowd = b.enemiesOf(f).filter((e) => Math.abs(e.x - f.x) < 100 && Math.abs(e.z - f.z) < 40).length;
+      if (f.spinCD <= 0 && (crowd >= 2 || (adx < 90 && adz < 30 && Math.random() < 0.3))) {
+        this.mx = 0;
+        this.mz = -1;
+        c.tap('attack');
+        return;
+      }
+      if (adx > 110 && adx < 260 && adz < 22) {
+        this.mx = sign(dx);
+        this.mz = 0;
+        c.tap('attack');
+        return;
+      }
+      if (adx > 60 && adx < 170 && adz < 26 && Math.random() < 0.45) {
+        this.mx = sign(dx);
+        this.mz = 0;
+        c.tap('jump');
+        this.diveT = 0.22;
+        return;
+      }
+    }
+    // 敵人（劇情模式）：用自己的特技
+    if (f.char.npc && Math.random() < this.p.special * 0.7) {
       const ok = [];
       for (const k of KINDS) {
         const sp = specialDef(f.char.id, k);
@@ -198,7 +226,7 @@ export class AI {
       c.tap('jump');
       return;
     }
-    if (adx > 300 && f.mp < 100 && f.mp > 40 && Math.random() < 0.35) {
+    if (f.char.npc && adx > 300 && f.mp < 100 && f.mp > 40 && Math.random() < 0.35) {
       this.def = true;
       this.mx = this.mz = 0;
       return;

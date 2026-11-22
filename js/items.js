@@ -1,19 +1,19 @@
-// 場上道具（參考小朋友齊打交：天上掉東西，撿起來用或丟人）
+// 場上道具：目前只剩補血品（走過去自動吃）；武器的資料保留但不會出現（weight 0）
 // food：撿到立即使用；light：輕武器（拿在手上揮、跑步/跳躍中按攻擊丟出）；
 // throw：只能丟（雞蛋）；heavy：重物（舉在頭上，按攻擊丟出）
 import { ARENA, rand, pick } from './util.js';
 
 export const ITEM_DEFS = {
   bento: { name: '便當', type: 'food', hp: 70, cap: 40, weight: 3 },
-  boba: { name: '珍奶', type: 'food', mp: 60, weight: 2 },
-  sign: { name: '抗議標語', type: 'light', dur: 10, dmg: 6, reach: 22, throwDmg: 16, weight: 3 },
-  mic: { name: '麥克風', type: 'light', dur: 8, dmg: 4, reach: 10, throwDmg: 14, weight: 2 },
-  egg: { name: '雞蛋', type: 'throw', throwDmg: 9, weight: 3 },
-  chair: { name: '議場椅子', type: 'heavy', throwDmg: 28, weight: 2 },
-  flag: { name: '競選旗', type: 'light', dur: 10, dmg: 8, reach: 40, throwDmg: 14, weight: 3 },
-  broom: { name: '掃把', type: 'light', dur: 10, dmg: 7, reach: 32, throwDmg: 12, weight: 2 },
-  slipper: { name: '藍白拖', type: 'throw', throwDmg: 10, weight: 2 },
-  stool: { name: '塑膠椅', type: 'heavy', throwDmg: 22, weight: 2 },
+  boba: { name: '珍奶', type: 'food', hp: 45, cap: 30, mp: 40, weight: 2 },
+  sign: { name: '抗議標語', type: 'light', dur: 10, dmg: 6, reach: 22, throwDmg: 16, weight: 0 },
+  mic: { name: '麥克風', type: 'light', dur: 8, dmg: 4, reach: 10, throwDmg: 14, weight: 0 },
+  egg: { name: '雞蛋', type: 'throw', throwDmg: 9, weight: 0 },
+  chair: { name: '議場椅子', type: 'heavy', throwDmg: 28, weight: 0 },
+  flag: { name: '競選旗', type: 'light', dur: 10, dmg: 8, reach: 40, throwDmg: 14, weight: 0 },
+  broom: { name: '掃把', type: 'light', dur: 10, dmg: 7, reach: 32, throwDmg: 12, weight: 0 },
+  slipper: { name: '藍白拖', type: 'throw', throwDmg: 10, weight: 0 },
+  stool: { name: '塑膠椅', type: 'heavy', throwDmg: 22, weight: 0 },
   // 劇情模式：紅包（政治獻金）。回很多血，但會被爆料扣票
   redenv: { name: '紅包', type: 'food', hp: 120, cap: 80, votes: -2500, weight: 0 },
 };

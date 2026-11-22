@@ -174,6 +174,12 @@ Use the attached images (this character's full-body illustration and three-view 
 Use the attached images (this character's full-body illustration and three-view sheet) as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: doing a forward somersault roll, curled into a ball. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
 ```
 
+**迴旋攻擊（↑↓＋攻）**　存檔：`assets/characters/su/spin.png`　尺寸：4 格橫排（每格 512×512，整張 2048×512）
+
+```
+Use the attached images (this character's full-body illustration and three-view sheet) as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: a spinning whirlwind attack hitting all around: winding up, spinning around with arms or a kick sweeping in a full circle, motion swirl lines, recover. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+```
+
 **抓住對手揍**　存檔：`assets/characters/su/catch.png`　尺寸：2 格橫排（每格 512×512，整張 1024×512）
 
 ```
@@ -384,6 +390,12 @@ Use the attached images (this character's full-body illustration and three-view 
 
 ```
 Use the attached images (this character's full-body illustration and three-view sheet) as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: doing a forward somersault roll, curled into a ball. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+```
+
+**迴旋攻擊（↑↓＋攻）**　存檔：`assets/characters/wang/spin.png`　尺寸：4 格橫排（每格 512×512，整張 2048×512）
+
+```
+Use the attached images (this character's full-body illustration and three-view sheet) as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: a spinning whirlwind attack hitting all around: winding up, spinning around with arms or a kick sweeping in a full circle, motion swirl lines, recover. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
 ```
 
 **抓住對手揍**　存檔：`assets/characters/wang/catch.png`　尺寸：2 格橫排（每格 512×512，整張 1024×512）
@@ -598,6 +610,12 @@ Use the attached images (this character's full-body illustration and three-view 
 Use the attached images (this character's full-body illustration and three-view sheet) as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: doing a forward somersault roll, curled into a ball. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
 ```
 
+**迴旋攻擊（↑↓＋攻）**　存檔：`assets/characters/han/spin.png`　尺寸：4 格橫排（每格 512×512，整張 2048×512）
+
+```
+Use the attached images (this character's full-body illustration and three-view sheet) as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: a spinning whirlwind attack hitting all around: winding up, spinning around with arms or a kick sweeping in a full circle, motion swirl lines, recover. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+```
+
 **抓住對手揍**　存檔：`assets/characters/han/catch.png`　尺寸：2 格橫排（每格 512×512，整張 1024×512）
 
 ```
@@ -808,6 +826,12 @@ Use the attached images (this character's full-body illustration and three-view 
 
 ```
 Use the attached images (this character's full-body illustration and three-view sheet) as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: doing a forward somersault roll, curled into a ball. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+```
+
+**迴旋攻擊（↑↓＋攻）**　存檔：`assets/characters/ma/spin.png`　尺寸：4 格橫排（每格 512×512，整張 2048×512）
+
+```
+Use the attached images (this character's full-body illustration and three-view sheet) as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: a spinning whirlwind attack hitting all around: winding up, spinning around with arms or a kick sweeping in a full circle, motion swirl lines, recover. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
 ```
 
 **抓住對手揍**　存檔：`assets/characters/ma/catch.png`　尺寸：2 格橫排（每格 512×512，整張 1024×512）
@@ -1022,6 +1046,12 @@ Use the attached images (this character's full-body illustration and three-view 
 Use the attached images (this character's full-body illustration and three-view sheet) as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: doing a forward somersault roll, curled into a ball. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
 ```
 
+**迴旋攻擊（↑↓＋攻）**　存檔：`assets/characters/ko/spin.png`　尺寸：4 格橫排（每格 512×512，整張 2048×512）
+
+```
+Use the attached images (this character's full-body illustration and three-view sheet) as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: a spinning whirlwind attack hitting all around: winding up, spinning around with arms or a kick sweeping in a full circle, motion swirl lines, recover. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+```
+
 **抓住對手揍**　存檔：`assets/characters/ko/catch.png`　尺寸：2 格橫排（每格 512×512，整張 1024×512）
 
 ```
@@ -1232,6 +1262,12 @@ Use the attached images (this character's full-body illustration and three-view 
 
 ```
 Use the attached images (this character's full-body illustration and three-view sheet) as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: doing a forward somersault roll, curled into a ball. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+```
+
+**迴旋攻擊（↑↓＋攻）**　存檔：`assets/characters/guan/spin.png`　尺寸：4 格橫排（每格 512×512，整張 2048×512）
+
+```
+Use the attached images (this character's full-body illustration and three-view sheet) as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: a spinning whirlwind attack hitting all around: winding up, spinning around with arms or a kick sweeping in a full circle, motion swirl lines, recover. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
 ```
 
 **抓住對手揍**　存檔：`assets/characters/guan/catch.png`　尺寸：2 格橫排（每格 512×512，整張 1024×512）
@@ -1882,6 +1918,10 @@ clean hand-drawn comic caricature illustration, bold black outlines, flat cel-sh
       },
       "roll": {
         "sheet": "assets/characters/su/roll.png",
+        "frames": 4
+      },
+      "spin": {
+        "sheet": "assets/characters/su/spin.png",
         "frames": 4
       },
       "catch": {

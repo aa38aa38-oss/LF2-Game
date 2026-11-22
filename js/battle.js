@@ -250,6 +250,21 @@ export class BattleScene {
         }
       }
     }
+    // 補血品：走過去就自動吃（不用按鍵）。劇情模式只有主角會吃
+    if (!this.fightOn) return;
+    for (const f of this.fighters) {
+      if (f.dead || f.hp <= 0 || f.y > 5 || f.climb || (this.cfg.mode === 'story' && f.team !== 0)) continue;
+      const it = this.items.find((it) => it.y <= 5 && it.def.type === 'food' && Math.abs(it.x - f.x) < 42 && Math.abs(it.z - f.z) < 26);
+      if (!it) continue;
+      this.items.splice(this.items.indexOf(it), 1);
+      const D = it.def;
+      if (D.hp) f.heal(D.hp, D.cap);
+      if (D.mp) f.mp = Math.min(100, f.mp + D.mp);
+      if (D.votes && this.onVotes) this.onVotes(f, D.votes, '收紅包！貪污疑雲');
+      this.sfx('heal');
+      this.fx.add({ type: 'text', x: f.x, z: f.z, y: 120, text: D.hp ? `${D.name} +${D.hp}` : `${D.name} 氣+${D.mp}`, color: D.hp ? '#5cff7a' : '#6ab8ff', size: 20, life: 0.9 });
+      for (let i = 0; i < 5; i++) this.fx.add({ type: 'plus', x: f.x + rand(-20, 20), z: f.z, y: rand(30, 100), life: 0.7 });
+    }
   }
   areaHit(f, box) {
     const h = { ...box, dmg: box.dmg * f.char.mul.pow };
@@ -965,7 +980,24 @@ export class BattleScene {
     const W = f.hold && f.hold.def && f.hold.def.type === 'light';
     const R = (a.x1 + (W ? (f.hold.def.reach || 0) : 0)) * 0.92;
     const cy = ARENA.floorY + f.z - f.y - 62 * (f.scale || 1);
-    const down = f.state === 'jatk' || f.state === 'djatk';
+    const down = f.state === 'jatk' || f.state === 'djatk' || f.state === 'dive';
+    if (f.state === 'spin') {
+      // 迴旋攻擊：一整圈刀光
+      p.save();
+      p.translate(f.x, cy + 20);
+      p.globalCompositeOperation = 'lighter';
+      p.lineCap = 'round';
+      for (const [w, col, al] of [[22, f.char.color, 0.55], [9, '#ffffff', 0.95]]) {
+        p.globalAlpha = al * fade;
+        p.strokeStyle = col;
+        p.lineWidth = w;
+        p.beginPath();
+        p.ellipse(0, 0, R, R * 0.42, 0, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * prog);
+        p.stroke();
+      }
+      p.restore();
+      return;
+    }
     const a0 = down ? -0.4 : f.state === 'a3' ? -1.4 : f.state === 'a2' ? 0.7 : -0.9;
     const a1 = down ? 1.3 : f.state === 'a3' ? 0.9 : f.state === 'a2' ? -0.5 : 0.5;
     const end = a0 + (a1 - a0) * prog;
@@ -990,7 +1022,7 @@ export class BattleScene {
     const f = this.player;
     if (f.dead) return;
     // 腳邊有道具：提示可以撿
-    if (!f.hold) {
+    if (false) {
       const it = this.items.find((it) => it.y <= 5 && Math.abs(it.x - f.x) < 52 && Math.abs(it.z - f.z) < 28);
       if (it) {
         const k = document.body.classList.contains('touch') ? '攻' : 'A';
@@ -1172,47 +1204,39 @@ export class BattleScene {
   }
 
   // 電腦版：畫面左下顯示三個技能的冷卻倒數（手機版直接顯示在按鈕上）
+  // 電腦版：左下顯示簡易指令（每個角色都一樣）＋大招集氣
   drawSkillBar(ctx) {
     const P = this.player;
     if (!P || P.dead || document.body.classList.contains('touch')) return;
-    const keys = [['Q', 'fwd', '防→攻'], ['W', 'up', '防↑攻'], ['E', 'down', '防↓攻']];
-    const x0 = 10 - this.g.ox, y = 496, w = 160;
-    keys.forEach(([key, k, cmd], i) => {
-      const def = specialDef(P.char.id, k);
-      if (!def) return;
-      const x = x0 + i * (w + 6);
-      const left = P.cd[k], ready = left <= 0;
+    const cmds = [['A', '連按＝三段連招'], ['→＋A', '前衝攻擊'], ['跳中 A', '從天而降'], ['↑↓＋A', '迴旋攻擊', P.spinCD]];
+    const y = 500, x0 = 10 - this.g.ox;
+    let x = x0;
+    for (const [k, name, cd] of cmds) {
+      const ready = !(cd > 0);
+      const kw = k.length * 13, label = ready ? name : `${name} ${cd.toFixed(1)}`;
+      const w = 22 + kw + label.length * 13;
       ctx.fillStyle = 'rgba(8,8,20,0.78)';
-      ctx.fillRect(x, y, w, 36);
-      if (!ready) {
-        ctx.fillStyle = 'rgba(60,140,255,0.35)';
-        ctx.fillRect(x, y + 32, w * (1 - left / specialCD(def)), 4);
-      } else {
-        ctx.fillStyle = 'rgba(60,140,255,0.9)';
-        ctx.fillRect(x, y + 32, w, 4);
-      }
+      ctx.fillRect(x, y, w, 30);
       ctx.strokeStyle = ready ? '#7fc0ff' : '#444';
       ctx.lineWidth = 2;
-      ctx.strokeRect(x, y, w, 36);
-      txt(ctx, key, x + 12, y + 17, { size: 14, font: 'px', align: 'center', color: '#ffd84a' });
-      txt(ctx, P.char.specials[i].name, x + 26, y + 12, { size: 14, weight: 900, color: ready ? '#fff' : '#888' });
-      txt(ctx, cmd, x + 26, y + 26, { size: 10, color: '#9aa' });
-      txt(ctx, ready ? 'OK' : left.toFixed(1), x + w - 8, y + 17, { size: ready ? 12 : 16, font: 'px', align: 'right', color: ready ? '#7fffa0' : '#fff' });
-    });
-    // R 大絕：顯示集氣百分比
-    const x = x0 + 3 * (w + 6), rw = 172, full = P.mp >= 100;
+      ctx.strokeRect(x, y, w, 30);
+      txt(ctx, k, x + 8, y + 15, { size: 13, weight: 900, color: '#ffd84a' });
+      txt(ctx, label, x + 14 + kw, y + 15, { size: 13, weight: 900, color: ready ? '#fff' : '#888' });
+      x += w + 6;
+    }
+    // R 大招：顯示集氣百分比
+    const rw = 172, full = P.mp >= 100;
     ctx.fillStyle = full ? 'rgba(80,60,0,0.85)' : 'rgba(8,8,20,0.78)';
-    ctx.fillRect(x, y, rw, 36);
+    ctx.fillRect(x, y - 6, rw, 36);
     ctx.fillStyle = full ? '#ffd84a' : 'rgba(255,216,74,0.45)';
-    ctx.fillRect(x, y + 32, (rw * Math.min(100, P.mp)) / 100, 4);
+    ctx.fillRect(x, y + 26, (rw * Math.min(100, P.mp)) / 100, 4);
     ctx.strokeStyle = full && Math.floor(this.time * 4) % 2 ? '#fff' : full ? '#ffd84a' : '#444';
     ctx.lineWidth = 2;
-    ctx.strokeRect(x, y, rw, 36);
-    txt(ctx, 'R', x + 12, y + 17, { size: 14, font: 'px', align: 'center', color: '#ffd84a' });
-    txt(ctx, P.char.superMove.name, x + 26, y + 12, { size: 13, weight: 900, color: full ? '#ffe14a' : '#888' });
-    txt(ctx, full ? '可以放大絕！' : '大絕', x + 26, y + 26, { size: 10, color: full ? '#fff' : '#9aa' });
-    txt(ctx, full ? 'OK' : `${Math.floor(P.mp)}%`, x + rw - 8, y + 17, { size: full ? 12 : 13, font: 'px', align: 'right', color: full ? '#7fffa0' : '#fff' });
-    txt(ctx, 'A 普攻　D 跳　F 集氣', x + rw + 10, y + 18, { size: 12, weight: 700, color: '#cfd3e6', stroke: '#000', sw: 3 });
+    ctx.strokeRect(x, y - 6, rw, 36);
+    txt(ctx, 'R', x + 12, y + 11, { size: 14, font: 'px', align: 'center', color: '#ffd84a' });
+    txt(ctx, P.char.superMove.name, x + 26, y + 6, { size: 13, weight: 900, color: full ? '#ffe14a' : '#888' });
+    txt(ctx, full ? '可以放大招！' : '大招', x + 26, y + 20, { size: 10, color: full ? '#fff' : '#9aa' });
+    txt(ctx, full ? 'OK' : `${Math.floor(P.mp)}%`, x + rw - 8, y + 11, { size: full ? 12 : 13, font: 'px', align: 'right', color: full ? '#7fffa0' : '#fff' });
   }
 
   drawPause(ctx) {

@@ -47,7 +47,7 @@ class Game {
     this.input.bindTouch(touch);
     this.input.bindJoystick(document.getElementById('stickZone'), document.getElementById('stickBase'), document.getElementById('stickKnob'));
     this.supBtn = touch.querySelector('.sup');
-    this.skBtns = ['fwd', 'up', 'down'].map((k, i) => ({ k, el: touch.querySelector('.sk' + (i + 1)), last: -1, char: null }));
+
     const fs = document.getElementById('fs');
     if (canFullscreen()) {
       fs.addEventListener('click', () => this.toggleFullscreen());
@@ -182,7 +182,7 @@ class Game {
       if (this.supBtn) {
         const P = this.scene.player;
         this.supBtn.classList.toggle('ready', !!(P && P.mp >= 100 && !P.dead));
-        if (P && P.cd) this.updateSkillButtons(P);
+
       }
       if (this.audio.muted) txt(this.ctx, '🔇', 940, 528, { size: 14, align: 'right', alpha: 0.7 });
       if (this.fade > 0) {

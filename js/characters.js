@@ -79,7 +79,7 @@ export const CHARS = [
     color: '#38b6e8',
     color2: '#06324a',
     stats: { pow: 2, spd: 5, def: 3 },
-    mul: { pow: 1.02, spd: 1.25, def: 1.02 },
+    mul: { pow: 0.95, spd: 1.1, def: 1.0 },
     look: {
       skin: '#f1c39a', hair: 'side', hairColor: '#17140f', glasses: null, brows: 'soft', headband: '#e23b3b',
       top: 'tee', topColor: '#ffffff', trim: '#2a7fd0', shorts: '#2a7fd0',
@@ -100,7 +100,7 @@ export const CHARS = [
     color: '#2ec4b6',
     color2: '#053a35',
     stats: { pow: 3, spd: 3, def: 3 },
-    mul: { pow: 1.0, spd: 1.02, def: 1.0 },
+    mul: { pow: 1.16, spd: 1.04, def: 1.1 },
     look: {
       skin: '#f0c29a', hair: 'short', hairColor: '#3b3b40', glasses: 'round', brows: 'flat', expr: 'flat',
       top: 'coat', topColor: '#fbfbfb', shirt: '#4b7bd1', tie: null,
@@ -121,7 +121,7 @@ export const CHARS = [
     color: '#e0393e',
     color2: '#3a0608',
     stats: { pow: 5, spd: 3, def: 5 },
-    mul: { pow: 0.97, spd: 0.94, def: 0.98 },
+    mul: { pow: 1.08, spd: 0.98, def: 1.06 },
     look: {
       skin: '#d9a173', hair: 'bald', hairColor: '#222', glasses: null, brows: 'angry', beard: '#1d1712',
       top: 'tank', topColor: '#141414', tie: null, muscle: true,

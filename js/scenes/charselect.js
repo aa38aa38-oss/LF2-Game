@@ -129,14 +129,13 @@ export class CharSelectScene {
       txt(ctx, n, 444, y, { size: 14, weight: 900, color: '#ddd' });
       segBar(ctx, 486, y - 6, 120, 12, v / 5, { segs: 5, color: ['#ff6a4a', '#5cc8ff', '#7cff7a'][i] });
     });
-    ch.specials.forEach((sp, i) => {
-      const y = 282 + i * 38;
-      txt(ctx, `技${i + 1}`, 630, y, { size: 13, weight: 900, color: '#8ab8ff' });
-      txt(ctx, `冷卻 ${specialCD(specialDef(ch.id, KINDS[i]))} 秒`, 930, y, { size: 12, weight: 900, color: '#7fc0ff', align: 'right' });
-      txt(ctx, sp.name, 686, y, { size: 15, weight: 900, color: '#fff' });
-      txt(ctx, sp.desc, 686, y + 17, { size: 12, color: '#aaa' });
+    // 共用指令招式（每個角色都一樣）
+    [['A 連按', '三段連招'], ['→＋A', '前衝攻擊'], ['跳中 A', '從天而降'], ['↑↓＋A', '迴旋攻擊']].forEach(([k, n], i) => {
+      const y = 284 + i * 26;
+      txt(ctx, k, 630, y, { size: 13, weight: 900, color: '#8ab8ff' });
+      txt(ctx, n, 700, y, { size: 15, weight: 900, color: '#fff' });
     });
-    txt(ctx, '大絕', 630, 400, { size: 13, weight: 900, color: '#ffd84a' });
+    txt(ctx, '大招', 630, 400, { size: 13, weight: 900, color: '#ffd84a' });
     txt(ctx, ch.superMove.name, 686, 400, { size: 15, weight: 900, color: '#ffd84a' });
     txt(ctx, ch.superMove.desc, 686, 417, { size: 12, color: '#aaa' });
     ctx.fillStyle = 'rgba(255,255,255,0.08)';
@@ -145,7 +144,7 @@ export class CharSelectScene {
     const q = `「${ch.quote}」`;
     const qs = q.length > 9 ? [q.slice(0, Math.ceil(q.length / 2)), q.slice(Math.ceil(q.length / 2))] : [q];
     qs.forEach((l, i) => txt(ctx, l, 526, 400 + i * 22 - (qs.length - 1) * 8, { size: 16, weight: 900, color: '#fff', align: 'center', stroke: '#000', sw: 4 }));
-    txt(ctx, '技能有冷卻秒數、不耗氣；氣集滿放大絕', 680, 456, { size: 13, color: '#8ab8ff', align: 'center' });
+    txt(ctx, '指令招式每人都一樣；大招是各自的絕招', 680, 456, { size: 13, color: '#8ab8ff', align: 'center' });
     txt(ctx, '← → 選擇　Enter 確定　Esc 返回', 680, 500, { size: 13, color: '#999', align: 'center' });
     if (this.flashT > 0) {
       ctx.fillStyle = `rgba(255,255,255,${this.flashT})`;
