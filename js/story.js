@@ -71,7 +71,7 @@ export const STAGE1 = {
 
 const VOTES = { gang: 1200, protester: 1000, paparazzi: 5000, kingpin: 12000, rival: 6000 };
 // 小怪血很少（兩三下就倒，打起來爽）；小王、Boss 才耐打
-const HPMUL = { gang: 0.05, protester: 0.05, paparazzi: 0.35, kingpin: 0.9 };
+const HPMUL = { gang: 0.05, protester: 0.05, paparazzi: 0.35, kingpin: 0.6 };
 
 // 環境傷害（計程車）的來源
 const ENV = { team: 9, x: 0, facing: 1, state: 'idle', combo: 0, comboT: 0, mp: 0, superDealt: null, char: { id: 'env', mul: { pow: 1 }, color: '#f4c20d' }, stats: { dmg: 0, maxCombo: 0, kos: 0 } };
