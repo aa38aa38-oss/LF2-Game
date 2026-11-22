@@ -70,7 +70,7 @@ repo 根目錄已經放了 `.nojekyll`，GitHub 不會亂處理檔案。
 
 ## 換成 Gemini 生成的美術圖
 
-目前衝衝院長、堅哥、發大財議長、慢跑總統、阿北，以及三個場景、首頁和開場已經換成 Gemini 生的圖；其他角色還是**程式畫的暫時素材**。生圖規格、檔名、每個角色每個動作的 prompt 都在 [`docs/GEMINI_PROMPTS.md`](docs/GEMINI_PROMPTS.md)。
+目前六位角色、三個場景、首頁和開場都已經換成 Gemini 生的圖（程式畫的版本仍保留當備用）。生圖規格、檔名、每個角色每個動作的 prompt 都在 [`docs/GEMINI_PROMPTS.md`](docs/GEMINI_PROMPTS.md)。
 
 新生的圖照 `assets/...` 的路徑放好後，執行 `python3 tools/prep_assets.py <資料夾>`，會自動去背、切格對齊、統一大小、壓縮並登記到 `assets/manifest.json`；沒登記的部分繼續用程式畫的。
 

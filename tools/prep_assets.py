@@ -24,7 +24,13 @@ OUT = ROOT / 'assets'
 CELL = 512          # Gemini 原圖每格寬
 SCALE = 0.5         # 輸出縮放
 PAD = 6             # 每格邊緣留白（輸出像素）
-FRAMES_HINT = {}    # 特殊情況可手動指定格數，例如 {'su/roll': 4}
+# 各動作預設格數（跟 docs/GEMINI_PROMPTS.md 一樣）；Gemini 畫的格數不同時，用 FRAMES_HINT 指定
+EXPECTED = {'idle': 4, 'walk': 6, 'run': 6, 'jump': 2, 'attack1': 3, 'attack2': 3, 'attack3': 4, 'jump_attack': 2,
+            'run_attack': 3, 'defend': 1, 'hurt': 2, 'fall': 3, 'down': 1, 'getup': 2, 'dizzy': 3, 'roll': 4,
+            'catch': 2, 'victory': 4, 'special': 4, 'special_fwd': 4, 'special_up': 4, 'special_down': 4, 'super': 6}
+FRAMES_HINT = {'guan/walk': 8, 'guan/run': 8, 'guan/super': 8}
+# 只用其中幾格（原圖有幾格人形疊在一起、切不開時用）
+FRAME_PICK = {'guan/run': [0, 1, 2, 3, 6, 7]}
 STRIP_SCALE = {}    # 某條動作畫得特別大／小時，可手動縮放，例如 {'han/roll': 0.8}
 
 
@@ -67,6 +73,14 @@ def body_mask(rgba, pal):
 def split_frames(alpha_mask, n):
     """依人形之間的空白欄切格；切不出來就平均切。回傳 [(x0, x1)]。"""
     W = alpha_mask.shape[1]
+    cw = W / n
+    cnt0 = alpha_mask.sum(axis=0)
+    # 先試平均切：每條格線附近幾乎沒有東西，代表 Gemini 是照等寬格子排的，直接平均切最準
+    if n > 1:
+        peak = max(1, cnt0.max())
+        ok = all(cnt0[max(0, int(i * cw) - 3):int(i * cw) + 4].max() < peak * 0.08 for i in range(1, n))
+        if ok:
+            return [(int(round(i * cw)), int(round((i + 1) * cw))) for i in range(n)], True
     col = alpha_mask.sum(axis=0) > 1
     runs, x = [], 0
     while x < W:
@@ -124,7 +138,7 @@ def process_strip(path, cid, anim, pal, ref_area):
     img = Image.open(path)
     rgba = key_green(img)
     H, W = rgba.shape[:2]
-    n = FRAMES_HINT.get(f'{cid}/{anim}') or max(1, round(W / CELL))
+    n = FRAMES_HINT.get(f'{cid}/{anim}') or EXPECTED.get(anim) or max(1, round(W / CELL))
     full = rgba[..., 3] > 24
     bounds, smart = split_frames(body_mask(rgba, pal) if pal is not None else full, n)
     frames = []
@@ -134,6 +148,9 @@ def process_strip(path, cid, anim, pal, ref_area):
         if info is None:
             continue
         frames.append((sub, info))
+    pick = FRAME_PICK.get(f'{cid}/{anim}')
+    if pick:
+        frames = [frames[i] for i in pick if i < len(frames)]
     if not frames:
         return None
     # 依身體面積把這條動作縮放成跟站立時一樣大
@@ -141,7 +158,7 @@ def process_strip(path, cid, anim, pal, ref_area):
     if ref_area and anim != 'idle':
         med = float(np.median([f['area'] for _, f in frames]))
         if med > 0:
-            auto = float(np.clip((ref_area / med) ** 0.5, 0.7, 1.3))
+            auto = float(np.clip((ref_area / med) ** 0.5, 0.4, 2.5))
             if abs(auto - 1) < 0.06:
                 auto = 1.0
     sc = SCALE * auto * STRIP_SCALE.get(f'{cid}/{anim}', 1.0)

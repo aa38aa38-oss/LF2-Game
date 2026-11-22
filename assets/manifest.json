@@ -457,6 +457,97 @@
         "sheet": "assets/characters/ma/walk.webp",
         "frames": 6
       }
+    },
+    "guan": {
+      "idle": {
+        "sheet": "assets/characters/guan/idle.webp",
+        "frames": 4
+      },
+      "_standH": 248.0,
+      "attack1": {
+        "sheet": "assets/characters/guan/attack1.webp",
+        "frames": 3
+      },
+      "attack2": {
+        "sheet": "assets/characters/guan/attack2.webp",
+        "frames": 3
+      },
+      "attack3": {
+        "sheet": "assets/characters/guan/attack3.webp",
+        "frames": 4
+      },
+      "catch": {
+        "sheet": "assets/characters/guan/catch.webp",
+        "frames": 2
+      },
+      "defend": {
+        "sheet": "assets/characters/guan/defend.webp",
+        "frames": 1
+      },
+      "dizzy": {
+        "sheet": "assets/characters/guan/dizzy.webp",
+        "frames": 3
+      },
+      "down": {
+        "sheet": "assets/characters/guan/down.webp",
+        "frames": 1
+      },
+      "fall": {
+        "sheet": "assets/characters/guan/fall.webp",
+        "frames": 3
+      },
+      "getup": {
+        "sheet": "assets/characters/guan/getup.webp",
+        "frames": 2
+      },
+      "hurt": {
+        "sheet": "assets/characters/guan/hurt.webp",
+        "frames": 2
+      },
+      "jump": {
+        "sheet": "assets/characters/guan/jump.webp",
+        "frames": 2
+      },
+      "jump_attack": {
+        "sheet": "assets/characters/guan/jump_attack.webp",
+        "frames": 2
+      },
+      "roll": {
+        "sheet": "assets/characters/guan/roll.webp",
+        "frames": 4
+      },
+      "run": {
+        "sheet": "assets/characters/guan/run.webp",
+        "frames": 6
+      },
+      "run_attack": {
+        "sheet": "assets/characters/guan/run_attack.webp",
+        "frames": 3
+      },
+      "special_down": {
+        "sheet": "assets/characters/guan/special_down.webp",
+        "frames": 4
+      },
+      "special_fwd": {
+        "sheet": "assets/characters/guan/special_fwd.webp",
+        "frames": 4
+      },
+      "special_up": {
+        "sheet": "assets/characters/guan/special_up.webp",
+        "frames": 4
+      },
+      "super": {
+        "sheet": "assets/characters/guan/super.webp",
+        "frames": 8
+      },
+      "victory": {
+        "sheet": "assets/characters/guan/victory.webp",
+        "frames": 4
+      },
+      "walk": {
+        "sheet": "assets/characters/guan/walk.webp",
+        "frames": 8
+      }
     }
   },
   "posters": {
@@ -464,14 +555,16 @@
     "wang": "assets/posters/wang.webp",
     "ko": "assets/posters/ko.webp",
     "su": "assets/posters/su.webp",
-    "ma": "assets/posters/ma.webp"
+    "ma": "assets/posters/ma.webp",
+    "guan": "assets/posters/guan.webp"
   },
   "portraits": {
     "han": "assets/portraits/han.webp",
     "wang": "assets/portraits/wang.webp",
     "ko": "assets/portraits/ko.webp",
     "su": "assets/portraits/su.webp",
-    "ma": "assets/portraits/ma.webp"
+    "ma": "assets/portraits/ma.webp",
+    "guan": "assets/portraits/guan.webp"
   },
   "select": {
     "han": "assets/select/han.webp"
