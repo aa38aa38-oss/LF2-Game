@@ -783,7 +783,9 @@ const FALLBACK = {
 const LOOP_ANIMS = new Set(['idle', 'walk', 'run', 'dizzy', 'victory', 'defend']);
 
 export function drawFighter(ctx, f, alpha = 1) {
-  const sx = f.x, sy = ARENA.floorY + f.z - f.y;
+  // 被打中定格時原地抖動
+  const jit = f.hitstop > 0 && ['hurt', 'fall', 'dizzy', 'caught', 'grabbed', 'ko'].includes(f.state) ? (Math.floor(f.hitstop * 60) % 2 ? 4 : -4) : 0;
+  const sx = f.x + jit, sy = ARENA.floorY + f.z - f.y;
   const anim = ANIM_MAP[f.state] || 'idle';
   const loop = LOOP_ANIMS.has(anim);
   // 三招技能可以各有一組圖（special_fwd / special_up / special_down），沒有就用共用的 special
@@ -805,7 +807,7 @@ export function drawFighter(ctx, f, alpha = 1) {
     ctx.translate(sx, sy);
     ctx.scale(f.facing, 1);
     ctx.globalAlpha *= alpha;
-    if (f.flash > 0 && FILTER_OK) ctx.filter = 'brightness(2.2)';
+    if (f.flash > 0 && FILTER_OK) ctx.filter = 'brightness(2.8) saturate(0.4)';
     ctx.drawImage(img, -w / 2, -h, w, h);
     ctx.restore();
   } else {

@@ -15,12 +15,13 @@ export const BDEF_MAX = 60; // 破防門檻
 
 // 一般攻擊（時間單位：秒；x0~x1 是前方距離；fall 倒地值；bdef 破防值）
 export const ATK = {
-  a1: { dur: 0.26, on: 0.06, off: 0.16, x0: -5, x1: 56, zr: 18, dmg: 7, kb: 70, stun: 0.3, lunge: 70, fall: 22, bdef: 16 },
-  a2: { dur: 0.28, on: 0.07, off: 0.18, x0: -5, x1: 58, zr: 18, dmg: 8, kb: 80, stun: 0.32, lunge: 80, fall: 22, bdef: 16 },
-  a3: { dur: 0.48, on: 0.14, off: 0.27, x0: -5, x1: 66, zr: 20, dmg: 13, kb: 230, launch: 340, lunge: 120, heavy: true, fall: 70, bdef: 45 },
-  jatk: { dur: 9, on: 0.05, off: 0.6, x0: -8, x1: 56, zr: 20, dmg: 11, kb: 120, stun: 0.38, air: true, fall: 40, bdef: 25 },
-  djatk: { dur: 9, on: 0.05, off: 0.7, x0: -8, x1: 62, zr: 22, dmg: 16, kb: 260, launch: 300, air: true, heavy: true, fall: 75, bdef: 50 },
-  ratk: { dur: 0.5, on: 0.06, off: 0.36, x0: -5, x1: 62, zr: 20, dmg: 15, kb: 300, launch: 300, heavy: true, fall: 75, bdef: 60 },
+  // 攻擊範圍參考吞食天地：往前打得遠、前後深度也比較寬鬆（不用站得很準）
+  a1: { dur: 0.26, on: 0.06, off: 0.16, x0: -10, x1: 80, zr: 32, dmg: 7, kb: 70, stun: 0.3, lunge: 70, fall: 22, bdef: 16 },
+  a2: { dur: 0.28, on: 0.07, off: 0.18, x0: -10, x1: 82, zr: 32, dmg: 8, kb: 80, stun: 0.32, lunge: 80, fall: 22, bdef: 16 },
+  a3: { dur: 0.48, on: 0.14, off: 0.27, x0: -14, x1: 94, zr: 36, dmg: 13, kb: 260, launch: 360, lunge: 120, heavy: true, fall: 70, bdef: 45 },
+  jatk: { dur: 9, on: 0.05, off: 0.6, x0: -12, x1: 76, zr: 30, dmg: 11, kb: 120, stun: 0.38, air: true, fall: 40, bdef: 25 },
+  djatk: { dur: 9, on: 0.05, off: 0.7, x0: -12, x1: 88, zr: 34, dmg: 16, kb: 280, launch: 300, air: true, heavy: true, fall: 75, bdef: 50 },
+  ratk: { dur: 0.5, on: 0.06, off: 0.36, x0: -10, x1: 90, zr: 32, dmg: 15, kb: 320, launch: 300, heavy: true, fall: 75, bdef: 60 },
   cpunch: { dur: 0.26, on: 0.08, off: 0.14, x0: -5, x1: 60, zr: 20, dmg: 8, fall: 0, bdef: 0 },
 };
 const NEXT = { a1: 'a2', a2: 'a3' };
@@ -505,7 +506,7 @@ export class Fighter {
     this.hp = Math.max(0, this.hp - dmg);
     this.cap = Math.max(this.hp, this.cap - dmg * 0.35);
     this.sinceHit = 0;
-    this.flash = 0.12;
+    this.flash = 0.16;
     this.mp = Math.min(100, this.mp + 5);
     // 被抓著的時候：只扣血，不改狀態
     if (this.state === 'caught' && src === this.caughtBy && !h.knock && this.hp > 0) return 'hit';
@@ -528,7 +529,7 @@ export class Fighter {
       this.setState('fall');
       this.fallPts = 0;
       this.vy = h.launch || 320;
-      this.vx = dir * (h.kb || 200);
+      this.vx = dir * (h.kb || 200) * (this.mob ? 1.4 : 1);
       this.vz = 0;
       this.y = Math.max(this.y, 1);
       this.mv.noFlip = !!h.noFlip;
@@ -539,8 +540,9 @@ export class Fighter {
       this.vx = dir * 60;
     } else {
       this.setState('hurt');
-      this.stun = h.stun || 0.3;
-      this.vx = dir * (h.kb || 80);
+      // 雜兵：硬直比較長、被打得比較遠（連段一定接得上，打起來爽）
+      this.stun = (h.stun || 0.3) * (this.mob ? 1.6 : 1) + (this.mob ? 0.08 : 0);
+      this.vx = dir * (h.kb || 80) * (this.mob ? 1.5 : 1);
     }
     if (!h.slip) this.facing = -dir;
     return 'hit';

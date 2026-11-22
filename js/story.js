@@ -18,7 +18,7 @@ export const STAGE1 = {
   id: 1,
   name: '議員選舉',
   sub: '廟口老街 → 菜市場公寓 → 宮廟廣場',
-  goal: 20000,
+  goal: 30000,
   worldW: 6000,
   floors: [
     { id: 0, name: '老街', xMin: 40, xMax: 2760, ...STREET },
@@ -42,15 +42,15 @@ export const STAGE1 = {
   gateX: 4700,
   // 波次：玩家走到 x 就出敵人，並鎖住畫面直到打完
   waves: [
-    { floor: 0, x: 480, lock: [60, 1060], cp: 0, spawn: [['gang', 'R'], ['gang', 'R'], ['protester', 'R']] },
-    { floor: 0, x: 1300, lock: [860, 1860], cp: 0, spawn: [['gang', 'R'], ['protester', 'L'], ['gang', 'R'], ['protester', 'R']] },
-    { floor: 0, x: 2100, lock: [1760, 2760], cp: 0, spawn: [['gang', 'R'], ['gang', 'R'], ['gang', 'L'], ['protester', 'R']], after: '↗ 走到右邊的斜坡，按「上」走上去' },
-    { floor: 1, x: 2700, lock: [2330, 3330], cp: 1, spawn: [['gang', 'R'], ['protester', 'R'], ['gang', 'R']] },
-    { floor: 2, x: 3200, lock: [2960, 3930], cp: 1, spawn: [['paparazzi', 'R', { mid: true }], ['gang', 'L']], title: '小王登場：偷拍狗仔', after: '↘ 從右邊的斜坡走下去' },
-    { floor: 3, x: 4150, lock: [3800, 4700], cp: 2, spawn: [['gang', 'R'], ['protester', 'R'], ['gang', 'R'], ['gang', 'L']] },
+    { floor: 0, x: 480, lock: [60, 1060], cp: 0, spawn: [['gang', 'R'], ['gang', 'R'], ['protester', 'R'], ['gang', 'L'], ['gang', 'R']] },
+    { floor: 0, x: 1300, lock: [860, 1860], cp: 0, spawn: [['gang', 'R'], ['protester', 'L'], ['gang', 'R'], ['protester', 'R'], ['gang', 'L'], ['gang', 'R']] },
+    { floor: 0, x: 2100, lock: [1760, 2760], cp: 0, spawn: [['gang', 'R'], ['gang', 'R'], ['gang', 'L'], ['protester', 'R'], ['protester', 'L'], ['gang', 'R']], after: '↗ 走到右邊的斜坡，按「上」走上去' },
+    { floor: 1, x: 2700, lock: [2330, 3330], cp: 1, spawn: [['gang', 'R'], ['protester', 'R'], ['gang', 'R'], ['gang', 'L'], ['gang', 'R']] },
+    { floor: 2, x: 3200, lock: [2960, 3930], cp: 1, spawn: [['paparazzi', 'R', { mid: true }], ['gang', 'L'], ['gang', 'R']], title: '小王登場：偷拍狗仔', after: '↘ 從右邊的斜坡走下去' },
+    { floor: 3, x: 4150, lock: [3800, 4700], cp: 2, spawn: [['gang', 'R'], ['protester', 'R'], ['gang', 'R'], ['gang', 'L'], ['protester', 'L'], ['gang', 'R']] },
   ],
   // 得票不夠時，在封鎖線前出現的「拉票」波次（可以重複）
-  rally: { floor: 3, lock: [3800, 4700], spawn: [['gang', 'R'], ['protester', 'R'], ['gang', 'L']] },
+  rally: { floor: 3, lock: [3800, 4700], spawn: [['gang', 'R'], ['protester', 'R'], ['gang', 'L'], ['gang', 'R'], ['gang', 'L']] },
   boss: { floor: 3, x: 4950, lock: [4620, 5620], id: 'kingpin' },
   // 路上的道具：補血（便當、珍奶）、武器（拿著一直打，被打倒才掉）、紅包（回血但扣票）
   items: [
@@ -183,6 +183,7 @@ export class StoryScene extends BattleScene {
     f.ai = new AI(f, diff);
     f.ctrl = f.ai.ctrl;
     f.npcKind = id;
+    f.mob = id === 'gang' || id === 'protester';
     f.mp = id === 'kingpin' ? 40 : 0;
     this.setFloor(f, floorId);
     if (id === 'protester') {
@@ -212,7 +213,7 @@ export class StoryScene extends BattleScene {
       this.fx.add({ type: 'ring', x: t.x, z: t.z, y: 0, life: 0.4, r: 140, color: '#ffd84a' });
       this.fx.add({ type: 'text', x: t.x, z: t.z, y: 150, text: pick(['啊～～！', '哇啊！', '救命啊！', '我錯了！', '下次不敢了！']), color: '#ffffff', size: 22, life: 0.9 });
       this.shake(6, 0.15);
-      this.hitstop = Math.max(this.hitstop, 0.06);
+      t.hitstop = Math.max(t.hitstop || 0, 0.06);
       if (Math.random() < 0.35) {
         const kind = pick(['bento', 'bento', 'boba', 'flag', 'broom', 'slipper']);
         const it = newItem(kind, t.x, t.z, 160);

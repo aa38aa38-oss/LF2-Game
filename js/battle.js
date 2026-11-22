@@ -271,7 +271,7 @@ export class BattleScene {
     if (r === 'block' || r === 'break') {
       this.fx.add({ type: 'block', x: t.x - sign(t.x - src.x) * 10, z: t.z, y: hy, life: 0.18 });
       this.sfx(r === 'break' ? 'heavy' : 'block');
-      if (r === 'break') this.hitstop = Math.max(this.hitstop, 0.08);
+      if (r === 'break') t.hitstop = Math.max(t.hitstop || 0, 0.08);
       return r;
     }
     const dealt = before - t.hp;
@@ -286,16 +286,14 @@ export class BattleScene {
     this.fx.add({ type: 'num', x: t.x + rand(-10, 10), z: t.z, y: t.y + 105, text: String(Math.round(dealt)), life: 0.7, color: heavy ? '#ffd84a' : '#fff', size: heavy ? 20 : 15 });
     this.sfx(heavy ? 'heavy' : 'hit');
     if (h.slip) this.sfx('slip');
-    // 打中頓幀：讓打擊有手感，但多段小傷害（香蕉、金幣、連打）不頓，大絕只在重擊時短頓，
-    // 而且兩次頓幀至少隔 0.2 秒，避免畫面一卡一卡
-    let stop = heavy ? 0.09 : dealt >= 6 ? 0.05 : 0;
-    if (src.superDealt != null) stop = heavy && h.knock ? 0.05 : 0;
-    if (this.time - (this.lastStopT ?? -9) < 0.2) stop = 0;
-    if (stop > 0) {
-      this.hitstop = Math.max(this.hitstop, stop);
-      this.lastStopT = this.time;
-    }
-    if (heavy) this.shake(5, 0.12);
+    // 打中頓幀（個人化）：只有「打的人」和「被打的人」定格一下，其他人照常行動，
+    // 多人混戰時不會互相拖慢。被打的人會原地抖動；飛行道具打中時只停被打的人
+    let stop = heavy ? 0.11 : dealt >= 6 ? 0.07 : 0.035;
+    if (src.superDealt != null) stop = heavy && h.knock ? 0.06 : 0.02;
+    t.hitstop = Math.max(t.hitstop || 0, stop);
+    t.hitShake = stop;
+    if (!h.proj && src.hitstop != null) src.hitstop = Math.max(src.hitstop, stop * 0.8);
+    if (heavy) this.shake(4, 0.1);
     if (before > 0 && t.hp <= 0) {
       src.stats.kos++;
       t.killer = src;
@@ -383,6 +381,13 @@ export class BattleScene {
           }
           f.superDealt = null;
         }
+      }
+      if (f.hitstop > 0) {
+        // 個人頓幀中：這個人定格（連段的攻擊鍵先記下來，不會漏按）
+        f.hitstop -= sdt;
+        if (f.ctrl && f.ctrl.pressed('attack') && ATK[f.state]) f.queue = true;
+        if (f.ai) f.ai.ctrl.endFrame();
+        continue;
       }
       if (f.ai && this.fightOn) f.ai.update(sdt, this);
       if (f.climb) {
@@ -583,7 +588,7 @@ export class BattleScene {
           if (f.y > 4 || f.state === 'down' || f.state === 'getup') continue;
         } else if (p.y < f.y - 10 || p.y > f.y + p.h + 70) continue;
         const dir = p.dir || sign(p.vx) || sign(f.x - p.x) || 1;
-        const h = { dmg: p.dmg * p.owner.char.mul.pow, kb: p.kb, stun: p.stun, knock: p.knock, launch: p.launch, unblockable: p.unblockable, dizzy: p.dizzy, slip: p.slip, fall: p.fall, scandal: p.scandal, dir: p.slip ? f.facing : dir };
+        const h = { dmg: p.dmg * p.owner.char.mul.pow, kb: p.kb, stun: p.stun, knock: p.knock, launch: p.launch, unblockable: p.unblockable, dizzy: p.dizzy, slip: p.slip, fall: p.fall, scandal: p.scandal, proj: true, dir: p.slip ? f.facing : dir };
         const r = this.applyHit(p.owner, f, h);
         if (r) {
           p.hits.add(f);
@@ -685,6 +690,7 @@ export class BattleScene {
           p.restore();
         }
         drawFighter(p, f);
+        this.drawSlash(p, f);
       } else if (d.it) {
         const it = d.it;
         const bob = it.y <= 0 ? Math.sin(this.time * 4 + it.x) * 1.5 : 0;
@@ -946,6 +952,38 @@ export class BattleScene {
       }
     }
     ctx.restore();
+  }
+
+  // 斬擊軌跡：出拳、揮武器時畫出一道弧形刀光，看得出攻擊範圍
+  drawSlash(p, f) {
+    const a = ATK[f.state];
+    if (!a || f.dead) return;
+    const T = f.stateT;
+    if (T < a.on * 0.5 || T > a.off + 0.08) return;
+    const prog = Math.min(1, Math.max(0, (T - a.on * 0.5) / (a.off - a.on * 0.5 + 0.0001)));
+    const fade = T > a.off ? 1 - (T - a.off) / 0.08 : 1;
+    const W = f.hold && f.hold.def && f.hold.def.type === 'light';
+    const R = (a.x1 + (W ? (f.hold.def.reach || 0) : 0)) * 0.92;
+    const cy = ARENA.floorY + f.z - f.y - 62 * (f.scale || 1);
+    const down = f.state === 'jatk' || f.state === 'djatk';
+    const a0 = down ? -0.4 : f.state === 'a3' ? -1.4 : f.state === 'a2' ? 0.7 : -0.9;
+    const a1 = down ? 1.3 : f.state === 'a3' ? 0.9 : f.state === 'a2' ? -0.5 : 0.5;
+    const end = a0 + (a1 - a0) * prog;
+    p.save();
+    p.translate(f.x, cy);
+    p.scale(f.facing, 1);
+    p.globalCompositeOperation = 'lighter';
+    p.lineCap = 'round';
+    const heavy = a.heavy;
+    for (const [w, col, al] of [[heavy ? 26 : 18, f.char.color, 0.55], [heavy ? 12 : 8, '#ffffff', 0.95]]) {
+      p.globalAlpha = al * fade;
+      p.strokeStyle = col;
+      p.lineWidth = w;
+      p.beginPath();
+      p.arc(0, 0, R, Math.min(a0, end), Math.max(a0, end));
+      p.stroke();
+    }
+    p.restore();
   }
 
   drawPlayerTag(ctx) {
