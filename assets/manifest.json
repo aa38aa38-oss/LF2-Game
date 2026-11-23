@@ -567,6 +567,48 @@
         "sheet": "assets/characters/gang/walk.webp",
         "frames": 6
       }
+    },
+    "paparazzi": {
+      "idle": {
+        "sheet": "assets/characters/paparazzi/idle.webp",
+        "frames": 4
+      },
+      "_standH": 250.0,
+      "attack1": {
+        "sheet": "assets/characters/paparazzi/attack1.webp",
+        "frames": 3
+      },
+      "hurt": {
+        "sheet": "assets/characters/paparazzi/hurt.webp",
+        "frames": 2
+      },
+      "special_fwd": {
+        "sheet": "assets/characters/paparazzi/special_fwd.webp",
+        "frames": 4
+      },
+      "walk": {
+        "sheet": "assets/characters/paparazzi/walk.webp",
+        "frames": 6
+      }
+    },
+    "protester": {
+      "idle": {
+        "sheet": "assets/characters/protester/idle.webp",
+        "frames": 4
+      },
+      "_standH": 250.0,
+      "attack1": {
+        "sheet": "assets/characters/protester/attack1.webp",
+        "frames": 3
+      },
+      "hurt": {
+        "sheet": "assets/characters/protester/hurt.webp",
+        "frames": 2
+      },
+      "walk": {
+        "sheet": "assets/characters/protester/walk.webp",
+        "frames": 4
+      }
     }
   },
   "posters": {
