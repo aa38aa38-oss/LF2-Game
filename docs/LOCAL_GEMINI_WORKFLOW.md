@@ -88,19 +88,20 @@
 - 背景圖存成 `incoming/<批次>/assets/scenery/s1_xxx.png`。街屋、公寓、宮廟要有綠幕（天空部分是純綠，遊戲會去背）；天空那張不用綠幕。
 - 背景不用三視圖，也不用第零步說明，直接開新對話貼 prompt 即可。
 
-### 第二關（市長選舉）清單
+### 第二、三關清單（像素風、最省用量：小怪只生 idle＋attack1）
 
-劇情模式改成三關：第一關立委選舉、第二關市長選舉、第三關總統選舉（最終關）。第二、三關沿用第一關的地圖骨架（老街 → 二樓 → 頂樓 → Boss 廣場），
-還沒有專屬圖時，遊戲會借第一關的背景再蓋一層色調，新敵人用程式繪圖先頂著。
+劇情模式三關：第一關立委選舉、第二關市長選舉（夜市 → 捷運高架月台 → 市府廣場）、第三關總統選舉（造勢舞台 → 凱道 → 貴賓看台 → 總統府）。
+第二、三關的 Boss 是玩家沒選到的其他候選人（用可選角色現有的圖），不用另外生。
 
-| 項目 | 存檔 | 要生的圖 | 狀態 |
-|---|---|---|---|
-| 網軍小編（小王） | `characters/troll/` | idle、walk、attack1、hurt、special_fwd（截圖帶風向） | |
-| 財團董事長（Boss） | `characters/tycoon/`、`portraits/tycoon.png` | idle、walk、attack1、hurt、special_fwd（撒鈔票）、special_up（推土機衝撞）、super（錢坑）、頭像 | |
-| 第二關背景 | `scenery/` | `s2_sky`（夜晚城市）、`s2_street`（夜市大街）、`s2_apartment`（商辦大樓）、`s2_temple`（市政府大樓） | |
-
-- 小怪沿用第一關的陣頭小弟、抗議群眾。
-- 第三關最終 Boss「幕後藏鏡人」（`mastermind`）的 prompt 也已經在 `docs/GEMINI_PROMPTS.md`，第三關背景之後再加。
+| 項目 | 存檔 | 狀態 |
+|---|---|---|
+| 第二關小怪：夜市攤販、發傳單工讀生、黑衣保鑣 | `characters/vendor|canvasser|bodyguard/` idle、attack1 | ✅ 已完成 |
+| 第二關小王：網軍小編、財團董事長 | `characters/troll|tycoon/` idle、attack1、special_fwd | ✅ 已完成（網軍小編 attack1 沒生成功，先用 idle 頂替） |
+| 第三關小怪：政論名嘴、造勢啦啦隊、買票樁腳 | `characters/reporter|cheerleader|votebuyer/` idle、attack1 | ✅ 已完成 |
+| 第三關小王：直播網紅、幕後藏鏡人 | `characters/influencer|mastermind/` | ✅ 已完成 |
+| 第二關背景 | `scenery/s2_sky、s2_street、s2_station、s2_cityhall` | ✅ 已完成 |
+| 第三關背景 | `scenery/s3_sky、s3_street、s3_stage、s3_stand、s3_palace` | ✅ 已完成 |
+| 路上危險物 | `scenery/prop_taxi（圍事計程車）、prop_scooter、prop_truck` | ✅ 已完成 |
 
 ### 之後（可選）：六位主角的「迴旋攻擊」
 每人一張 `spin.png`（4 格），目前借用踢腿圖，不補也能玩。

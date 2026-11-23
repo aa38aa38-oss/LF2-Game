@@ -8,6 +8,22 @@ import { drawItem } from './items.js';
 export const SC = 1.3;
 const OL = '#15121a';
 const FILTER_OK = typeof CanvasRenderingContext2D !== 'undefined' && 'filter' in CanvasRenderingContext2D.prototype;
+// 每張動作圖的「白閃版本」只做一次就快取起來
+const flashCache = new WeakMap();
+function flashImg(img) {
+  let c = flashCache.get(img);
+  if (c) return c;
+  c = document.createElement('canvas');
+  c.width = img.width;
+  c.height = img.height;
+  const x = c.getContext('2d');
+  x.drawImage(img, 0, 0);
+  x.globalCompositeOperation = 'source-atop';
+  x.fillStyle = 'rgba(255,255,255,0.7)';
+  x.fillRect(0, 0, c.width, c.height);
+  flashCache.set(img, c);
+  return c;
+}
 
 export function shade(hex, f) {
   if (!hex || hex[0] !== '#') return hex;
@@ -722,7 +738,8 @@ export function drawChar(ctx, ch, pose, x, y, facing, sc = SC, alpha = 1, flash 
   ctx.translate(x, y);
   ctx.scale(facing * sc, sc);
   if (alpha < 1) ctx.globalAlpha *= alpha;
-  if (flash && FILTER_OK) ctx.filter = 'brightness(2.4)';
+  // 程式畫的角色被打中：快速閃爍代替 ctx.filter（filter 很耗效能）
+  if (flash && Math.floor(t * 30) % 2) ctx.globalAlpha *= 0.45;
   if (p.lying) {
     ctx.translate(38, -9);
     ctx.rotate(-Math.PI / 2);
@@ -807,8 +824,8 @@ export function drawFighter(ctx, f, alpha = 1) {
     ctx.translate(sx, sy);
     ctx.scale(f.facing, 1);
     ctx.globalAlpha *= alpha;
-    if (f.flash > 0 && FILTER_OK) ctx.filter = 'brightness(2.8) saturate(0.4)';
-    ctx.drawImage(img, -w / 2, -h, w, h);
+    // 被打中的白閃：用預先做好的「白色版本」圖，不用 ctx.filter（filter 很耗效能，人多時會 lag）
+    ctx.drawImage(f.flash > 0 ? flashImg(img) : img, -w / 2, -h, w, h);
     ctx.restore();
   } else {
     drawChar(ctx, f.char, poseFor(f), sx, sy, f.facing, SC * (f.scale || 1), alpha, f.flash > 0, f.animT);

@@ -190,6 +190,72 @@ export const NPCS = [
       top: 'suit', topColor: '#c8a030', shirt: '#ffffff', tie: '#b01818', belly: true, bottom: '#2a2418', shoes: '#111111', tw: 26, hr: 15,
     },
   },
+  // 第二關小怪
+  {
+    id: 'vendor', title: '夜市攤販', npc: true, quote: '', color: '#d86a2a', color2: '#2a1408',
+    specials: [{ name: '丟塑膠椅' }], superMove: { name: '' }, stats: { pow: 2, spd: 2, def: 2 },
+    mul: { pow: 0.55, spd: 0.9, def: 0.95 },
+    look: {
+      skin: '#d8a070', hair: 'short', hairColor: '#1a1a1a', glasses: null, brows: 'angry', headband: '#ffffff',
+      top: 'tank', topColor: '#f0e8d8', bottom: '#3a4a7a', shoes: '#2a64c8', belly: true, tw: 22, hr: 13.5,
+    },
+  },
+  {
+    id: 'canvasser', title: '發傳單工讀生', npc: true, quote: '', color: '#2ab86a', color2: '#062a14',
+    specials: [{ name: '撒傳單' }], superMove: { name: '' }, stats: { pow: 2, spd: 4, def: 1 },
+    mul: { pow: 0.45, spd: 1.05, def: 0.9 },
+    look: {
+      skin: '#f0c49a', hair: 'short', hairColor: '#3a2a20', glasses: null, brows: 'soft',
+      top: 'tee', topColor: '#2ab86a', trim: '#ffffff', bottom: '#2a2a32', shoes: '#eeeeee', tw: 18, hr: 13.5,
+    },
+  },
+  {
+    id: 'bodyguard', title: '黑衣保鑣', npc: true, quote: '', color: '#222228', color2: '#08080a',
+    specials: [{ name: '熊抱衝撞' }], superMove: { name: '' }, stats: { pow: 3, spd: 2, def: 3 },
+    mul: { pow: 0.65, spd: 0.9, def: 1.0 },
+    look: {
+      skin: '#c98d5e', hair: 'bald', hairColor: '#141210', glasses: 'rect', brows: 'angry',
+      top: 'suit', topColor: '#18181c', shirt: '#ffffff', tie: '#18181c', bottom: '#18181c', shoes: '#0b0b0b', tw: 24, hr: 14,
+    },
+  },
+  // 第三關小怪
+  {
+    id: 'reporter', title: '政論名嘴', npc: true, quote: '', color: '#3a5aa8', color2: '#0a142a',
+    specials: [{ name: '爆料大聲公' }], superMove: { name: '' }, stats: { pow: 2, spd: 2, def: 2 },
+    mul: { pow: 0.55, spd: 0.9, def: 0.95 },
+    look: {
+      skin: '#eab78a', hair: 'side', hairColor: '#4a3a30', glasses: 'rect', brows: 'flat',
+      top: 'suit', topColor: '#3a5aa8', shirt: '#ffffff', tie: '#d8202a', bottom: '#22283a', shoes: '#111111', tw: 20, hr: 13.5, prop: 'phone',
+    },
+  },
+  {
+    id: 'cheerleader', title: '造勢啦啦隊', npc: true, quote: '', color: '#ff5aa8', color2: '#3a0a24',
+    specials: [{ name: '加油打氣（幫敵人回血）' }], superMove: { name: '' }, stats: { pow: 1, spd: 3, def: 1 },
+    mul: { pow: 0.4, spd: 1.0, def: 0.85 },
+    look: {
+      skin: '#f6caa0', hair: 'long', hairColor: '#e8b830', glasses: null, brows: 'soft', headband: '#ff5aa8',
+      top: 'tank', topColor: '#ff5aa8', bottom: '#ffffff', shoes: '#ffffff', tw: 17, hr: 13,
+    },
+  },
+  {
+    id: 'votebuyer', title: '買票樁腳', npc: true, quote: '', color: '#a8862a', color2: '#2a1e04',
+    specials: [{ name: '撒買票紅包' }], superMove: { name: '' }, stats: { pow: 2, spd: 2, def: 2 },
+    mul: { pow: 0.5, spd: 0.9, def: 0.95 },
+    look: {
+      skin: '#d9a57a', hair: 'baldSides', hairColor: '#8a8a8a', glasses: null, brows: 'flat',
+      top: 'shirt', topColor: '#f0e0a0', shirt: '#f0e0a0', tie: null, belly: true, bottom: '#3a3530', shoes: '#4a2a10', tw: 24, hr: 14,
+    },
+  },
+  // 第三關小王
+  {
+    id: 'influencer', title: '直播網紅', npc: true, quote: '', color: '#ff7ad8', color2: '#2a0a24',
+    specials: [{ name: '直播閃光' }, { name: '留言轟炸' }, { name: '叫粉絲' }], superMove: { name: '' }, stats: { pow: 3, spd: 4, def: 2 },
+    mul: { pow: 0.9, spd: 1.1, def: 0.95 },
+    look: {
+      skin: '#f6caa0', hair: 'side', hairColor: '#ff7ad8', glasses: 'round', brows: 'soft',
+      top: 'coat', topColor: '#ffffff', shirt: '#ff7ad8', tie: null, bottom: '#2a2a32', shoes: '#ff7ad8', tw: 18, hr: 13.5, prop: 'phone',
+    },
+  },
   // ───── 第三關「總統選舉」最終 Boss ─────
   {
     id: 'mastermind', title: '幕後藏鏡人', npc: true, boss: true, quote: '這場選舉，從頭到尾都是我在操盤。', color: '#5a1a8a', color2: '#12041e',

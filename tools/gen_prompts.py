@@ -242,27 +242,39 @@ NPCS = [
            ("special_down", "叫小弟", 4, "clapping his hands and pointing forward commandingly, shouting orders"),
            ("super", "鞭炮雨", 6, "raising both arms and laughing as many lit firecrackers rain down from the sky around him, sparks everywhere")],
     victory="arms crossed laughing smugly, flashing a fat red envelope", boss=True),
-  # ───── 第二關「市長選舉」─────
-  dict(id='troll', title='網軍小編', stage='第 2 關小王', color='blue and grey',
-    brief="", desc="a pale young internet troll in a dark blue hoodie, round glasses, messy hair, white sneakers, staring at a glowing smartphone, smug typing grin",
-    special=None,
-    lean_extra=[("special_fwd", "截圖帶風向", 4, "holding up a glowing smartphone and blasting a beam of floating angry emoji icons forward")],
-    victory=None),
-  dict(id='tycoon', title='財團董事長', stage='第 2 關 Boss', color='gold and dark red',
-    brief="", desc="a fat rich property tycoon, silver side-parted hair, rectangular gold glasses, shiny gold business suit, white shirt, red tie, big belly, cigar, gold watch, arrogant smirk",
-    special=None,
-    lean_extra=[("special_fwd", "撒鈔票", 4, "throwing a fan of banknotes forward like shuriken"),
-                ("special_up", "推土機衝撞", 4, "charging forward head-down like a bull"),
-                ("super", "錢坑", 4, "laughing with both arms raised while a rain of gold coins and banknotes falls around him")],
-    victory=None, boss=True),
-  # ───── 第三關「總統選舉」最終 Boss ─────
-  dict(id='mastermind', title='幕後藏鏡人', stage='第 3 關最終 Boss', color='black and purple',
-    brief="", desc="a tall sinister political mastermind in a long black suit, slicked long black hair, dark rectangular glasses, purple tie, black leather gloves, cold confident smile",
-    special=None,
-    lean_extra=[("special_fwd", "黑金鞭炮陣", 4, "throwing purple-glowing firecrackers forward in a spread"),
-                ("special_up", "黑箱衝撞", 4, "dashing forward low with a dark purple aura trail"),
-                ("super", "黑金風暴", 4, "raising both arms as a swirling storm of black money and purple lightning surrounds him")],
-    victory=None, boss=True),
+  # ───── 第二、三關的新敵人：最省用量版本（小怪只要 idle＋attack1；走路、被打會自動用 idle 頂替）─────
+  dict(id='vendor', title='夜市攤販', stage='第 2 關小怪', color='', keys=['idle', 'attack1'],
+    desc="a chubby night-market food stall vendor, white headband, white tank top, blue shorts, blue-and-white slippers, holding a red plastic stool"),
+  dict(id='canvasser', title='發傳單工讀生', stage='第 2 關小怪', color='', keys=['idle', 'attack1'],
+    desc="a skinny young campaign flyer distributor in a bright green campaign t-shirt and cap, holding a stack of white flyers, eager smile"),
+  dict(id='bodyguard', title='黑衣保鑣', stage='第 2 關小怪', color='', keys=['idle', 'attack1'],
+    desc="a big bald bodyguard in a black suit and black sunglasses, earpiece, stern face, arms ready to tackle"),
+  dict(id='troll', title='網軍小編', stage='第 2 關小王', color='', keys=['idle', 'attack1'],
+    desc="a pale young internet troll in a dark blue hoodie, round glasses, messy hair, white sneakers, staring at a glowing smartphone, smug typing grin",
+    lean_extra=[("special_fwd", "帶風向", 4, "holding up a glowing smartphone and blasting floating angry emoji icons forward")]),
+  dict(id='tycoon', title='財團董事長', stage='第 2 關小王', color='', keys=['idle', 'attack1'],
+    desc="a fat rich property tycoon, silver side-parted hair, rectangular gold glasses, shiny gold business suit, white shirt, red tie, big belly, cigar, gold watch, arrogant smirk",
+    lean_extra=[("special_fwd", "撒鈔票", 4, "throwing a fan of gold coins and banknotes forward")]),
+  dict(id='reporter', title='政論名嘴', stage='第 3 關小怪', color='', keys=['idle', 'attack1'],
+    desc="a TV political pundit in a blue suit and red tie, rectangular glasses, side-parted hair, shouting into a microphone"),
+  dict(id='cheerleader', title='造勢啦啦隊', stage='第 3 關小怪', color='', keys=['idle', 'attack1'],
+    desc="a cheerful campaign rally cheerleader girl, blonde ponytail, pink headband, pink tank top, white skirt, holding pink pom-poms"),
+  dict(id='votebuyer', title='買票樁腳', stage='第 3 關小怪', color='', keys=['idle', 'attack1'],
+    desc="a chubby middle-aged vote buyer, balding with grey sides, beige short-sleeve shirt, holding a fan of red envelopes, sly grin"),
+  dict(id='influencer', title='直播網紅', stage='第 3 關小王', color='', keys=['idle', 'attack1'],
+    desc="a flashy livestream influencer with pink hair, round glasses, white jacket, holding a selfie stick with a glowing phone",
+    lean_extra=[("special_fwd", "直播閃光", 4, "holding up the phone on a selfie stick and firing a bright white camera flash forward")]),
+  dict(id='mastermind', title='幕後藏鏡人', stage='第 3 關小王', color='', keys=['idle', 'attack1'],
+    desc="a tall sinister political mastermind in a long black suit, slicked long black hair, dark rectangular glasses, purple tie, black leather gloves, cold confident smile"),
+]
+# 路上的危險物（劇情模式）：像素風、側面向右、綠幕，存到 assets/scenery/prop_xxx.png
+PROPS = [
+  dict(group='劇情模式路上危險物（像素風，生好放 assets/scenery/）', name='圍事計程車（第一關）', file='assets/scenery/prop_taxi.png', size='約 2:1 橫式',
+    prompt="Pixel art game prop for a 2D beat 'em up: a yellow taxi car used by local gang enforcers, side view facing right, tinted black windows, two tough thugs leaning out of the windows shouting and waving baseball bats, a red campaign flag tied on the roof, dented bumper, speed lines behind it. simple 16-bit pixel art, chunky dark outlines, limited color palette, plain solid pure green background (#00FF00), no text, no shadow, the whole car fits inside the image."),
+  dict(group='劇情模式路上危險物（像素風，生好放 assets/scenery/）', name='夜市暴衝機車（第二關）', file='assets/scenery/prop_scooter.png', size='約 3:2 橫式',
+    prompt="Pixel art game prop for a 2D beat 'em up: a red scooter speeding recklessly with a delivery rider in a yellow helmet carrying a big food box, side view facing right, speed lines. simple 16-bit pixel art, chunky dark outlines, limited color palette, plain solid pure green background (#00FF00), no text, no shadow, the whole scooter fits inside the image."),
+  dict(group='劇情模式路上危險物（像素風，生好放 assets/scenery/）', name='競選宣傳車（第三關）', file='assets/scenery/prop_truck.png', size='約 5:2 橫式',
+    prompt="Pixel art game prop for a 2D beat 'em up: a small white election campaign truck with big loudspeakers on the roof, red and blue campaign banners with color blocks instead of text on its side, side view facing right, speed lines. simple 16-bit pixel art, chunky dark outlines, limited color palette, plain solid pure green background (#00FF00), no text, no shadow, the whole truck fits inside the image."),
 ]
 NPC_BASIC = [
   ('idle', '站立待機', 4, "fighting stance, slight breathing bob, looping idle animation"),
@@ -290,6 +302,8 @@ NPC_LEAN = [
 def npc_sections(n):
     items = []
     for i, (key, zh, fr, act) in enumerate(NPC_LEAN):
+        if n.get('keys') and key not in n['keys']:
+            continue
         if i == 0:
             pr = f"Pixel art enemy sprite strip for a 2D beat 'em up game: {n['desc']}. {act}, {fr} frames in one horizontal row. {NPC_STYLE}."
         else:
@@ -316,17 +330,32 @@ COMMON_S1 = [
     prompt=f"The front of a colorful traditional Taiwanese folk temple seen straight on: red walls and pillars, carved dragon columns, an ornate roof with green and yellow glazed tiles and upswept swallowtail ridges decorated with figurines, a big wooden main door in the center with a golden plaque (color block, no readable text), strings of red lanterns, a large bronze incense burner in front with smoke. The bottom edge of the image is the ground line. Everything above and around the temple is plain solid pure green (#00FF00) for transparency. {S1_SCENE} Wide image, about 2.3 to 1."),
 ]
 
-# 第二關「市長選舉」：檔名沿用第一關的角色分工（sky／street／apartment＝可以上樓的大樓／temple＝Boss 戰建築），遊戲會依關卡自動換圖
+# 第二關「市長選舉」：夜市大街 → 捷運高架月台 → 市府廣場（圖的比例和地板高度要對上 js/story.js 的 STAGE2）
 S2 = '劇情第二關背景（4 張，生好放 assets/scenery/）'
 COMMON_S2 = [
   dict(group=S2, name='夜晚城市天空', file='assets/scenery/s2_sky.png', size='16:9（1920×1080）',
     prompt=f"A night sky over a big modern Taiwanese city for a game background: deep navy blue at the top fading to purple near the bottom, a few stars, a distant skyline of glass office towers and a tall landmark tower silhouette with many lit windows and red aircraft lights along the bottom 30 percent, the left and right edges connect seamlessly when tiled. {S1_SCENE} Wide 16:9, no green screen."),
   dict(group=S2, name='夜市大街（會左右重複）', file='assets/scenery/s2_street.png', size='3:1 超寬（2400×800）',
     prompt=f"A long row of busy Taiwanese night market stalls and old 3-story shop buildings seen straight from the front at night, glowing food stall signboards in red, yellow and blue with color blocks instead of text, strings of light bulbs, steam from food carts, hanging lanterns, mayoral election campaign banners with color blocks, along the bottom 20 percent a row of food stall counters. The bottom edge of the image is the ground line. Everything above the rooftops is plain solid pure green (#00FF00) for transparency. The left and right edges must connect seamlessly when tiled. {S1_SCENE} Very wide 3:1 image."),
-  dict(group=S2, name='商辦大樓（可以上二樓、頂樓）', file='assets/scenery/s2_apartment.png', size='約 2.7:1 超寬（2400×900）',
-    prompt=f"The flat front facade of a wide modern 5-story office building seen straight on at night. Layout from top to bottom: the top 24 percent is the rooftop area above a flat roof line, with rooftop AC units on the left, a big billboard frame with color blocks on the right and a helipad railing, and plain solid pure green (#00FF00) sky behind them; below the roof line are blue glass curtain walls with lit office windows; between 64 and 80 percent height a long open-air glass-railed walkway runs across the full width; the bottom 20 percent is a ground-floor lobby with glass doors, a convenience store and potted plants. The bottom edge of the image is the ground line. {S1_SCENE} Very wide image, about 2.7 to 1."),
-  dict(group=S2, name='市政府大樓（Boss 戰）', file='assets/scenery/s2_temple.png', size='約 2.3:1 寬（2400×1040）',
-    prompt=f"The front of a grand modern city hall building seen straight on at night: wide white stone facade with tall columns, a big central entrance with glass doors, a flagpole on each side, rows of lit windows, wide stone steps in front, election campaign banners with color blocks hanging on the facade. The bottom edge of the image is the ground line. Everything above and around the building is plain solid pure green (#00FF00) for transparency. {S1_SCENE} Wide image, about 2.3 to 1."),
+  dict(group=S2, name='捷運高架車站（月台在中間高度）', file='assets/scenery/s2_station.png', size='約 4:1 超寬（2400×600）',
+    prompt=f"The flat side view of a long elevated metro (MRT) station at night seen straight on. Layout from top to bottom: the top 45 percent is the station's curved white roof canopy and glass walls with a parked silver metro train behind the platform; at 48 to 60 percent height is the long platform floor edge with yellow safety line; below that a thick grey concrete viaduct with round pillars, and the bottom 20 percent is street level with a few small shops and scooters parked. The bottom edge of the image is the ground line. Everything above the roof is plain solid pure green (#00FF00) for transparency. {S1_SCENE} Very wide image, about 4 to 1."),
+  dict(group=S2, name='市政府大樓（Boss 戰）', file='assets/scenery/s2_cityhall.png', size='約 2.7:1 寬（2400×900）',
+    prompt=f"The front of a grand modern city hall building seen straight on at night: wide white stone facade with tall columns, a big central entrance with glass doors, a flagpole on each side, rows of lit windows, wide stone steps in front, election campaign banners with color blocks hanging on the facade. The bottom edge of the image is the ground line. Everything above and around the building is plain solid pure green (#00FF00) for transparency. {S1_SCENE} Wide image, about 2.7 to 1."),
+]
+
+# 第三關「總統選舉」：造勢舞台 → 凱道人潮 → 貴賓看台 → 總統府前廣場
+S3 = '劇情第三關背景（5 張，生好放 assets/scenery/）'
+COMMON_S3 = [
+  dict(group=S3, name='黃昏的凱道天空', file='assets/scenery/s3_sky.png', size='16:9（1920×1080）',
+    prompt=f"A dramatic sunset sky over a capital city for a game background: deep crimson at the top fading to orange and gold near the bottom, fireworks bursting, searchlight beams, a distant skyline silhouette along the bottom 30 percent, the left and right edges connect seamlessly when tiled. {S1_SCENE} Wide 16:9, no green screen."),
+  dict(group=S3, name='凱道兩旁的大樓與人潮（會左右重複）', file='assets/scenery/s3_street.png', size='3:1 超寬（2400×800）',
+    prompt=f"A long row of grand old government office buildings along a wide boulevard seen straight from the front, red brick and white stone, hanging election campaign banners and national-style flags with color blocks instead of text, and along the bottom 25 percent a dense cheering crowd silhouette waving colorful flags and glow sticks. The bottom edge of the image is the ground line. Everything above the rooftops is plain solid pure green (#00FF00) for transparency. The left and right edges must connect seamlessly when tiled. {S1_SCENE} Very wide 3:1 image."),
+  dict(group=S3, name='造勢晚會舞台（主角從舞台上出發）', file='assets/scenery/s3_stage.png', size='約 3.4:1 超寬（2400×700）',
+    prompt=f"The flat front view of a huge election campaign rally stage at night. Layout from top to bottom: the top 60 percent is a metal truss frame with colorful stage lights, a giant red LED screen with color blocks instead of text and big speakers; at 66 to 82 percent height is the wooden stage floor; the bottom 18 percent is the stage front skirt covered with red and blue banners with color blocks. The bottom edge of the image is the ground line. Everything above and around the truss is plain solid pure green (#00FF00) for transparency. {S1_SCENE} Very wide image, about 3.4 to 1."),
+  dict(group=S3, name='貴賓看台（在中間高度）', file='assets/scenery/s3_stand.png', size='約 3:1 超寬（2400×800）',
+    prompt=f"The flat side view of a temporary VIP grandstand for a political rally seen straight on. Layout from top to bottom: the top 40 percent is a white tent roof with flags and spotlights; at 43 to 57 percent height is the grandstand walkway floor with a railing; below that steel scaffolding with banners with color blocks, and the bottom 15 percent is ground level with security barriers. The bottom edge of the image is the ground line. Everything above the tent roof is plain solid pure green (#00FF00) for transparency. {S1_SCENE} Very wide image, about 3 to 1."),
+  dict(group=S3, name='總統府（最終 Boss 戰）', file='assets/scenery/s3_palace.png', size='約 2.6:1 寬（2400×920）',
+    prompt=f"The front of a grand historic presidential office building seen straight on: red brick and white stone Baroque facade, a tall central clock tower, arched windows, a big central gate, flags on both sides, lit by golden spotlights at night. The bottom edge of the image is the ground line. Everything above and around the building is plain solid pure green (#00FF00) for transparency. {S1_SCENE} Wide image, about 2.6 to 1."),
 ]
 
 COMMON = [
@@ -351,7 +380,7 @@ COMMON = [
 ]
 
 def build():
-    data = {'chars': [], 'common': COMMON_S1 + COMMON_S2 + COMMON}
+    data = {'chars': [], 'common': COMMON_S1 + PROPS + COMMON_S2 + COMMON_S3 + COMMON}
     for c in CHARS:
         data['chars'].append({'id': c['id'], 'title': c['title'], 'quote': c['quote'], 'items': char_sections(c)})
     for n in NPCS:

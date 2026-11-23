@@ -414,7 +414,66 @@ function imgBox(ctx, x0, x1, img, x, w, top) {
 // 各關借圖時的色調
 const TINT = { s2: 'rgba(10,20,90,0.42)', s3: 'rgba(120,8,20,0.36)' };
 
+// ───── 第二、三關：依 L.scene 的設定畫（有 Gemini 圖就用圖，沒有就畫簡單的樓房）─────
+// 一棟簡單的樓：方塊＋一格一格的窗戶
+function block(ctx, x0, x1, x, w, top, color, win) {
+  if (x + w < x0 || x > x1 || w <= 0) return;
+  ctx.fillStyle = color;
+  ctx.fillRect(x, top, w, FY - top);
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  ctx.fillRect(x, top, w, 10);
+  for (let yy = top + 34; yy < FY - 50; yy += 58)
+    for (let xx = x + 26; xx < x + w - 40; xx += 66) {
+      ctx.fillStyle = hash(xx * 0.37 + yy * 1.7) > 0.3 ? win : 'rgba(0,0,0,0.35)';
+      ctx.fillRect(xx, yy, 30, 32);
+    }
+  ctx.strokeStyle = '#15121a';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(x, top, w, FY - top);
+}
+// 高架月台、看台底下的柱子
+function pillars(ctx, x0, x1, F) {
+  const bot = FY + F.zMax + 36;
+  for (let x = Math.ceil((F.xMin + 40) / 260) * 260; x < F.xMax - 20; x += 260) {
+    if (x < x0 - 40 || x > x1 + 40) continue;
+    ctx.fillStyle = '#7a808a';
+    ctx.fillRect(x, bot, 34, FY - bot);
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.fillRect(x + 24, bot, 10, FY - bot);
+  }
+}
+function drawScene(ctx, t, x0, x1, L, cam, gateOpen) {
+  const A = ASSETS.scenery, S = L.scene;
+  if (A[S.sky]) imgSky(ctx, x0, x1, cam, A[S.sky]);
+  else {
+    const g = ctx.createLinearGradient(0, -700, 0, FY);
+    g.addColorStop(0, S.skyColor[0]);
+    g.addColorStop(1, S.skyColor[1]);
+    ctx.fillStyle = g;
+    ctx.fillRect(x0, -1400, x1 - x0, FY + 1400);
+  }
+  for (const s of S.strips || []) {
+    if (A[s.key]) imgStrip(ctx, x0, x1, s.a, s.b, A[s.key], s.h);
+    else for (let x = s.a; x < s.b; x += 320) block(ctx, x0, x1, x, Math.min(310, s.b - x), FY - s.h + hash(x) * 90, s.color, s.win);
+  }
+  for (const s of S.fill || []) for (let x = s.a; x < s.b; x += 320) block(ctx, x0, x1, x, Math.min(310, s.b - x), FY - s.h + hash(x) * 60, s.color, s.win);
+  for (const b of S.boxes || []) {
+    if (A[b.key]) imgBox(ctx, x0, x1, A[b.key], b.x, b.w, b.top);
+    else block(ctx, x0, x1, b.x, b.w, b.top, b.color, b.win);
+  }
+  for (const [a, b, tiles] of S.streets) street(ctx, x0, x1, a, b, tiles);
+  for (const s of S.slabs || []) {
+    const F = L.floors[s.f];
+    if (s.pillars) pillars(ctx, x0, x1, F);
+    slab(ctx, x0, x1, F, s.color);
+    railing(ctx, x0, x1, F);
+  }
+  for (const r of L.ramps) ramp(ctx, r.xb, FY + L.floors[r.bot].zMin, r.xt, FY + L.floors[r.top].zMax);
+  gateLine(ctx, L.gateX, gateOpen, t);
+}
+
 export function drawStoryStage(ctx, t, x0, x1, L, cam, gateOpen) {
+  if (L.scene) return drawScene(ctx, t, x0, x1, L, cam, gateOpen);
   const A = ASSETS.scenery, p = L.art || 's1';
   // 這一關的圖；沒有就借第一關的
   const S = {};

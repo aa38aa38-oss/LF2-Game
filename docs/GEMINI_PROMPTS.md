@@ -1478,6 +1478,60 @@ Same character as the attached image: pixel art head and shoulders portrait, men
 
 ---
 
+## 第 2 關小怪：夜市攤販（`vendor`）
+
+### 動作（像素風，一次一張；第二張起都上傳 idle）
+
+**站立待機（第一張，之後都上傳它當參考）**　存檔：`assets/characters/vendor/idle.png`　尺寸：4 格橫排
+
+```
+Pixel art enemy sprite strip for a 2D beat 'em up game: a chubby night-market food stall vendor, white headband, white tank top, blue shorts, blue-and-white slippers, holding a red plastic stool. fighting stance, slight breathing bob, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
+```
+
+**攻擊**　存檔：`assets/characters/vendor/attack1.png`　尺寸：3 格橫排
+
+```
+Same character as the attached image, same pixel art style and colors. a punch: wind-up, full extension, recover, 3 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
+```
+
+---
+
+## 第 2 關小怪：發傳單工讀生（`canvasser`）
+
+### 動作（像素風，一次一張；第二張起都上傳 idle）
+
+**站立待機（第一張，之後都上傳它當參考）**　存檔：`assets/characters/canvasser/idle.png`　尺寸：4 格橫排
+
+```
+Pixel art enemy sprite strip for a 2D beat 'em up game: a skinny young campaign flyer distributor in a bright green campaign t-shirt and cap, holding a stack of white flyers, eager smile. fighting stance, slight breathing bob, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
+```
+
+**攻擊**　存檔：`assets/characters/canvasser/attack1.png`　尺寸：3 格橫排
+
+```
+Same character as the attached image, same pixel art style and colors. a punch: wind-up, full extension, recover, 3 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
+```
+
+---
+
+## 第 2 關小怪：黑衣保鑣（`bodyguard`）
+
+### 動作（像素風，一次一張；第二張起都上傳 idle）
+
+**站立待機（第一張，之後都上傳它當參考）**　存檔：`assets/characters/bodyguard/idle.png`　尺寸：4 格橫排
+
+```
+Pixel art enemy sprite strip for a 2D beat 'em up game: a big bald bodyguard in a black suit and black sunglasses, earpiece, stern face, arms ready to tackle. fighting stance, slight breathing bob, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
+```
+
+**攻擊**　存檔：`assets/characters/bodyguard/attack1.png`　尺寸：3 格橫排
+
+```
+Same character as the attached image, same pixel art style and colors. a punch: wind-up, full extension, recover, 3 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
+```
+
+---
+
 ## 第 2 關小王：網軍小編（`troll`）
 
 ### 動作（像素風，一次一張；第二張起都上傳 idle）
@@ -1488,35 +1542,23 @@ Same character as the attached image: pixel art head and shoulders portrait, men
 Pixel art enemy sprite strip for a 2D beat 'em up game: a pale young internet troll in a dark blue hoodie, round glasses, messy hair, white sneakers, staring at a glowing smartphone, smug typing grin. fighting stance, slight breathing bob, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-**走路**　存檔：`assets/characters/troll/walk.png`　尺寸：6 格橫排
-
-```
-Same character as the attached image, same pixel art style and colors. walking forward, 6 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
-```
-
 **攻擊**　存檔：`assets/characters/troll/attack1.png`　尺寸：3 格橫排
 
 ```
 Same character as the attached image, same pixel art style and colors. a punch: wind-up, full extension, recover, 3 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-**被打**　存檔：`assets/characters/troll/hurt.png`　尺寸：2 格橫排
-
-```
-Same character as the attached image, same pixel art style and colors. staggering backward with a funny surprised face, 2 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
-```
-
 ### 招式（同上）
 
-**截圖帶風向**　存檔：`assets/characters/troll/special_fwd.png`　尺寸：4 格橫排
+**帶風向**　存檔：`assets/characters/troll/special_fwd.png`　尺寸：4 格橫排
 
 ```
-Same character as the attached image, same pixel art style and colors. holding up a glowing smartphone and blasting a beam of floating angry emoji icons forward, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
+Same character as the attached image, same pixel art style and colors. holding up a glowing smartphone and blasting floating angry emoji icons forward, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
 ---
 
-## 第 2 關 Boss：財團董事長（`tycoon`）
+## 第 2 關小王：財團董事長（`tycoon`）
 
 ### 動作（像素風，一次一張；第二張起都上傳 idle）
 
@@ -1526,22 +1568,10 @@ Same character as the attached image, same pixel art style and colors. holding u
 Pixel art enemy sprite strip for a 2D beat 'em up game: a fat rich property tycoon, silver side-parted hair, rectangular gold glasses, shiny gold business suit, white shirt, red tie, big belly, cigar, gold watch, arrogant smirk. fighting stance, slight breathing bob, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-**走路**　存檔：`assets/characters/tycoon/walk.png`　尺寸：6 格橫排
-
-```
-Same character as the attached image, same pixel art style and colors. walking forward, 6 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
-```
-
 **攻擊**　存檔：`assets/characters/tycoon/attack1.png`　尺寸：3 格橫排
 
 ```
 Same character as the attached image, same pixel art style and colors. a punch: wind-up, full extension, recover, 3 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
-```
-
-**被打**　存檔：`assets/characters/tycoon/hurt.png`　尺寸：2 格橫排
-
-```
-Same character as the attached image, same pixel art style and colors. staggering backward with a funny surprised face, 2 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
 ### 招式（同上）
@@ -1549,30 +1579,92 @@ Same character as the attached image, same pixel art style and colors. staggerin
 **撒鈔票**　存檔：`assets/characters/tycoon/special_fwd.png`　尺寸：4 格橫排
 
 ```
-Same character as the attached image, same pixel art style and colors. throwing a fan of banknotes forward like shuriken, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
-```
-
-**推土機衝撞**　存檔：`assets/characters/tycoon/special_up.png`　尺寸：4 格橫排
-
-```
-Same character as the attached image, same pixel art style and colors. charging forward head-down like a bull, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
-```
-
-**錢坑**　存檔：`assets/characters/tycoon/super.png`　尺寸：4 格橫排
-
-```
-Same character as the attached image, same pixel art style and colors. laughing with both arms raised while a rain of gold coins and banknotes falls around him, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
-```
-
-**頭像（大招橫幅用）**　存檔：`assets/portraits/tycoon.png`　尺寸：正方形
-
-```
-Same character as the attached image: pixel art head and shoulders portrait, menacing smug face, simple gold and dark red background, square image, no text.
+Same character as the attached image, same pixel art style and colors. throwing a fan of gold coins and banknotes forward, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
 ---
 
-## 第 3 關最終 Boss：幕後藏鏡人（`mastermind`）
+## 第 3 關小怪：政論名嘴（`reporter`）
+
+### 動作（像素風，一次一張；第二張起都上傳 idle）
+
+**站立待機（第一張，之後都上傳它當參考）**　存檔：`assets/characters/reporter/idle.png`　尺寸：4 格橫排
+
+```
+Pixel art enemy sprite strip for a 2D beat 'em up game: a TV political pundit in a blue suit and red tie, rectangular glasses, side-parted hair, shouting into a microphone. fighting stance, slight breathing bob, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
+```
+
+**攻擊**　存檔：`assets/characters/reporter/attack1.png`　尺寸：3 格橫排
+
+```
+Same character as the attached image, same pixel art style and colors. a punch: wind-up, full extension, recover, 3 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
+```
+
+---
+
+## 第 3 關小怪：造勢啦啦隊（`cheerleader`）
+
+### 動作（像素風，一次一張；第二張起都上傳 idle）
+
+**站立待機（第一張，之後都上傳它當參考）**　存檔：`assets/characters/cheerleader/idle.png`　尺寸：4 格橫排
+
+```
+Pixel art enemy sprite strip for a 2D beat 'em up game: a cheerful campaign rally cheerleader girl, blonde ponytail, pink headband, pink tank top, white skirt, holding pink pom-poms. fighting stance, slight breathing bob, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
+```
+
+**攻擊**　存檔：`assets/characters/cheerleader/attack1.png`　尺寸：3 格橫排
+
+```
+Same character as the attached image, same pixel art style and colors. a punch: wind-up, full extension, recover, 3 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
+```
+
+---
+
+## 第 3 關小怪：買票樁腳（`votebuyer`）
+
+### 動作（像素風，一次一張；第二張起都上傳 idle）
+
+**站立待機（第一張，之後都上傳它當參考）**　存檔：`assets/characters/votebuyer/idle.png`　尺寸：4 格橫排
+
+```
+Pixel art enemy sprite strip for a 2D beat 'em up game: a chubby middle-aged vote buyer, balding with grey sides, beige short-sleeve shirt, holding a fan of red envelopes, sly grin. fighting stance, slight breathing bob, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
+```
+
+**攻擊**　存檔：`assets/characters/votebuyer/attack1.png`　尺寸：3 格橫排
+
+```
+Same character as the attached image, same pixel art style and colors. a punch: wind-up, full extension, recover, 3 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
+```
+
+---
+
+## 第 3 關小王：直播網紅（`influencer`）
+
+### 動作（像素風，一次一張；第二張起都上傳 idle）
+
+**站立待機（第一張，之後都上傳它當參考）**　存檔：`assets/characters/influencer/idle.png`　尺寸：4 格橫排
+
+```
+Pixel art enemy sprite strip for a 2D beat 'em up game: a flashy livestream influencer with pink hair, round glasses, white jacket, holding a selfie stick with a glowing phone. fighting stance, slight breathing bob, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
+```
+
+**攻擊**　存檔：`assets/characters/influencer/attack1.png`　尺寸：3 格橫排
+
+```
+Same character as the attached image, same pixel art style and colors. a punch: wind-up, full extension, recover, 3 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
+```
+
+### 招式（同上）
+
+**直播閃光**　存檔：`assets/characters/influencer/special_fwd.png`　尺寸：4 格橫排
+
+```
+Same character as the attached image, same pixel art style and colors. holding up the phone on a selfie stick and firing a bright white camera flash forward, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
+```
+
+---
+
+## 第 3 關小王：幕後藏鏡人（`mastermind`）
 
 ### 動作（像素風，一次一張；第二張起都上傳 idle）
 
@@ -1582,48 +1674,10 @@ Same character as the attached image: pixel art head and shoulders portrait, men
 Pixel art enemy sprite strip for a 2D beat 'em up game: a tall sinister political mastermind in a long black suit, slicked long black hair, dark rectangular glasses, purple tie, black leather gloves, cold confident smile. fighting stance, slight breathing bob, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-**走路**　存檔：`assets/characters/mastermind/walk.png`　尺寸：6 格橫排
-
-```
-Same character as the attached image, same pixel art style and colors. walking forward, 6 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
-```
-
 **攻擊**　存檔：`assets/characters/mastermind/attack1.png`　尺寸：3 格橫排
 
 ```
 Same character as the attached image, same pixel art style and colors. a punch: wind-up, full extension, recover, 3 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
-```
-
-**被打**　存檔：`assets/characters/mastermind/hurt.png`　尺寸：2 格橫排
-
-```
-Same character as the attached image, same pixel art style and colors. staggering backward with a funny surprised face, 2 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
-```
-
-### 招式（同上）
-
-**黑金鞭炮陣**　存檔：`assets/characters/mastermind/special_fwd.png`　尺寸：4 格橫排
-
-```
-Same character as the attached image, same pixel art style and colors. throwing purple-glowing firecrackers forward in a spread, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
-```
-
-**黑箱衝撞**　存檔：`assets/characters/mastermind/special_up.png`　尺寸：4 格橫排
-
-```
-Same character as the attached image, same pixel art style and colors. dashing forward low with a dark purple aura trail, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
-```
-
-**黑金風暴**　存檔：`assets/characters/mastermind/super.png`　尺寸：4 格橫排
-
-```
-Same character as the attached image, same pixel art style and colors. raising both arms as a swirling storm of black money and purple lightning surrounds him, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
-```
-
-**頭像（大招橫幅用）**　存檔：`assets/portraits/mastermind.png`　尺寸：正方形
-
-```
-Same character as the attached image: pixel art head and shoulders portrait, menacing smug face, simple black and purple background, square image, no text.
 ```
 
 ---
@@ -1656,6 +1710,26 @@ The flat front facade of a wide old 5-story Taiwanese apartment building seen st
 The front of a colorful traditional Taiwanese folk temple seen straight on: red walls and pillars, carved dragon columns, an ornate roof with green and yellow glazed tiles and upswept swallowtail ridges decorated with figurines, a big wooden main door in the center with a golden plaque (color block, no readable text), strings of red lanterns, a large bronze incense burner in front with smoke. The bottom edge of the image is the ground line. Everything above and around the temple is plain solid pure green (#00FF00) for transparency. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, detailed 2D side-scrolling beat 'em up background art. Straight-on flat front view (orthographic, no perspective vanishing point), no people, no characters, no text, no readable signs (use colored blocks instead of words). Wide image, about 2.3 to 1.
 ```
 
+### 劇情模式路上危險物（像素風，生好放 assets/scenery/）
+
+**圍事計程車（第一關）**　存檔：`assets/scenery/prop_taxi.png`　尺寸：約 2:1 橫式
+
+```
+Pixel art game prop for a 2D beat 'em up: a yellow taxi car used by local gang enforcers, side view facing right, tinted black windows, two tough thugs leaning out of the windows shouting and waving baseball bats, a red campaign flag tied on the roof, dented bumper, speed lines behind it. simple 16-bit pixel art, chunky dark outlines, limited color palette, plain solid pure green background (#00FF00), no text, no shadow, the whole car fits inside the image.
+```
+
+**夜市暴衝機車（第二關）**　存檔：`assets/scenery/prop_scooter.png`　尺寸：約 3:2 橫式
+
+```
+Pixel art game prop for a 2D beat 'em up: a red scooter speeding recklessly with a delivery rider in a yellow helmet carrying a big food box, side view facing right, speed lines. simple 16-bit pixel art, chunky dark outlines, limited color palette, plain solid pure green background (#00FF00), no text, no shadow, the whole scooter fits inside the image.
+```
+
+**競選宣傳車（第三關）**　存檔：`assets/scenery/prop_truck.png`　尺寸：約 5:2 橫式
+
+```
+Pixel art game prop for a 2D beat 'em up: a small white election campaign truck with big loudspeakers on the roof, red and blue campaign banners with color blocks instead of text on its side, side view facing right, speed lines. simple 16-bit pixel art, chunky dark outlines, limited color palette, plain solid pure green background (#00FF00), no text, no shadow, the whole truck fits inside the image.
+```
+
 ### 劇情第二關背景（4 張，生好放 assets/scenery/）
 
 **夜晚城市天空**　存檔：`assets/scenery/s2_sky.png`　尺寸：16:9（1920×1080）
@@ -1670,16 +1744,48 @@ A night sky over a big modern Taiwanese city for a game background: deep navy bl
 A long row of busy Taiwanese night market stalls and old 3-story shop buildings seen straight from the front at night, glowing food stall signboards in red, yellow and blue with color blocks instead of text, strings of light bulbs, steam from food carts, hanging lanterns, mayoral election campaign banners with color blocks, along the bottom 20 percent a row of food stall counters. The bottom edge of the image is the ground line. Everything above the rooftops is plain solid pure green (#00FF00) for transparency. The left and right edges must connect seamlessly when tiled. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, detailed 2D side-scrolling beat 'em up background art. Straight-on flat front view (orthographic, no perspective vanishing point), no people, no characters, no text, no readable signs (use colored blocks instead of words). Very wide 3:1 image.
 ```
 
-**商辦大樓（可以上二樓、頂樓）**　存檔：`assets/scenery/s2_apartment.png`　尺寸：約 2.7:1 超寬（2400×900）
+**捷運高架車站（月台在中間高度）**　存檔：`assets/scenery/s2_station.png`　尺寸：約 4:1 超寬（2400×600）
 
 ```
-The flat front facade of a wide modern 5-story office building seen straight on at night. Layout from top to bottom: the top 24 percent is the rooftop area above a flat roof line, with rooftop AC units on the left, a big billboard frame with color blocks on the right and a helipad railing, and plain solid pure green (#00FF00) sky behind them; below the roof line are blue glass curtain walls with lit office windows; between 64 and 80 percent height a long open-air glass-railed walkway runs across the full width; the bottom 20 percent is a ground-floor lobby with glass doors, a convenience store and potted plants. The bottom edge of the image is the ground line. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, detailed 2D side-scrolling beat 'em up background art. Straight-on flat front view (orthographic, no perspective vanishing point), no people, no characters, no text, no readable signs (use colored blocks instead of words). Very wide image, about 2.7 to 1.
+The flat side view of a long elevated metro (MRT) station at night seen straight on. Layout from top to bottom: the top 45 percent is the station's curved white roof canopy and glass walls with a parked silver metro train behind the platform; at 48 to 60 percent height is the long platform floor edge with yellow safety line; below that a thick grey concrete viaduct with round pillars, and the bottom 20 percent is street level with a few small shops and scooters parked. The bottom edge of the image is the ground line. Everything above the roof is plain solid pure green (#00FF00) for transparency. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, detailed 2D side-scrolling beat 'em up background art. Straight-on flat front view (orthographic, no perspective vanishing point), no people, no characters, no text, no readable signs (use colored blocks instead of words). Very wide image, about 4 to 1.
 ```
 
-**市政府大樓（Boss 戰）**　存檔：`assets/scenery/s2_temple.png`　尺寸：約 2.3:1 寬（2400×1040）
+**市政府大樓（Boss 戰）**　存檔：`assets/scenery/s2_cityhall.png`　尺寸：約 2.7:1 寬（2400×900）
 
 ```
-The front of a grand modern city hall building seen straight on at night: wide white stone facade with tall columns, a big central entrance with glass doors, a flagpole on each side, rows of lit windows, wide stone steps in front, election campaign banners with color blocks hanging on the facade. The bottom edge of the image is the ground line. Everything above and around the building is plain solid pure green (#00FF00) for transparency. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, detailed 2D side-scrolling beat 'em up background art. Straight-on flat front view (orthographic, no perspective vanishing point), no people, no characters, no text, no readable signs (use colored blocks instead of words). Wide image, about 2.3 to 1.
+The front of a grand modern city hall building seen straight on at night: wide white stone facade with tall columns, a big central entrance with glass doors, a flagpole on each side, rows of lit windows, wide stone steps in front, election campaign banners with color blocks hanging on the facade. The bottom edge of the image is the ground line. Everything above and around the building is plain solid pure green (#00FF00) for transparency. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, detailed 2D side-scrolling beat 'em up background art. Straight-on flat front view (orthographic, no perspective vanishing point), no people, no characters, no text, no readable signs (use colored blocks instead of words). Wide image, about 2.7 to 1.
+```
+
+### 劇情第三關背景（5 張，生好放 assets/scenery/）
+
+**黃昏的凱道天空**　存檔：`assets/scenery/s3_sky.png`　尺寸：16:9（1920×1080）
+
+```
+A dramatic sunset sky over a capital city for a game background: deep crimson at the top fading to orange and gold near the bottom, fireworks bursting, searchlight beams, a distant skyline silhouette along the bottom 30 percent, the left and right edges connect seamlessly when tiled. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, detailed 2D side-scrolling beat 'em up background art. Straight-on flat front view (orthographic, no perspective vanishing point), no people, no characters, no text, no readable signs (use colored blocks instead of words). Wide 16:9, no green screen.
+```
+
+**凱道兩旁的大樓與人潮（會左右重複）**　存檔：`assets/scenery/s3_street.png`　尺寸：3:1 超寬（2400×800）
+
+```
+A long row of grand old government office buildings along a wide boulevard seen straight from the front, red brick and white stone, hanging election campaign banners and national-style flags with color blocks instead of text, and along the bottom 25 percent a dense cheering crowd silhouette waving colorful flags and glow sticks. The bottom edge of the image is the ground line. Everything above the rooftops is plain solid pure green (#00FF00) for transparency. The left and right edges must connect seamlessly when tiled. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, detailed 2D side-scrolling beat 'em up background art. Straight-on flat front view (orthographic, no perspective vanishing point), no people, no characters, no text, no readable signs (use colored blocks instead of words). Very wide 3:1 image.
+```
+
+**造勢晚會舞台（主角從舞台上出發）**　存檔：`assets/scenery/s3_stage.png`　尺寸：約 3.4:1 超寬（2400×700）
+
+```
+The flat front view of a huge election campaign rally stage at night. Layout from top to bottom: the top 60 percent is a metal truss frame with colorful stage lights, a giant red LED screen with color blocks instead of text and big speakers; at 66 to 82 percent height is the wooden stage floor; the bottom 18 percent is the stage front skirt covered with red and blue banners with color blocks. The bottom edge of the image is the ground line. Everything above and around the truss is plain solid pure green (#00FF00) for transparency. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, detailed 2D side-scrolling beat 'em up background art. Straight-on flat front view (orthographic, no perspective vanishing point), no people, no characters, no text, no readable signs (use colored blocks instead of words). Very wide image, about 3.4 to 1.
+```
+
+**貴賓看台（在中間高度）**　存檔：`assets/scenery/s3_stand.png`　尺寸：約 3:1 超寬（2400×800）
+
+```
+The flat side view of a temporary VIP grandstand for a political rally seen straight on. Layout from top to bottom: the top 40 percent is a white tent roof with flags and spotlights; at 43 to 57 percent height is the grandstand walkway floor with a railing; below that steel scaffolding with banners with color blocks, and the bottom 15 percent is ground level with security barriers. The bottom edge of the image is the ground line. Everything above the tent roof is plain solid pure green (#00FF00) for transparency. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, detailed 2D side-scrolling beat 'em up background art. Straight-on flat front view (orthographic, no perspective vanishing point), no people, no characters, no text, no readable signs (use colored blocks instead of words). Very wide image, about 3 to 1.
+```
+
+**總統府（最終 Boss 戰）**　存檔：`assets/scenery/s3_palace.png`　尺寸：約 2.6:1 寬（2400×920）
+
+```
+The front of a grand historic presidential office building seen straight on: red brick and white stone Baroque facade, a tall central clock tower, arched windows, a big central gate, flags on both sides, lit by golden spotlights at night. The bottom edge of the image is the ground line. Everything above and around the building is plain solid pure green (#00FF00) for transparency. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, detailed 2D side-scrolling beat 'em up background art. Straight-on flat front view (orthographic, no perspective vanishing point), no people, no characters, no text, no readable signs (use colored blocks instead of words). Wide image, about 2.6 to 1.
 ```
 
 ### 場景背景

@@ -29,9 +29,9 @@ PAD = 6             # 每格邊緣留白（輸出像素）
 EXPECTED = {'idle': 4, 'walk': 6, 'run': 6, 'jump': 2, 'attack1': 3, 'attack2': 3, 'attack3': 4, 'jump_attack': 2,
             'run_attack': 3, 'defend': 1, 'hurt': 2, 'fall': 3, 'down': 1, 'getup': 2, 'dizzy': 3, 'roll': 4,
             'catch': 2, 'victory': 4, 'spin': 4, 'special': 4, 'special_fwd': 4, 'special_up': 4, 'special_down': 4, 'super': 6}
-FRAMES_HINT = {'protester/walk': 4, 'kingpin/hurt': 4, 'kingpin/super': 4, 'guan/walk': 8, 'guan/run': 8, 'guan/super': 8}
+FRAMES_HINT = {'cheerleader/attack1': 4, 'protester/walk': 4, 'kingpin/hurt': 4, 'kingpin/super': 4, 'guan/walk': 8, 'guan/run': 8, 'guan/super': 8}
 # 只用其中幾格（原圖有幾格人形疊在一起、切不開時用）
-FRAME_PICK = {'kingpin/hurt': [0, 1], 'guan/run': [0, 1, 2, 3, 6, 7]}
+FRAME_PICK = {'reporter/idle': [0, 2, 3], 'kingpin/hurt': [0, 1], 'guan/run': [0, 1, 2, 3, 6, 7]}
 STRIP_SCALE = {}    # 某條動作畫得特別大／小時，可手動縮放，例如 {'han/roll': 0.8}
 
 
@@ -297,6 +297,12 @@ def main(dirs):
                 im = Image.open(f).convert('RGB')
             else:
                 im = Image.fromarray(key_green_outside(Image.open(f)))
+            if f.stem.startswith('prop_'):
+                # 路上危險物（計程車等）：裁掉四周空白，縮到寬 480
+                bb = im.getchannel('A').point(lambda v: 255 if v > 24 else 0).getbbox()
+                if bb:
+                    im = im.crop(bb)
+                im = im.resize((480, round(im.height * 480 / im.width)), Image.LANCZOS)
             if im.width > 2400:
                 im = im.resize((2400, round(im.height * 2400 / im.width)), Image.LANCZOS)
             (OUT / 'scenery').mkdir(exist_ok=True)

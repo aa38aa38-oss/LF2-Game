@@ -640,6 +640,124 @@
         "sheet": "assets/characters/kingpin/walk.webp",
         "frames": 6
       }
+    },
+    "bodyguard": {
+      "idle": {
+        "sheet": "assets/characters/bodyguard/idle.webp",
+        "frames": 4
+      },
+      "_standH": 250.0,
+      "attack1": {
+        "sheet": "assets/characters/bodyguard/attack1.webp",
+        "frames": 3
+      }
+    },
+    "canvasser": {
+      "idle": {
+        "sheet": "assets/characters/canvasser/idle.webp",
+        "frames": 4
+      },
+      "_standH": 250.0,
+      "attack1": {
+        "sheet": "assets/characters/canvasser/attack1.webp",
+        "frames": 3
+      }
+    },
+    "cheerleader": {
+      "idle": {
+        "sheet": "assets/characters/cheerleader/idle.webp",
+        "frames": 4
+      },
+      "_standH": 250.0,
+      "attack1": {
+        "sheet": "assets/characters/cheerleader/attack1.webp",
+        "frames": 4
+      }
+    },
+    "influencer": {
+      "idle": {
+        "sheet": "assets/characters/influencer/idle.webp",
+        "frames": 4
+      },
+      "_standH": 250.0,
+      "attack1": {
+        "sheet": "assets/characters/influencer/attack1.webp",
+        "frames": 3
+      },
+      "special_fwd": {
+        "sheet": "assets/characters/influencer/special_fwd.webp",
+        "frames": 4
+      }
+    },
+    "mastermind": {
+      "idle": {
+        "sheet": "assets/characters/mastermind/idle.webp",
+        "frames": 4
+      },
+      "_standH": 250.0,
+      "attack1": {
+        "sheet": "assets/characters/mastermind/attack1.webp",
+        "frames": 3
+      }
+    },
+    "reporter": {
+      "idle": {
+        "sheet": "assets/characters/reporter/idle.webp",
+        "frames": 3
+      },
+      "_standH": 250.0,
+      "attack1": {
+        "sheet": "assets/characters/reporter/attack1.webp",
+        "frames": 3
+      }
+    },
+    "troll": {
+      "idle": {
+        "sheet": "assets/characters/troll/idle.webp",
+        "frames": 4
+      },
+      "_standH": 250.0,
+      "special_fwd": {
+        "sheet": "assets/characters/troll/special_fwd.webp",
+        "frames": 4
+      }
+    },
+    "tycoon": {
+      "idle": {
+        "sheet": "assets/characters/tycoon/idle.webp",
+        "frames": 4
+      },
+      "_standH": 250.0,
+      "attack1": {
+        "sheet": "assets/characters/tycoon/attack1.webp",
+        "frames": 3
+      },
+      "special_fwd": {
+        "sheet": "assets/characters/tycoon/special_fwd.webp",
+        "frames": 4
+      }
+    },
+    "vendor": {
+      "idle": {
+        "sheet": "assets/characters/vendor/idle.webp",
+        "frames": 4
+      },
+      "_standH": 250.0,
+      "attack1": {
+        "sheet": "assets/characters/vendor/attack1.webp",
+        "frames": 3
+      }
+    },
+    "votebuyer": {
+      "idle": {
+        "sheet": "assets/characters/votebuyer/idle.webp",
+        "frames": 4
+      },
+      "_standH": 250.0,
+      "attack1": {
+        "sheet": "assets/characters/votebuyer/attack1.webp",
+        "frames": 3
+      }
     }
   },
   "posters": {
@@ -677,6 +795,18 @@
     "s1_apartment": "assets/scenery/s1_apartment.webp",
     "s1_sky": "assets/scenery/s1_sky.webp",
     "s1_street": "assets/scenery/s1_street.webp",
-    "s1_temple": "assets/scenery/s1_temple.webp"
+    "s1_temple": "assets/scenery/s1_temple.webp",
+    "prop_scooter": "assets/scenery/prop_scooter.webp",
+    "prop_taxi": "assets/scenery/prop_taxi.webp",
+    "prop_truck": "assets/scenery/prop_truck.webp",
+    "s2_cityhall": "assets/scenery/s2_cityhall.webp",
+    "s2_sky": "assets/scenery/s2_sky.webp",
+    "s2_station": "assets/scenery/s2_station.webp",
+    "s2_street": "assets/scenery/s2_street.webp",
+    "s3_palace": "assets/scenery/s3_palace.webp",
+    "s3_sky": "assets/scenery/s3_sky.webp",
+    "s3_stage": "assets/scenery/s3_stage.webp",
+    "s3_stand": "assets/scenery/s3_stand.webp",
+    "s3_street": "assets/scenery/s3_street.webp"
   }
 }

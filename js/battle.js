@@ -10,6 +10,7 @@ import { drawFighter, drawShadow, drawBanana, drawPortrait, portrait, rrect } fr
 import { ASSETS } from './assets.js';
 import { ITEM_DEFS, spawnRandomItem, newItem, drawItem } from './items.js';
 import { txt, pixelText, segBar, panel, blink, Hotspots } from './ui.js';
+import { makeDoors, updateDoors, drawDoors, drawDoorLabels } from './doors.js';
 
 export const MODE_NAME = { '1v1': '單挑模式', brawl: '四人大亂鬥', survival: '連戰生存', story: '劇情模式' };
 const DIFF_MUL = { easy: 0.8, normal: 1, hard: 1.3 };
@@ -50,6 +51,8 @@ export class BattleScene {
       this.player.z = 50;
       const pos = [[1160, 50], [1160, 150], [760, 150]];
       cfg.cpuChars.slice(0, 3).forEach((id, i) => this.addFighter(id, { cpu: true, team: i + 1, x: pos[i][0], z: pos[i][1], facing: pos[i][0] > 960 ? -1 : 1, label: 'CPU' }));
+      // 暗門：成對，靠後牆按「上」就從另一扇門出來
+      this.doors = makeDoors();
       this.setPhase('intro');
     } else {
       this.pool = shuffle(CHARS.map((c) => c.id).filter((id) => id !== cfg.playerChar));
@@ -385,6 +388,7 @@ export class BattleScene {
     const sdt = dt * this.slow;
     this.phaseT += dt;
     this.updatePhase(dt);
+    if (this.doors && this.phase !== 'intro') updateDoors(this, sdt);
     for (const f of this.fighters) {
       if (f.superDealt != null && f.state !== 'super') {
         // 大絕結束後再等飛行道具落地 1.5 秒，才結算有沒有打中
@@ -661,6 +665,7 @@ export class BattleScene {
     const worldT = (c, k) => c.setTransform(k * z, 0, 0, k * z, k * (-cam.x * z + sx), k * (-cam.y * z + sy));
     worldT(p, g.pixScale);
     this.stage.draw(p, this.time, cam.x - 10, cam.x + vw + 10);
+    if (this.doors) drawDoors(p, this.doors, this.time);
     for (const f of this.fighters) if (!f.climb) drawShadow(p, f.x, f.z, f.y);
     for (const pr of this.projs) if (pr.trap || pr.gravity) drawShadow(p, pr.x, pr.z, pr.y, 10);
     for (const it of this.items) drawShadow(p, it.x, it.z, it.y, 14);
@@ -736,6 +741,7 @@ export class BattleScene {
     const ctx = g.ctx;
     ctx.save();
     worldT(ctx, 1);
+    if (this.doors) drawDoorLabels(ctx, this.doors, this.time);
     this.fx.drawUI(ctx, 'world');
     this.drawPlayerTag(ctx);
     ctx.restore();
@@ -887,10 +893,78 @@ export class BattleScene {
         ctx.fillText('合成', 0, 12);
         break;
       }
+      case 'flyer': {
+        // 競選傳單
+        ctx.translate(x, y - 16);
+        ctx.rotate(Math.sin(p.t * 18) * 0.6);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(-9, -12, 18, 24);
+        ctx.fillStyle = '#2ab86a';
+        ctx.fillRect(-9, -12, 18, 7);
+        ctx.fillStyle = '#d8202a';
+        ctx.fillRect(-6, -1, 12, 3);
+        ctx.fillRect(-6, 5, 8, 3);
+        ctx.strokeStyle = '#222';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(-9, -12, 18, 24);
+        break;
+      }
+      case 'scooter':
+      case 'truck': {
+        // 機車（夜市暴衝）／宣傳車（總統選舉）：有 Gemini 圖就用圖，沒有就畫簡單的
+        const d = sign(p.vx) || 1;
+        const im = ASSETS.scenery[p.kind === 'truck' ? 'prop_truck' : 'prop_scooter'];
+        ctx.translate(x, y);
+        ctx.scale(d, 1);
+        if (im) {
+          const w = p.kind === 'truck' ? 200 : 110, h = (im.height * w) / im.width;
+          ctx.drawImage(im, -w / 2, -h + 4, w, h);
+          break;
+        }
+        if (p.kind === 'scooter') {
+          ctx.fillStyle = '#d8202a';
+          ctx.fillRect(-30, -40, 60, 20);
+          ctx.fillStyle = '#222';
+          ctx.fillRect(-10, -62, 20, 24);
+          ctx.fillStyle = '#ffd84a';
+          ctx.fillRect(-12, -76, 24, 16);
+          for (const wx of [-24, 24]) {
+            ctx.fillStyle = '#1a1a1a';
+            ctx.beginPath();
+            ctx.arc(wx, -10, 10, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(-96, -70, 140, 60);
+          ctx.fillStyle = '#d8202a';
+          ctx.fillRect(-96, -52, 140, 18);
+          ctx.fillStyle = '#3a8cff';
+          ctx.fillRect(44, -56, 50, 46);
+          ctx.fillStyle = '#9fd4ff';
+          ctx.fillRect(62, -50, 26, 16);
+          ctx.fillStyle = '#ffd84a';
+          ctx.fillRect(-80, -92, 30, 22);
+          ctx.fillRect(-20, -92, 30, 22);
+          for (const wx of [-66, 0, 66]) {
+            ctx.fillStyle = '#1a1a1a';
+            ctx.beginPath();
+            ctx.arc(wx, -8, 12, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+        break;
+      }
       case 'taxi': {
-        // 計程車（小黃）
+        // 圍事計程車：有 Gemini 圖（assets/scenery/prop_taxi）就用圖，沒有就畫小黃
         const d = sign(p.vx) || 1;
         ctx.translate(x, y);
+        if (ASSETS.scenery.prop_taxi) {
+          const im = ASSETS.scenery.prop_taxi, w = 170, h = (im.height * w) / im.width;
+          ctx.scale(-d, 1); // 這張 Gemini 圖的車頭朝左，要反過來
+          ctx.drawImage(im, -w / 2, -h + 4, w, h);
+          break;
+        }
         ctx.scale(d, 1);
         ctx.fillStyle = 'rgba(0,0,0,0.3)';
         ctx.fillRect(-62, -4, 124, 8);
