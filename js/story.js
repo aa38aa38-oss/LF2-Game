@@ -1,4 +1,4 @@
-// 劇情模式：一路打到當選總統。第一關「議員選舉」
+// 劇情模式：一路打到當選總統。三關：立委選舉 → 市長選舉 → 總統選舉（最終關難度大幅提升）
 // 地圖是「樓層式 2.5D」：每層樓是一段可以前後走的地板，用不同的前後深度（z）表示，
 // 所以不同樓層的人自然打不到彼此；樓層之間用鷹架樓梯連接，鏡頭會上下左右跟著走。
 import { BattleScene } from './battle.js';
@@ -8,7 +8,7 @@ import './npcmoves.js';
 import { newItem } from './items.js';
 import { ARENA, rand, pick, clamp, easeOut } from './util.js';
 import { txt, pixelText, panel, segBar, blink } from './ui.js';
-import { drawStage1 } from './story_art.js';
+import { drawStoryStage } from './story_art.js';
 
 const FY = ARENA.floorY;
 const STREET = { zMin: 0, zMax: 186 };
@@ -16,8 +16,11 @@ const STREET = { zMin: 0, zMax: 186 };
 // ───────── 第一關的地圖資料 ─────────
 export const STAGE1 = {
   id: 1,
-  name: '議員選舉',
+  name: '立委選舉',
   sub: '廟口老街 → 菜市場公寓 → 宮廟廣場',
+  art: 's1',
+  winTitle: '立委',
+  mobs: ['gang', 'protester'],
   goal: 25000,
   worldW: 6000,
   floors: [
@@ -51,7 +54,7 @@ export const STAGE1 = {
   ],
   // 得票不夠時，在封鎖線前出現的「拉票」波次（可以重複）
   rally: { floor: 3, lock: [3800, 4700], spawn: [['gang', 'R'], ['protester', 'R'], ['gang', 'L'], ['gang', 'R'], ['gang', 'L']] },
-  boss: { floor: 3, x: 4950, lock: [4620, 5620], id: 'kingpin' },
+  boss: { floor: 3, x: 4950, lock: [4620, 5620], id: 'kingpin', minion: 'gang' },
   // 路上的道具：補血（便當、珍奶）、紅包（回血但扣票），走過去就自動吃
   items: [
     ['bento', 0, 760, 150],
@@ -69,9 +72,109 @@ export const STAGE1 = {
   taxi: { floor: 0, from: 1850, to: 2700 },
 };
 
-const VOTES = { gang: 1200, protester: 1000, paparazzi: 5000, kingpin: 12000, rival: 6000 };
+// ───────── 第二關「市長選舉」：沿用第一關的地圖骨架（樓層、斜坡），換場景、敵人和難度 ─────────
+const R = 'R', Lf = 'L';
+export const STAGE2 = {
+  ...STAGE1,
+  id: 2,
+  name: '市長選舉',
+  sub: '夜市大街 → 商辦大樓 → 市政府廣場',
+  art: 's2',
+  winTitle: '市長',
+  goal: 40000,
+  mobs: ['gang', 'protester'],
+  floors: [
+    { ...STAGE1.floors[0], name: '夜市大街' },
+    { ...STAGE1.floors[1], name: '商辦二樓' },
+    { ...STAGE1.floors[2], name: '商辦頂樓' },
+    { ...STAGE1.floors[3], name: '市府廣場' },
+  ],
+  diff: 0.5, // AI 聰明程度加成
+  hpMul: 1.3, // 敵人血量倍率
+  waves: [
+    { floor: 0, x: 480, lock: [60, 1060], cp: 0, spawn: [['protester', R], ['gang', R], ['protester', R], ['gang', Lf], ['protester', R], ['gang', R]] },
+    { floor: 0, x: 1300, lock: [860, 1860], cp: 0, spawn: [['gang', R], ['troll', R, { mid: true }], ['protester', Lf], ['gang', R], ['protester', R], ['gang', Lf]], title: '網軍小編出沒！' },
+    { floor: 0, x: 2100, lock: [1760, 2760], cp: 0, spawn: [['gang', R], ['protester', R], ['gang', Lf], ['protester', R], ['gang', Lf], ['gang', R], ['protester', R]], after: '↗ 走到右邊的斜坡，按「上」走上去' },
+    { floor: 1, x: 2700, lock: [2330, 3330], cp: 1, spawn: [['protester', R], ['gang', R], ['protester', Lf], ['gang', R], ['gang', Lf], ['protester', R]] },
+    { floor: 2, x: 3200, lock: [2960, 3930], cp: 1, spawn: [['troll', R, { mid: true }], ['paparazzi', Lf, { mid: true }], ['gang', R]], title: '小王登場：網軍小編＋偷拍狗仔', after: '↘ 從右邊的斜坡走下去' },
+    { floor: 3, x: 4150, lock: [3800, 4700], cp: 2, spawn: [['gang', R], ['protester', R], ['gang', Lf], ['protester', R], ['gang', R], ['protester', Lf], ['gang', R]] },
+  ],
+  rally: { floor: 3, lock: [3800, 4700], spawn: [['protester', R], ['gang', R], ['protester', Lf], ['gang', R], ['gang', Lf], ['protester', R]] },
+  boss: { floor: 3, x: 4950, lock: [4620, 5620], id: 'tycoon', minion: 'gang' },
+  items: [
+    ['bento', 0, 760, 150],
+    ['redenv', 0, 1100, 60],
+    ['redenv', 0, 1640, 160],
+    ['bento', 0, 1980, 70],
+    ['bento', 1, 2950, -170],
+    ['redenv', 1, 3300, -180],
+    ['boba', 2, 3150, -440],
+    ['redenv', 2, 3600, -420],
+    ['bento', 2, 3780, -440],
+    ['bento', 3, 4350, 120],
+    ['redenv', 3, 4500, 60],
+    ['bento', 3, 4620, 150],
+    ['boba', 3, 5100, 90],
+  ],
+};
+
+// ───────── 第三關「總統選舉」：最終關，難度大幅提升 ─────────
+// 敵人更多、更耐打、AI 全部最聰明；最後是「幕後藏鏡人」＋另一位總統候選人同時上場
+export const STAGE3 = {
+  ...STAGE1,
+  id: 3,
+  name: '總統選舉',
+  sub: '凱道大街 → 造勢大樓 → 總統府前廣場',
+  art: 's3',
+  winTitle: '總統',
+  goal: 60000,
+  final: true,
+  floors: [
+    { ...STAGE1.floors[0], name: '凱道大街' },
+    { ...STAGE1.floors[1], name: '造勢大樓二樓' },
+    { ...STAGE1.floors[2], name: '造勢大樓頂樓' },
+    { ...STAGE1.floors[3], name: '總統府前廣場' },
+  ],
+  diff: 1.5,
+  hpMul: 1.7,
+  bossHpMul: 1.6,
+  waves: [
+    { floor: 0, x: 480, lock: [60, 1060], cp: 0, spawn: [['gang', R], ['protester', R], ['gang', Lf], ['protester', R], ['gang', R], ['gang', Lf], ['protester', R]] },
+    { floor: 0, x: 1300, lock: [860, 1860], cp: 0, spawn: [['troll', R, { mid: true }], ['gang', Lf], ['protester', R], ['gang', R], ['paparazzi', Lf, { mid: true }], ['gang', R], ['protester', Lf]], title: '網軍＋狗仔聯手！' },
+    { floor: 0, x: 2100, lock: [1760, 2760], cp: 0, spawn: [['gang', R], ['gang', R], ['protester', Lf], ['troll', R, { mid: true }], ['gang', Lf], ['protester', R], ['gang', R], ['protester', Lf]], after: '↗ 走到右邊的斜坡，按「上」走上去' },
+    { floor: 1, x: 2700, lock: [2330, 3330], cp: 1, spawn: [['gang', R], ['protester', R], ['paparazzi', Lf, { mid: true }], ['gang', R], ['gang', Lf], ['protester', R], ['gang', R]] },
+    { floor: 2, x: 3200, lock: [2960, 3930], cp: 1, spawn: [['kingpin', R, { mid: true }], ['troll', Lf, { mid: true }], ['gang', R], ['gang', Lf]], title: '前任 Boss 回來報仇：角頭樁腳王！', after: '↘ 從右邊的斜坡走下去' },
+    { floor: 3, x: 4150, lock: [3800, 4700], cp: 2, spawn: [['tycoon', R, { mid: true }], ['gang', R], ['protester', Lf], ['gang', R], ['protester', R], ['gang', Lf]], title: '財團董事長擋路！' },
+  ],
+  rally: { floor: 3, lock: [3800, 4700], spawn: [['gang', R], ['protester', R], ['troll', Lf, { mid: true }], ['gang', R], ['gang', Lf], ['protester', R]] },
+  boss: { floor: 3, x: 4950, lock: [4620, 5620], id: 'mastermind', minion: 'troll', rival: true },
+  items: [
+    ['bento', 0, 760, 150],
+    ['redenv', 0, 1100, 60],
+    ['redenv', 0, 1640, 160],
+    ['boba', 0, 1980, 70],
+    ['bento', 1, 2950, -170],
+    ['redenv', 1, 3300, -180],
+    ['boba', 2, 3150, -440],
+    ['redenv', 2, 3600, -420],
+    ['bento', 2, 3780, -440],
+    ['bento', 3, 4350, 120],
+    ['redenv', 3, 4500, 60],
+    ['redenv', 3, 4560, 150],
+    ['bento', 3, 4620, 150],
+    ['boba', 3, 5100, 90],
+  ],
+};
+
+export const STAGES = [STAGE1, STAGE2, STAGE3];
+const NUM = ['一', '二', '三'];
+
+const VOTES = { gang: 1200, protester: 1000, paparazzi: 5000, troll: 5000, kingpin: 12000, tycoon: 15000, mastermind: 25000, rival: 8000 };
 // 小怪血很少（兩三下就倒，打起來爽）；小王、Boss 才耐打
-const HPMUL = { gang: 0.05, protester: 0.05, paparazzi: 0.35, kingpin: 0.6 };
+const HPMUL = { gang: 0.05, protester: 0.05, paparazzi: 0.35, troll: 0.35, kingpin: 0.6, tycoon: 0.7, mastermind: 0.85 };
+const BOSSES = new Set(['kingpin', 'tycoon', 'mastermind']);
+// 紅包上的暗示標語：讓玩家一看就知道收了會掉票
+const DIRTY = ['不法利益', '官商勾結', '黑金', '利益輸送', '政治獻金？', '圖利廠商'];
 
 // 環境傷害（計程車）的來源
 const ENV = { team: 9, x: 0, facing: 1, state: 'idle', combo: 0, comboT: 0, mp: 0, superDealt: null, char: { id: 'env', mul: { pow: 1 }, color: '#f4c20d' }, stats: { dmg: 0, maxCombo: 0, kos: 0 } };
@@ -84,7 +187,8 @@ export class StoryScene extends BattleScene {
   enter() {
     const cfg = this.cfg;
     super.enter();
-    const L = (this.L = STAGE1);
+    this.stageIdx = Math.min(STAGES.length - 1, cfg.storyStage || 0);
+    const L = (this.L = STAGES[this.stageIdx]);
     this.worldW = L.worldW;
     this.noRandomItems = true;
     this.fighters = [];
@@ -99,6 +203,8 @@ export class StoryScene extends BattleScene {
     this.wavesDone = new Set();
     this.waveActive = null;
     this.bossOn = false;
+    this.boss = null;
+    this.rival = null;
     this.hint = null;
     this.popups = [];
     this.queue = [];
@@ -115,11 +221,12 @@ export class StoryScene extends BattleScene {
       if (L.checkpoints[this.cp].floor === 3 && fl !== 3) continue;
       const it = newItem(kind, x, z, 0);
       it.floor = fl;
+      if (kind === 'redenv') it.label = DIRTY[this.items.filter((i) => i.kind === 'redenv').length % DIRTY.length];
       this.items.push(it);
     }
     this.cam = { x: cp.x - 480, y: 0 };
     this.updateCamera(0, true);
-    this.stage = { id: 'story1', name: L.name, draw: (ctx, t, x0, x1) => drawStage1(ctx, t, x0, x1, L, this.cam, this.gateOpen) };
+    this.stage = { id: `story${L.id}`, name: L.name, draw: (ctx, t, x0, x1) => drawStoryStage(ctx, t, x0, x1, L, this.cam, this.gateOpen) };
     this.setPhase('intro');
     this.onKO = (t) => this.gainVotes(t);
     this.onScandal = (t, n) => {
@@ -166,24 +273,32 @@ export class StoryScene extends BattleScene {
     if (opt.x != null) x = opt.x;
     const z = rand(F.zMin + 10, F.zMax - 10);
     const cid = id === 'rival' ? opt.cid : id;
+    const L = this.L;
+    const isBoss = BOSSES.has(id);
+    // 關卡越後面越耐打；最終 Boss（和對手候選人）再額外加血
+    let hpMul = (id === 'rival' ? 0.55 : HPMUL[id] || 0.4) * (L.hpMul || 1);
+    if (opt.finalBoss) hpMul *= L.bossHpMul || 1;
     const f = this.addFighter(cid, {
       cpu: true, team: 1, x, z, facing: side === 'L' ? 1 : -1, label: 'CPU',
-      hpMul: id === 'rival' ? 0.55 : HPMUL[id] || 0.4, scale: id === 'kingpin' ? 1.3 : 1, votes: VOTES[id] || 1000,
+      hpMul, scale: isBoss ? 1.3 : 1, votes: VOTES[id] || 1000,
     });
-    // 小怪比較笨、Boss 和對手比較聰明（再依玩家選的難度微調）
+    // 小怪比較笨、Boss 和對手比較聰明（再依玩家選的難度、關卡微調）
     const base = { easy: 0, normal: 1, hard: 2 }[this.cfg.difficulty || 'normal'];
-    const lv = (id === 'kingpin' || id === 'rival' || id === 'paparazzi' ? 0.5 : 0) + base - 1;
+    const lv = (isBoss || id === 'rival' || id === 'paparazzi' || id === 'troll' ? 0.5 : 0) + base - 1 + (L.diff || 0);
     const diff = lv >= 1 ? 'hard' : lv >= 0 ? 'normal' : 'easy';
     f.ai = new AI(f, diff);
     f.ctrl = f.ai.ctrl;
     f.npcKind = id;
     f.mob = id === 'gang' || id === 'protester';
-    f.mp = id === 'kingpin' ? 40 : 0;
+    f.mp = isBoss ? 40 : 0;
     this.setFloor(f, floorId);
 
     return f;
   }
   summon(id, n, near) {
+    // Boss「叫小弟」：每一關叫出自己的手下；最終關一次多叫一個
+    if (id === 'gang' && this.L.boss.minion) id = this.L.boss.minion;
+    if (this.L.final) n += 1;
     for (let i = 0; i < n; i++) this.spawnEnemy(id, i % 2 ? 'L' : 'R', near.floor);
   }
   enemiesAlive() {
@@ -195,7 +310,7 @@ export class StoryScene extends BattleScene {
     if (t.team === 0) return;
     this.addVotes(t.votes || 1000, '');
     // 越南大戰式的爽快倒地：小怪慘叫著飛出去，偶爾掉補血或武器
-    if (t.npcKind !== 'kingpin') {
+    if (!BOSSES.has(t.npcKind) && t.npcKind !== 'rival') {
       const dir = Math.sign(t.x - this.player.x) || 1;
       t.vx = dir * 620;
       t.vy = Math.max(t.vy, 560);
@@ -302,7 +417,8 @@ export class StoryScene extends BattleScene {
     const P = this.player, L = this.L;
     if (this.waveActive) {
       const w = this.waveActive;
-      const bossDown = w.boss && this.boss && this.boss.hp <= 0;
+      // 最終關：Boss 和對手候選人都要打倒
+      const bossDown = w.boss && this.boss && this.boss.hp <= 0 && (!this.rival || this.rival.hp <= 0);
       if (bossDown || (!this.enemiesAlive().length && !this.queue.length)) {
         this.waveActive = null;
         this.setFloor(P, P.floor);
@@ -368,11 +484,18 @@ export class StoryScene extends BattleScene {
     this.waveActive = w;
     P.bounds = { ...P.bounds, xMin: w.lock[0], xMax: w.lock[1] };
     // 只有一個有長血條的 Boss，打到一半會叫小弟
-    this.boss = this.spawnEnemy('kingpin', 'R', 3, { x: Math.min(L.boss.lock[1] - 40, this.cam.x + this.viewW + 60) });
-    this.later(3, () => this.boss && !this.boss.dead && this.spawnEnemy('gang', 'L', 3));
-    this.say('BOSS：角頭樁腳王', 2, '#ff5a3c');
-    this.popups.push({ t: 0, text: `「${CHAR_BY_ID.kingpin.quote}」`, color: '#ff9a3a', x: L.boss.x + 200, z: 20, big: true });
-    this.refill(0.4, '支持者應援：回血！');
+    const id = L.boss.id, B = CHAR_BY_ID[id];
+    this.boss = this.spawnEnemy(id, 'R', 3, { x: Math.min(L.boss.lock[1] - 40, this.cam.x + this.viewW + 60), finalBoss: true });
+    this.later(3, () => this.boss && !this.boss.dead && this.spawnEnemy(L.boss.minion || 'gang', 'L', 3));
+    // 最終關：另一位總統候選人（從其他可選角色挑一位）一起上場
+    if (L.boss.rival) {
+      const pool = CHARS.filter((c) => c.id !== P.char.id);
+      this.rival = this.spawnEnemy('rival', 'L', 3, { cid: pick(pool).id, x: L.boss.lock[0] + 40, finalBoss: true });
+      this.later(1.2, () => this.popups.push({ t: 0, text: `對手候選人：${this.rival.char.title}`, color: '#ffd84a', x: this.rival.x, z: this.rival.z, big: true }));
+    }
+    this.say(`${L.final ? '最終 BOSS' : 'BOSS'}：${B.title}`, 2, '#ff5a3c');
+    this.popups.push({ t: 0, text: `「${B.quote}」`, color: '#ff9a3a', x: L.boss.x + 200, z: 20, big: true });
+    this.refill(L.final ? 1 : 0.4, '支持者應援：回血！');
     this.sfx('cutin');
   }
 
@@ -548,6 +671,11 @@ export class StoryScene extends BattleScene {
     if (this.done) return;
     this.done = true;
     const P = this.player;
+    // 還有下一關：接著打（通關時間、下跪次數累計；得票每關重新算）
+    if (this.stageIdx < STAGES.length - 1) {
+      this.g.setScene(new StoryScene(this.g, { ...this.cfg, storyStage: this.stageIdx + 1, cp: 0, votes: 0, clock: this.clock, kneels: this.kneels }));
+      return;
+    }
     // 排行榜依通關速度：越快分數越高（5 分鐘破關約 7 萬分）
     this.g.goResult({
       cfg: { ...this.cfg, mode: 'story' }, win: true, score: Math.max(1000, Math.round(100000 - this.clock * 100)), wave: 1, clearTime: this.clock,
@@ -580,6 +708,24 @@ export class StoryScene extends BattleScene {
       const a = 1 - Math.max(0, p.t - 0.9) / 0.5;
       txt(ctx, p.text, p.x, FY + p.z - 150 - p.t * 40, { size: p.big ? 22 : p.warn ? 22 : 20, weight: 900, color: p.color, align: 'center', stroke: '#000', sw: 5, alpha: Math.max(0, a) });
     }
+    // 地上的紅包：頭上掛暗示標語，一看就知道「收了會掉票」
+    for (const it of this.items) {
+      if (it.kind !== 'redenv' || it.y > 5) continue;
+      const bx = it.x, by = FY + it.z - 12 - Math.sin(this.time * 3 + it.x) * 3;
+      const label = it.label || '不法利益';
+      ctx.save();
+      ctx.font = `900 15px 'Noto Sans TC',sans-serif`;
+      const w = Math.max(70, ctx.measureText(label).width + 18);
+      // 掛牌
+      ctx.fillStyle = 'rgba(20,0,0,0.85)';
+      ctx.fillRect(bx - w / 2, by - 40, w, 38);
+      ctx.strokeStyle = blink(this.time, 2.5) ? '#ff3a3a' : '#ffd84a';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(bx - w / 2, by - 40, w, 38);
+      ctx.restore();
+      txt(ctx, label, bx, by - 28, { size: 15, weight: 900, color: '#ffd84a', align: 'center' });
+      txt(ctx, '收了掉票！', bx, by - 11, { size: 11, weight: 900, color: '#ff6a6a', align: 'center' });
+    }
     // 敵人頭上的小血條
     for (const f of this.fighters) {
       if (f.team === 0 || f.dead || f === this.boss || f.hp >= f.maxHp) continue;
@@ -609,31 +755,41 @@ export class StoryScene extends BattleScene {
     this.hudPanel(ctx, this.player, 10, 8, 380, false);
     // 得票
     const L = this.L, gx = 430, gw = 510;
-    txt(ctx, `第一關　${L.name}`, gx, 16, { size: 15, weight: 900, color: '#ffd84a' });
+    const B = this.boss;
+    const bossFight = B && this.bossOn && (this.phase === 'fight' || this.phase === 'kneel');
+    txt(ctx, `第${NUM[this.stageIdx]}關　${L.name}`, gx, 16, { size: 15, weight: 900, color: '#ffd84a' });
     txt(ctx, `得票 ${this.votes.toLocaleString()}`, gx + gw, 16, { size: 15, weight: 900, color: '#fff', align: 'right' });
-    const r = Math.min(1, this.votes / L.goal);
-    ctx.fillStyle = '#1a1a2a';
-    ctx.fillRect(gx, 30, gw, 18);
-    ctx.fillStyle = r >= 1 ? '#5cff7a' : '#3a8cff';
-    ctx.fillRect(gx, 30, gw * r, 18);
-    ctx.strokeStyle = '#c9a227';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(gx, 30, gw, 18);
-    txt(ctx, r >= 1 ? '過當選門檻！去打倒 Boss' : `當選門檻 ${L.goal.toLocaleString()} 票`, gx + gw / 2, 39, { size: 12, weight: 900, color: '#fff', align: 'center', stroke: '#000', sw: 3 });
-    txt(ctx, `打倒敵人加票；被偷拍、收紅包會扣票`, gx, 64, { size: 11, color: '#9a9ab0' });
+    if (bossFight) {
+      // Boss 戰：右上角的得票條換成 Boss 血條，不擋住打鬥畫面
+      const Rv = this.rival;
+      const hasRival = Rv && Rv.hp > 0 && !Rv.dead;
+      const bw = hasRival ? gw * 0.62 : gw;
+      ctx.fillStyle = '#1a1a2a';
+      ctx.fillRect(gx, 30, gw, 18);
+      segBar(ctx, gx, 30, bw, 18, Math.max(0, B.hp) / B.maxHp, { segs: 24, colors: ['#ff4a3a', '#ff4a3a', '#ff4a3a'] });
+      txt(ctx, `BOSS　${B.char.title}`, gx + bw / 2, 39, { size: 12, weight: 900, color: '#fff', align: 'center', stroke: '#000', sw: 3 });
+      if (hasRival) {
+        const rx = gx + bw + 8, rw = gw - bw - 8;
+        segBar(ctx, rx, 30, rw, 18, Math.max(0, Rv.hp) / Rv.maxHp, { segs: 12, colors: ['#ffb020', '#ffb020', '#ffb020'] });
+        txt(ctx, `對手 ${Rv.char.title}`, rx + rw / 2, 39, { size: 12, weight: 900, color: '#fff', align: 'center', stroke: '#000', sw: 3 });
+      }
+      ctx.strokeStyle = '#ff5a3c';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(gx, 30, gw, 18);
+    } else {
+      const r = Math.min(1, this.votes / L.goal);
+      ctx.fillStyle = '#1a1a2a';
+      ctx.fillRect(gx, 30, gw, 18);
+      ctx.fillStyle = r >= 1 ? '#5cff7a' : '#3a8cff';
+      ctx.fillRect(gx, 30, gw * r, 18);
+      ctx.strokeStyle = '#c9a227';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(gx, 30, gw, 18);
+      txt(ctx, r >= 1 ? '過當選門檻！去打倒 Boss' : `當選門檻 ${L.goal.toLocaleString()} 票`, gx + gw / 2, 39, { size: 12, weight: 900, color: '#fff', align: 'center', stroke: '#000', sw: 3 });
+    }
+    txt(ctx, bossFight ? '打倒 Boss 就當選！' : `打倒敵人加票；被偷拍、收紅包（不法利益）會扣票`, gx, 64, { size: 11, color: bossFight ? '#ff9a7a' : '#9a9ab0' });
     const m = Math.floor(this.clock / 60), sec = Math.floor(this.clock % 60);
     txt(ctx, `⏱ ${m}:${String(sec).padStart(2, '0')}${this.kneels ? `　跪了 ${this.kneels} 次` : ''}`, gx + gw, 64, { size: 13, weight: 900, color: '#ffd84a', align: 'right' });
-    // Boss 血條
-    const B = this.boss;
-    if (B && this.bossOn && this.phase === 'fight') {
-      const bw = 520, bx = 480 - bw / 2, by = 96;
-      ctx.fillStyle = 'rgba(0,0,0,0.65)';
-      ctx.fillRect(bx - 8, by - 6, bw + 16, 40);
-      txt(ctx, `BOSS　${B.char.title}`, bx, by + 4, { size: 14, weight: 900, color: '#ff7a5a' });
-      segBar(ctx, bx, by + 14, bw, 12, Math.max(0, B.hp) / B.maxHp, { segs: 30, colors: ['#ff4a3a', '#ff4a3a', '#ff4a3a'] });
-      const R = this.rival;
-      if (R && !R.dead) txt(ctx, `＋對手陣營：${R.char.title}`, bx + bw, by + 4, { size: 12, weight: 900, color: '#ffd84a', align: 'right' });
-    }
   }
 
   drawScandal(ctx, s) {
@@ -670,10 +826,10 @@ export class StoryScene extends BattleScene {
     ctx.globalAlpha = a;
     ctx.fillStyle = 'rgba(0,0,0,0.7)';
     ctx.fillRect(-this.g.ox, 170, this.g.CW, 200);
-    pixelText(ctx, 'STAGE 1', 480, 205, { size: 24, scale: 2, font: 'px', color: '#ffd84a', outline: '#000' });
-    txt(ctx, '議員選舉', 480, 258, { size: 48, weight: 900, color: '#fff', align: 'center', stroke: '#000', sw: 8 });
+    pixelText(ctx, this.L.final ? 'FINAL STAGE' : `STAGE ${this.L.id}`, 480, 205, { size: 24, scale: 2, font: 'px', color: this.L.final ? '#ff5a3c' : '#ffd84a', outline: '#000' });
+    txt(ctx, this.L.name, 480, 258, { size: 48, weight: 900, color: '#fff', align: 'center', stroke: '#000', sw: 8 });
     txt(ctx, this.L.sub, 480, 306, { size: 16, weight: 700, color: '#cfd3e6', align: 'center' });
-    txt(ctx, `拿下 ${this.L.goal.toLocaleString()} 票，再打倒 Boss 就能當選！`, 480, 336, { size: 16, weight: 900, color: '#5cff7a', align: 'center' });
+    txt(ctx, this.L.final ? `最終關！拿下 ${this.L.goal.toLocaleString()} 票，打倒幕後藏鏡人和對手，當選總統！` : `拿下 ${this.L.goal.toLocaleString()} 票，再打倒 Boss 就能當選${this.L.winTitle}！`, 480, 336, { size: 16, weight: 900, color: this.L.final ? '#ff9a3a' : '#5cff7a', align: 'center' });
     ctx.restore();
   }
 
@@ -720,11 +876,12 @@ export class StoryScene extends BattleScene {
       ctx.strokeStyle = '#ff2a2a';
       ctx.lineWidth = 6;
       ctx.strokeRect(-110, -38, 220, 76);
-      txt(ctx, '當選！議員', 0, 0, { size: 40, weight: 900, color: '#ff2a2a', align: 'center' });
+      txt(ctx, `當選！${this.L.winTitle}`, 0, 0, { size: 40, weight: 900, color: '#ff2a2a', align: 'center' });
       ctx.restore();
     }
     if (T > 2.2) {
-      txt(ctx, '下一關「立委選舉」製作中，敬請期待！', 480, 360, { size: 16, weight: 900, color: '#ffd84a', align: 'center' });
+      const next = STAGES[this.stageIdx + 1];
+      txt(ctx, next ? `下一關：第${NUM[this.stageIdx + 1]}關「${next.name}」` : '恭喜！從立委一路當選總統！', 480, 360, { size: 16, weight: 900, color: '#ffd84a', align: 'center' });
       if (blink(T, 1.5)) txt(ctx, '按確定繼續', 480, 390, { size: 14, color: '#fff', align: 'center' });
     }
   }

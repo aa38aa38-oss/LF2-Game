@@ -171,5 +171,34 @@ export const NPCS = [
       top: 'shirt', topColor: '#7a1fa0', shirt: '#7a1fa0', tie: null, belly: true, bottom: '#1d1d22', shoes: '#c8a030', tw: 27, hr: 15,
     },
   },
+  // ───── 第二關「市長選舉」─────
+  {
+    id: 'troll', title: '網軍小編', npc: true, quote: '', color: '#3a7ad8', color2: '#0e1e3a',
+    specials: [{ name: '截圖帶風向' }, { name: '假新聞' }, { name: '下線' }], superMove: { name: '' }, stats: { pow: 3, spd: 4, def: 2 },
+    mul: { pow: 0.9, spd: 1.1, def: 0.95 },
+    look: {
+      skin: '#f0c49a', hair: 'short', hairColor: '#2a2a40', glasses: 'round', brows: 'flat',
+      top: 'coat', topColor: '#3a4a6a', shirt: '#22283a', tie: null, bottom: '#2a2a32', shoes: '#eeeeee', tw: 19, hr: 13.5, prop: 'phone',
+    },
+  },
+  {
+    id: 'tycoon', title: '財團董事長', npc: true, boss: true, quote: '市政府的標案，早就內定好了！', color: '#c8a030', color2: '#2a1e04',
+    specials: [{ name: '撒鈔票' }, { name: '推土機衝撞' }, { name: '叫保鑣' }], superMove: { name: '錢坑' }, stats: { pow: 5, spd: 2, def: 5 },
+    mul: { pow: 1.05, spd: 0.92, def: 1.15 },
+    look: {
+      skin: '#eab78a', hair: 'side', hairColor: '#d8d8d8', glasses: 'rect', brows: 'angry',
+      top: 'suit', topColor: '#c8a030', shirt: '#ffffff', tie: '#b01818', belly: true, bottom: '#2a2418', shoes: '#111111', tw: 26, hr: 15,
+    },
+  },
+  // ───── 第三關「總統選舉」最終 Boss ─────
+  {
+    id: 'mastermind', title: '幕後藏鏡人', npc: true, boss: true, quote: '這場選舉，從頭到尾都是我在操盤。', color: '#5a1a8a', color2: '#12041e',
+    specials: [{ name: '黑金鞭炮陣' }, { name: '黑箱衝撞' }, { name: '動員全部人馬' }], superMove: { name: '黑金風暴' }, stats: { pow: 5, spd: 4, def: 5 },
+    mul: { pow: 1.3, spd: 1.08, def: 1.3 },
+    look: {
+      skin: '#d9a57a', hair: 'long', hairColor: '#0e0c12', glasses: 'rect', brows: 'intense',
+      top: 'suit', topColor: '#141018', shirt: '#2a0a3a', tie: '#8a1fb0', bottom: '#141018', shoes: '#0b0b0b', tw: 24, hr: 14.5,
+    },
+  },
 ];
 for (const n of NPCS) CHAR_BY_ID[n.id] = n;

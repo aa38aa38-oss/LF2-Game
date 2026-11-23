@@ -163,3 +163,9 @@ Object.assign(MOVES, {
     },
   },
 });
+
+// 第二、三關的新敵人先沿用現有招式（之後要做專屬招式再拆開）：
+// 網軍小編＝偷拍狗仔的招式；財團董事長、幕後藏鏡人＝角頭樁腳王的招式（叫小弟會依關卡換成該關的小弟）
+MOVES.troll = MOVES.paparazzi;
+MOVES.tycoon = MOVES.kingpin;
+MOVES.mastermind = MOVES.kingpin;

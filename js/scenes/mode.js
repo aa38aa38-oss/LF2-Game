@@ -5,7 +5,7 @@ import { txt, pixelText, panel, Hotspots } from '../ui.js';
 import { menuBg, poseOf } from './common.js';
 
 const MODES = [
-  { id: 'story', name: '劇情模式', desc: ['從議員一路打到總統！', '打倒對手拉選票。'], chars: [2] },
+  { id: 'story', name: '劇情模式', desc: ['立委 → 市長 → 總統，三關打到底！', '打倒對手拉選票。'], chars: [2] },
   { id: '1v1', name: '單挑模式', desc: ['自己挑對手，', '一對一打到剩一個！'], chars: [0, 2] },
   { id: 'brawl', name: '四人大亂鬥', desc: ['四位政治人物同場混戰，', '誰都可以打！'], chars: [1, 3, 4, 5] },
 ];

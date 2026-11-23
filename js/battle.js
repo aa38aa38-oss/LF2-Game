@@ -179,7 +179,7 @@ export class BattleScene {
     if (D.type === 'food') {
       if (D.hp) f.heal(D.hp, D.cap);
       if (D.mp) f.mp = Math.min(100, f.mp + D.mp);
-      if (D.votes && this.onVotes) this.onVotes(f, D.votes, '收紅包！貪污疑雲');
+      if (D.votes && this.onVotes) this.onVotes(f, D.votes, `收紅包！${best.label || '貪污疑雲'} `);
       this.sfx('heal');
       this.fx.add({ type: 'text', x: f.x, z: f.z, y: 120, text: D.hp ? `${D.name} +${D.hp}` : `${D.name} 氣+${D.mp}`, color: D.hp ? '#5cff7a' : '#6ab8ff', size: 20, life: 0.9 });
     } else {
@@ -260,7 +260,7 @@ export class BattleScene {
       const D = it.def;
       if (D.hp) f.heal(D.hp, D.cap);
       if (D.mp) f.mp = Math.min(100, f.mp + D.mp);
-      if (D.votes && this.onVotes) this.onVotes(f, D.votes, '收紅包！貪污疑雲');
+      if (D.votes && this.onVotes) this.onVotes(f, D.votes, `收紅包！${it.label || '貪污疑雲'} `);
       this.sfx('heal');
       this.fx.add({ type: 'text', x: f.x, z: f.z, y: 120, text: D.hp ? `${D.name} +${D.hp}` : `${D.name} 氣+${D.mp}`, color: D.hp ? '#5cff7a' : '#6ab8ff', size: 20, life: 0.9 });
       for (let i = 0; i < 5; i++) this.fx.add({ type: 'plus', x: f.x + rand(-20, 20), z: f.z, y: rand(30, 100), life: 0.7 });

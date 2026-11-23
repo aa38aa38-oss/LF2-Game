@@ -242,6 +242,27 @@ NPCS = [
            ("special_down", "叫小弟", 4, "clapping his hands and pointing forward commandingly, shouting orders"),
            ("super", "鞭炮雨", 6, "raising both arms and laughing as many lit firecrackers rain down from the sky around him, sparks everywhere")],
     victory="arms crossed laughing smugly, flashing a fat red envelope", boss=True),
+  # ───── 第二關「市長選舉」─────
+  dict(id='troll', title='網軍小編', stage='第 2 關小王', color='blue and grey',
+    brief="", desc="a pale young internet troll in a dark blue hoodie, round glasses, messy hair, white sneakers, staring at a glowing smartphone, smug typing grin",
+    special=None,
+    lean_extra=[("special_fwd", "截圖帶風向", 4, "holding up a glowing smartphone and blasting a beam of floating angry emoji icons forward")],
+    victory=None),
+  dict(id='tycoon', title='財團董事長', stage='第 2 關 Boss', color='gold and dark red',
+    brief="", desc="a fat rich property tycoon, silver side-parted hair, rectangular gold glasses, shiny gold business suit, white shirt, red tie, big belly, cigar, gold watch, arrogant smirk",
+    special=None,
+    lean_extra=[("special_fwd", "撒鈔票", 4, "throwing a fan of banknotes forward like shuriken"),
+                ("special_up", "推土機衝撞", 4, "charging forward head-down like a bull"),
+                ("super", "錢坑", 4, "laughing with both arms raised while a rain of gold coins and banknotes falls around him")],
+    victory=None, boss=True),
+  # ───── 第三關「總統選舉」最終 Boss ─────
+  dict(id='mastermind', title='幕後藏鏡人', stage='第 3 關最終 Boss', color='black and purple',
+    brief="", desc="a tall sinister political mastermind in a long black suit, slicked long black hair, dark rectangular glasses, purple tie, black leather gloves, cold confident smile",
+    special=None,
+    lean_extra=[("special_fwd", "黑金鞭炮陣", 4, "throwing purple-glowing firecrackers forward in a spread"),
+                ("special_up", "黑箱衝撞", 4, "dashing forward low with a dark purple aura trail"),
+                ("super", "黑金風暴", 4, "raising both arms as a swirling storm of black money and purple lightning surrounds him")],
+    victory=None, boss=True),
 ]
 NPC_BASIC = [
   ('idle', '站立待機', 4, "fighting stance, slight breathing bob, looping idle animation"),
@@ -295,6 +316,19 @@ COMMON_S1 = [
     prompt=f"The front of a colorful traditional Taiwanese folk temple seen straight on: red walls and pillars, carved dragon columns, an ornate roof with green and yellow glazed tiles and upswept swallowtail ridges decorated with figurines, a big wooden main door in the center with a golden plaque (color block, no readable text), strings of red lanterns, a large bronze incense burner in front with smoke. The bottom edge of the image is the ground line. Everything above and around the temple is plain solid pure green (#00FF00) for transparency. {S1_SCENE} Wide image, about 2.3 to 1."),
 ]
 
+# 第二關「市長選舉」：檔名沿用第一關的角色分工（sky／street／apartment＝可以上樓的大樓／temple＝Boss 戰建築），遊戲會依關卡自動換圖
+S2 = '劇情第二關背景（4 張，生好放 assets/scenery/）'
+COMMON_S2 = [
+  dict(group=S2, name='夜晚城市天空', file='assets/scenery/s2_sky.png', size='16:9（1920×1080）',
+    prompt=f"A night sky over a big modern Taiwanese city for a game background: deep navy blue at the top fading to purple near the bottom, a few stars, a distant skyline of glass office towers and a tall landmark tower silhouette with many lit windows and red aircraft lights along the bottom 30 percent, the left and right edges connect seamlessly when tiled. {S1_SCENE} Wide 16:9, no green screen."),
+  dict(group=S2, name='夜市大街（會左右重複）', file='assets/scenery/s2_street.png', size='3:1 超寬（2400×800）',
+    prompt=f"A long row of busy Taiwanese night market stalls and old 3-story shop buildings seen straight from the front at night, glowing food stall signboards in red, yellow and blue with color blocks instead of text, strings of light bulbs, steam from food carts, hanging lanterns, mayoral election campaign banners with color blocks, along the bottom 20 percent a row of food stall counters. The bottom edge of the image is the ground line. Everything above the rooftops is plain solid pure green (#00FF00) for transparency. The left and right edges must connect seamlessly when tiled. {S1_SCENE} Very wide 3:1 image."),
+  dict(group=S2, name='商辦大樓（可以上二樓、頂樓）', file='assets/scenery/s2_apartment.png', size='約 2.7:1 超寬（2400×900）',
+    prompt=f"The flat front facade of a wide modern 5-story office building seen straight on at night. Layout from top to bottom: the top 24 percent is the rooftop area above a flat roof line, with rooftop AC units on the left, a big billboard frame with color blocks on the right and a helipad railing, and plain solid pure green (#00FF00) sky behind them; below the roof line are blue glass curtain walls with lit office windows; between 64 and 80 percent height a long open-air glass-railed walkway runs across the full width; the bottom 20 percent is a ground-floor lobby with glass doors, a convenience store and potted plants. The bottom edge of the image is the ground line. {S1_SCENE} Very wide image, about 2.7 to 1."),
+  dict(group=S2, name='市政府大樓（Boss 戰）', file='assets/scenery/s2_temple.png', size='約 2.3:1 寬（2400×1040）',
+    prompt=f"The front of a grand modern city hall building seen straight on at night: wide white stone facade with tall columns, a big central entrance with glass doors, a flagpole on each side, rows of lit windows, wide stone steps in front, election campaign banners with color blocks hanging on the facade. The bottom edge of the image is the ground line. Everything above and around the building is plain solid pure green (#00FF00) for transparency. {S1_SCENE} Wide image, about 2.3 to 1."),
+]
+
 COMMON = [
   dict(group='場景背景', name='立法院議場', file='assets/stages/legislature.png', size='16:9（1920×1080）',
     prompt=f"{STYLE}, side-scrolling beat 'em up stage background, interior of a parliament assembly hall, wooden walls, a raised speaker's podium in the center, two electronic voting result boards, rows of wooden desks with microphones along the back, press gallery balcony with camera flashes, the lower 46 percent of the image is an open empty teal carpet floor in perspective with a few scattered papers, the left and right edges should connect seamlessly when tiled, wide 16:9, no characters, no text"),
@@ -317,7 +351,7 @@ COMMON = [
 ]
 
 def build():
-    data = {'chars': [], 'common': COMMON_S1 + COMMON}
+    data = {'chars': [], 'common': COMMON_S1 + COMMON_S2 + COMMON}
     for c in CHARS:
         data['chars'].append({'id': c['id'], 'title': c['title'], 'quote': c['quote'], 'items': char_sections(c)})
     for n in NPCS:

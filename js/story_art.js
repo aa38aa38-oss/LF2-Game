@@ -1,4 +1,5 @@
-// 劇情模式第一關「議員選舉」的程式繪圖背景（之後可換成 Gemini 圖）
+// 劇情模式的背景：有 Gemini 圖（assets/scenery/<關卡>_xxx）就用圖，沒有就用程式繪圖
+// 第二、三關還沒有專屬圖時，先借第一關的圖再蓋一層色調（市長選舉＝夜晚藍、總統選舉＝暗紅）
 // 世界座標：畫面 y = 322 + z - 高度。一樓街道 z 0～186，二樓陽台 z -210～-130，頂樓 z -470～-390
 import { FONT_TC } from './util.js';
 import { ASSETS } from './assets.js';
@@ -410,22 +411,39 @@ function imgBox(ctx, x0, x1, img, x, w, top) {
   ctx.drawImage(img, x, top, w, FY - top);
 }
 
-export function drawStage1(ctx, t, x0, x1, L, cam, gateOpen) {
-  const S = ASSETS.scenery;
-  if (S.s1_sky) imgSky(ctx, x0, x1, cam, S.s1_sky);
+// 各關借圖時的色調
+const TINT = { s2: 'rgba(10,20,90,0.42)', s3: 'rgba(120,8,20,0.36)' };
+
+export function drawStoryStage(ctx, t, x0, x1, L, cam, gateOpen) {
+  const A = ASSETS.scenery, p = L.art || 's1';
+  // 這一關的圖；沒有就借第一關的
+  const S = {};
+  let borrowed = false;
+  for (const k of ['sky', 'street', 'apartment', 'temple']) {
+    S[k] = A[`${p}_${k}`];
+    if (!S[k] && A[`s1_${k}`]) {
+      S[k] = A[`s1_${k}`];
+      borrowed = borrowed || p !== 's1';
+    }
+  }
+  if (S.sky) imgSky(ctx, x0, x1, cam, S.sky);
   else sky(ctx, x0, x1, cam);
-  if (S.s1_street) {
-    imgStrip(ctx, x0, x1, 0, L.apt.x0 + 20, S.s1_street, 470);
-    imgStrip(ctx, x0, x1, L.apt.x1 - 10, L.temple.x - 120, S.s1_street, 470);
+  if (S.street) {
+    imgStrip(ctx, x0, x1, 0, L.apt.x0 + 20, S.street, 470);
+    imgStrip(ctx, x0, x1, L.apt.x1 - 10, L.temple.x - 120, S.street, 470);
   } else {
     shophouses(ctx, x0, x1, 0, L.apt.x0 + 20, t);
     shophouses(ctx, x0, x1, L.apt.x1 - 10, L.temple.x - 120, t);
   }
   // 公寓：圖的上緣 = 頂樓加蓋的屋頂（頂樓地板往上 150）
-  if (S.s1_apartment) imgBox(ctx, x0, x1, S.s1_apartment, L.apt.x0, L.apt.x1 - L.apt.x0, FY + L.apt.roofZ - 150);
+  if (S.apartment) imgBox(ctx, x0, x1, S.apartment, L.apt.x0, L.apt.x1 - L.apt.x0, FY + L.apt.roofZ - 150);
   else apartment(ctx, x0, x1, L.apt);
-  if (S.s1_temple) imgBox(ctx, x0, x1, S.s1_temple, L.temple.x - 160, 1080, FY - 470);
+  if (S.temple) imgBox(ctx, x0, x1, S.temple, L.temple.x - 160, 1080, FY - 470);
   else temple(ctx, x0, x1, L.temple.x, t);
+  if ((borrowed || !A[`${p}_sky`]) && TINT[p]) {
+    ctx.fillStyle = TINT[p];
+    ctx.fillRect(x0, -1200, x1 - x0, FY + 1200);
+  }
   street(ctx, x0, x1, 0, L.floors[0].xMax + 60);
   street(ctx, x0, x1, L.floors[0].xMax + 60, L.floors[3].xMin, false);
   street(ctx, x0, x1, L.floors[3].xMin, L.worldW, true);

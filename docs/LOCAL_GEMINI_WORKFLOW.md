@@ -88,6 +88,20 @@
 - 背景圖存成 `incoming/<批次>/assets/scenery/s1_xxx.png`。街屋、公寓、宮廟要有綠幕（天空部分是純綠，遊戲會去背）；天空那張不用綠幕。
 - 背景不用三視圖，也不用第零步說明，直接開新對話貼 prompt 即可。
 
+### 第二關（市長選舉）清單
+
+劇情模式改成三關：第一關立委選舉、第二關市長選舉、第三關總統選舉（最終關）。第二、三關沿用第一關的地圖骨架（老街 → 二樓 → 頂樓 → Boss 廣場），
+還沒有專屬圖時，遊戲會借第一關的背景再蓋一層色調，新敵人用程式繪圖先頂著。
+
+| 項目 | 存檔 | 要生的圖 | 狀態 |
+|---|---|---|---|
+| 網軍小編（小王） | `characters/troll/` | idle、walk、attack1、hurt、special_fwd（截圖帶風向） | |
+| 財團董事長（Boss） | `characters/tycoon/`、`portraits/tycoon.png` | idle、walk、attack1、hurt、special_fwd（撒鈔票）、special_up（推土機衝撞）、super（錢坑）、頭像 | |
+| 第二關背景 | `scenery/` | `s2_sky`（夜晚城市）、`s2_street`（夜市大街）、`s2_apartment`（商辦大樓）、`s2_temple`（市政府大樓） | |
+
+- 小怪沿用第一關的陣頭小弟、抗議群眾。
+- 第三關最終 Boss「幕後藏鏡人」（`mastermind`）的 prompt 也已經在 `docs/GEMINI_PROMPTS.md`，第三關背景之後再加。
+
 ### 之後（可選）：六位主角的「迴旋攻擊」
 每人一張 `spin.png`（4 格），目前借用踢腿圖，不補也能玩。
 角色 ID：`su`、`wang`、`han`、`ma`、`ko`、`guan`。
