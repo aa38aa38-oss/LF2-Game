@@ -1326,460 +1326,154 @@ Use the attached images (this character's full-body illustration and three-view 
 
 ## 第 1 關小怪：陣頭小弟（`gang`）
 
-### 第零步：每次開新對話，先貼這段
+### 動作（像素風，一次一張；第二張起都上傳 idle）
 
-**遊戲說明＋這個角色的說明**　存檔：`（不用存檔）`　尺寸：文字
-
-```
-我正在做一款原創的網頁格鬥小遊戲（2.5D 橫向清版亂鬥），風格是輕鬆搞笑的政治諷刺漫畫。接下來要畫「劇情模式」裡的敵人，他們都是原創的虛構角色，代表選舉時會遇到的各種麻煩，不像任何真實人物。請記住以下規則：
-
-【美術風格】
-- 乾淨的手繪諷刺漫畫插畫風：粗黑外框線、平塗上色加簡單陰影（跟我遊戲主角們的畫風一致）
-- 正常成人比例，大約六頭身，不要 Q 版、不要大頭
-- 誇張、好笑、一眼看得出是什麼角色
-
-【圖片規格】
-- 背景一律是純綠色 #00FF00（遊戲會自動去背），角色身上不要用亮綠色
-- 角色一律「側面、面向右邊」、全身、腳底貼齊圖片下緣
-- 動作圖是「動作條」：同一個角色的連續動作由左到右排成一列，每格一樣寬、角色大小一樣、位置置中，格子之間不要畫框線
-- 圖上不要有任何文字、數字、浮水印、地面陰影
-- 被打、倒地要畫成搞笑的卡通反應，不要畫成真的受傷
-
-【一致性】
-- 我會上傳這個角色的三視圖，每一張都要跟它的臉、髮型、服裝、配色、比例、畫風完全一樣
-- 一次只畫一張圖，畫完等我確認
-
-這次要畫的是「陣頭小弟」（廟口陣頭的小混混）。外型：瘦瘦的年輕人、染成金黃色的刺蝟頭、細眉、嚼檳榔的囂張表情、白色無袖背心、黑色運動褲、藍白拖。手上拿著一串紅色鞭炮。招式：用拳頭亂打、把點燃的鞭炮丟出去。
-
-如果了解了，請回答「了解」，然後等我下一步的指示。
-```
-
-### 第一步：三視圖（之後每張都上傳它）
-
-**三視圖設定圖**　存檔：`assets/ref/gang.png（自己留著當參考）`　尺寸：16:9 橫式
+**站立待機（第一張，之後都上傳它當參考）**　存檔：`assets/characters/gang/idle.png`　尺寸：4 格橫排
 
 ```
-Character reference sheet of an original video game enemy character: a skinny cocky young temple-procession gang punk, bleached golden spiky hair, thin eyebrows, smug face, white sleeveless tank top, black track pants, blue-and-white plastic slippers, holding a string of red firecrackers. Three views side by side: front view, side view facing right, back view, full body, the same character in all views, plain solid pure green background (#00FF00), no text. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Pixel art enemy sprite strip for a 2D beat 'em up game: a skinny cocky young temple-procession gang punk, bleached golden spiky hair, thin eyebrows, smug face, white sleeveless tank top, black track pants, blue-and-white plastic slippers, holding a string of red firecrackers. fighting stance, slight breathing bob, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-### 動作（每張都上傳三視圖，一次只生一張）
-
-**站立待機**　存檔：`assets/characters/gang/idle.png`　尺寸：4 格橫排（每格 512×512）
+**走路**　存檔：`assets/characters/gang/walk.png`　尺寸：6 格橫排
 
 ```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: fighting stance, slight breathing bob, looping idle animation. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Same character as the attached image, same pixel art style and colors. walking forward, 6 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-**走路**　存檔：`assets/characters/gang/walk.png`　尺寸：6 格橫排（每格 512×512）
+**攻擊**　存檔：`assets/characters/gang/attack1.png`　尺寸：3 格橫排
 
 ```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: walking forward with a swagger, looping walk animation. 6 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Same character as the attached image, same pixel art style and colors. a punch: wind-up, full extension, recover, 3 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-**攻擊第一下**　存檔：`assets/characters/gang/attack1.png`　尺寸：3 格橫排（每格 512×512）
+**被打**　存檔：`assets/characters/gang/hurt.png`　尺寸：2 格橫排
 
 ```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: a quick jab punch: wind-up, full extension, recover. 3 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**攻擊第二下**　存檔：`assets/characters/gang/attack2.png`　尺寸：3 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: a wide hook punch: wind-up, full extension, recover. 3 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**被打**　存檔：`assets/characters/gang/hurt.png`　尺寸：2 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: comedic cartoon reaction: staggering backward with a funny surprised face. 2 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**被打飛**　存檔：`assets/characters/gang/fall.png`　尺寸：3 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: comically tumbling backward through the air like a slapstick cartoon. 3 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**倒地**　存檔：`assets/characters/gang/down.png`　尺寸：1 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: lying flat on the floor on his back with cartoon swirly eyes, horizontal pose. 1 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**起身**　存檔：`assets/characters/gang/getup.png`　尺寸：2 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: getting up from the ground: kneeling on one knee, then rising. 2 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**暈眩**　存檔：`assets/characters/gang/dizzy.png`　尺寸：3 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: dizzy and wobbling with cartoon stars around the head, looping. 3 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-### 招式（同上）
-
-**丟鞭炮**　存檔：`assets/characters/gang/special.png`　尺寸：4 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: lighting a string of red firecrackers and tossing it forward underhand, sparks on the fuse. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Same character as the attached image, same pixel art style and colors. staggering backward with a funny surprised face, 2 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
 ---
 
 ## 第 1 關小怪：抗議群眾（`protester`）
 
-### 第零步：每次開新對話，先貼這段
+### 動作（像素風，一次一張；第二張起都上傳 idle）
 
-**遊戲說明＋這個角色的說明**　存檔：`（不用存檔）`　尺寸：文字
-
-```
-我正在做一款原創的網頁格鬥小遊戲（2.5D 橫向清版亂鬥），風格是輕鬆搞笑的政治諷刺漫畫。接下來要畫「劇情模式」裡的敵人，他們都是原創的虛構角色，代表選舉時會遇到的各種麻煩，不像任何真實人物。請記住以下規則：
-
-【美術風格】
-- 乾淨的手繪諷刺漫畫插畫風：粗黑外框線、平塗上色加簡單陰影（跟我遊戲主角們的畫風一致）
-- 正常成人比例，大約六頭身，不要 Q 版、不要大頭
-- 誇張、好笑、一眼看得出是什麼角色
-
-【圖片規格】
-- 背景一律是純綠色 #00FF00（遊戲會自動去背），角色身上不要用亮綠色
-- 角色一律「側面、面向右邊」、全身、腳底貼齊圖片下緣
-- 動作圖是「動作條」：同一個角色的連續動作由左到右排成一列，每格一樣寬、角色大小一樣、位置置中，格子之間不要畫框線
-- 圖上不要有任何文字、數字、浮水印、地面陰影
-- 被打、倒地要畫成搞笑的卡通反應，不要畫成真的受傷
-
-【一致性】
-- 我會上傳這個角色的三視圖，每一張都要跟它的臉、髮型、服裝、配色、比例、畫風完全一樣
-- 一次只畫一張圖，畫完等我確認
-
-這次要畫的是「抗議群眾」（喊司法不公的抗議民眾）。外型：中年大叔、灰色旁分頭髮、圓框眼鏡、額頭綁白色布條（上面不要有可讀的字）、米色 T 恤、深灰長褲。手上拿著手寫抗議牌（牌子上用色塊代替文字）和一個小擴音器。招式：拿牌子揮人、對著擴音器大喊放出音波。
-
-如果了解了，請回答「了解」，然後等我下一步的指示。
-```
-
-### 第一步：三視圖（之後每張都上傳它）
-
-**三視圖設定圖**　存檔：`assets/ref/protester.png（自己留著當參考）`　尺寸：16:9 橫式
+**站立待機（第一張，之後都上傳它當參考）**　存檔：`assets/characters/protester/idle.png`　尺寸：4 格橫排
 
 ```
-Character reference sheet of an original video game enemy character: an angry middle-aged male protester, grey side-parted hair, round glasses, white cloth headband with red marks (no readable text), beige t-shirt, dark grey trousers, holding a handmade protest placard with color blocks instead of text and a small megaphone. Three views side by side: front view, side view facing right, back view, full body, the same character in all views, plain solid pure green background (#00FF00), no text. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Pixel art enemy sprite strip for a 2D beat 'em up game: an angry middle-aged male protester, grey side-parted hair, round glasses, white cloth headband with red marks (no readable text), beige t-shirt, dark grey trousers, holding a handmade protest placard with color blocks instead of text and a small megaphone. fighting stance, slight breathing bob, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-### 動作（每張都上傳三視圖，一次只生一張）
-
-**站立待機**　存檔：`assets/characters/protester/idle.png`　尺寸：4 格橫排（每格 512×512）
+**走路**　存檔：`assets/characters/protester/walk.png`　尺寸：6 格橫排
 
 ```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: fighting stance, slight breathing bob, looping idle animation. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Same character as the attached image, same pixel art style and colors. walking forward, 6 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-**走路**　存檔：`assets/characters/protester/walk.png`　尺寸：6 格橫排（每格 512×512）
+**攻擊**　存檔：`assets/characters/protester/attack1.png`　尺寸：3 格橫排
 
 ```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: walking forward with a swagger, looping walk animation. 6 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Same character as the attached image, same pixel art style and colors. a punch: wind-up, full extension, recover, 3 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-**攻擊第一下**　存檔：`assets/characters/protester/attack1.png`　尺寸：3 格橫排（每格 512×512）
+**被打**　存檔：`assets/characters/protester/hurt.png`　尺寸：2 格橫排
 
 ```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: a quick jab punch: wind-up, full extension, recover. 3 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**攻擊第二下**　存檔：`assets/characters/protester/attack2.png`　尺寸：3 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: a wide hook punch: wind-up, full extension, recover. 3 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**被打**　存檔：`assets/characters/protester/hurt.png`　尺寸：2 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: comedic cartoon reaction: staggering backward with a funny surprised face. 2 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**被打飛**　存檔：`assets/characters/protester/fall.png`　尺寸：3 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: comically tumbling backward through the air like a slapstick cartoon. 3 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**倒地**　存檔：`assets/characters/protester/down.png`　尺寸：1 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: lying flat on the floor on his back with cartoon swirly eyes, horizontal pose. 1 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**起身**　存檔：`assets/characters/protester/getup.png`　尺寸：2 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: getting up from the ground: kneeling on one knee, then rising. 2 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**暈眩**　存檔：`assets/characters/protester/dizzy.png`　尺寸：3 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: dizzy and wobbling with cartoon stars around the head, looping. 3 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-### 招式（同上）
-
-**大聲公**　存檔：`assets/characters/protester/special.png`　尺寸：4 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: shouting furiously into a small megaphone, visible sound-wave rings coming out. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Same character as the attached image, same pixel art style and colors. staggering backward with a funny surprised face, 2 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
 ---
 
 ## 第 1 關小王：偷拍狗仔（`paparazzi`）
 
-### 第零步：每次開新對話，先貼這段
+### 動作（像素風，一次一張；第二張起都上傳 idle）
 
-**遊戲說明＋這個角色的說明**　存檔：`（不用存檔）`　尺寸：文字
-
-```
-我正在做一款原創的網頁格鬥小遊戲（2.5D 橫向清版亂鬥），風格是輕鬆搞笑的政治諷刺漫畫。接下來要畫「劇情模式」裡的敵人，他們都是原創的虛構角色，代表選舉時會遇到的各種麻煩，不像任何真實人物。請記住以下規則：
-
-【美術風格】
-- 乾淨的手繪諷刺漫畫插畫風：粗黑外框線、平塗上色加簡單陰影（跟我遊戲主角們的畫風一致）
-- 正常成人比例，大約六頭身，不要 Q 版、不要大頭
-- 誇張、好笑、一眼看得出是什麼角色
-
-【圖片規格】
-- 背景一律是純綠色 #00FF00（遊戲會自動去背），角色身上不要用亮綠色
-- 角色一律「側面、面向右邊」、全身、腳底貼齊圖片下緣
-- 動作圖是「動作條」：同一個角色的連續動作由左到右排成一列，每格一樣寬、角色大小一樣、位置置中，格子之間不要畫框線
-- 圖上不要有任何文字、數字、浮水印、地面陰影
-- 被打、倒地要畫成搞笑的卡通反應，不要畫成真的受傷
-
-【一致性】
-- 我會上傳這個角色的三視圖，每一張都要跟它的臉、髮型、服裝、配色、比例、畫風完全一樣
-- 一次只畫一張圖，畫完等我確認
-
-這次要畫的是「偷拍狗仔」（專門偷拍、做假緋聞照的狗仔記者）。外型：鬼鬼祟祟的中年男子、反戴棒球帽、深色墨鏡、米色風衣、脖子上掛一台裝長鏡頭的大相機、奸笑。招式：舉相機閃光偷拍、丟出打了馬賽克的「合成照片」、往後開溜。
-
-如果了解了，請回答「了解」，然後等我下一步的指示。
-```
-
-### 第一步：三視圖（之後每張都上傳它）
-
-**三視圖設定圖**　存檔：`assets/ref/paparazzi.png（自己留著當參考）`　尺寸：16:9 橫式
+**站立待機（第一張，之後都上傳它當參考）**　存檔：`assets/characters/paparazzi/idle.png`　尺寸：4 格橫排
 
 ```
-Character reference sheet of an original video game enemy character: a sneaky paparazzi photographer, backwards baseball cap, dark sunglasses, beige trench coat, a big DSLR camera with a long zoom lens hanging from his neck, sly grin. Three views side by side: front view, side view facing right, back view, full body, the same character in all views, plain solid pure green background (#00FF00), no text. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Pixel art enemy sprite strip for a 2D beat 'em up game: a sneaky paparazzi photographer, backwards baseball cap, dark sunglasses, beige trench coat, a big DSLR camera with a long zoom lens hanging from his neck, sly grin. fighting stance, slight breathing bob, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-### 動作（每張都上傳三視圖，一次只生一張）
-
-**站立待機**　存檔：`assets/characters/paparazzi/idle.png`　尺寸：4 格橫排（每格 512×512）
+**走路**　存檔：`assets/characters/paparazzi/walk.png`　尺寸：6 格橫排
 
 ```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: fighting stance, slight breathing bob, looping idle animation. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Same character as the attached image, same pixel art style and colors. walking forward, 6 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-**走路**　存檔：`assets/characters/paparazzi/walk.png`　尺寸：6 格橫排（每格 512×512）
+**攻擊**　存檔：`assets/characters/paparazzi/attack1.png`　尺寸：3 格橫排
 
 ```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: walking forward with a swagger, looping walk animation. 6 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Same character as the attached image, same pixel art style and colors. a punch: wind-up, full extension, recover, 3 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-**攻擊第一下**　存檔：`assets/characters/paparazzi/attack1.png`　尺寸：3 格橫排（每格 512×512）
+**被打**　存檔：`assets/characters/paparazzi/hurt.png`　尺寸：2 格橫排
 
 ```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: a quick jab punch: wind-up, full extension, recover. 3 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**攻擊第二下**　存檔：`assets/characters/paparazzi/attack2.png`　尺寸：3 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: a wide hook punch: wind-up, full extension, recover. 3 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**被打**　存檔：`assets/characters/paparazzi/hurt.png`　尺寸：2 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: comedic cartoon reaction: staggering backward with a funny surprised face. 2 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**被打飛**　存檔：`assets/characters/paparazzi/fall.png`　尺寸：3 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: comically tumbling backward through the air like a slapstick cartoon. 3 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**倒地**　存檔：`assets/characters/paparazzi/down.png`　尺寸：1 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: lying flat on the floor on his back with cartoon swirly eyes, horizontal pose. 1 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**起身**　存檔：`assets/characters/paparazzi/getup.png`　尺寸：2 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: getting up from the ground: kneeling on one knee, then rising. 2 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**暈眩**　存檔：`assets/characters/paparazzi/dizzy.png`　尺寸：3 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: dizzy and wobbling with cartoon stars around the head, looping. 3 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Same character as the attached image, same pixel art style and colors. staggering backward with a funny surprised face, 2 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
 ### 招式（同上）
 
-**閃光偷拍**　存檔：`assets/characters/paparazzi/special_fwd.png`　尺寸：4 格橫排（每格 512×512）
+**閃光偷拍**　存檔：`assets/characters/paparazzi/special_fwd.png`　尺寸：4 格橫排
 
 ```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: raising the camera to his eye and firing a blinding white flash forward. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**丟合成照**　存檔：`assets/characters/paparazzi/special_up.png`　尺寸：4 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: flicking a printed photo with a pink mosaic blur forward like a frisbee, sneaky grin. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**開溜**　存檔：`assets/characters/paparazzi/special_down.png`　尺寸：4 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: scurrying backward away from the viewer's right side, hunched, clutching the camera. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Same character as the attached image, same pixel art style and colors. raising a big camera to his eye and firing a white flash forward, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
 ---
 
 ## 第 1 關 Boss：角頭樁腳王（`kingpin`）
 
-### 第零步：每次開新對話，先貼這段
+### 動作（像素風，一次一張；第二張起都上傳 idle）
 
-**遊戲說明＋這個角色的說明**　存檔：`（不用存檔）`　尺寸：文字
-
-```
-我正在做一款原創的網頁格鬥小遊戲（2.5D 橫向清版亂鬥），風格是輕鬆搞笑的政治諷刺漫畫。接下來要畫「劇情模式」裡的敵人，他們都是原創的虛構角色，代表選舉時會遇到的各種麻煩，不像任何真實人物。請記住以下規則：
-
-【美術風格】
-- 乾淨的手繪諷刺漫畫插畫風：粗黑外框線、平塗上色加簡單陰影（跟我遊戲主角們的畫風一致）
-- 正常成人比例，大約六頭身，不要 Q 版、不要大頭
-- 誇張、好笑、一眼看得出是什麼角色
-
-【圖片規格】
-- 背景一律是純綠色 #00FF00（遊戲會自動去背），角色身上不要用亮綠色
-- 角色一律「側面、面向右邊」、全身、腳底貼齊圖片下緣
-- 動作圖是「動作條」：同一個角色的連續動作由左到右排成一列，每格一樣寬、角色大小一樣、位置置中，格子之間不要畫框線
-- 圖上不要有任何文字、數字、浮水印、地面陰影
-- 被打、倒地要畫成搞笑的卡通反應，不要畫成真的受傷
-
-【一致性】
-- 我會上傳這個角色的三視圖，每一張都要跟它的臉、髮型、服裝、配色、比例、畫風完全一樣
-- 一次只畫一張圖，畫完等我確認
-
-這次要畫的是第一關 Boss「角頭樁腳王」（地方角頭兼樁腳，專門喬選票）。外型：高大魁梧、大肚子、油頭往後梳、金框墨鏡、粗金項鍊、紫色花襯衫釦子開到胸口、手戴金戒指、金色皮鞋、得意又兇的笑。招式：一次丟三串鞭炮、低頭衝撞、拍手叫小弟、讓鞭炮像雨一樣落下。金句：「這區的票，攏是阮在喬的！」
-
-如果了解了，請回答「了解」，然後等我下一步的指示。
-```
-
-### 第一步：三視圖（之後每張都上傳它）
-
-**三視圖設定圖**　存檔：`assets/ref/kingpin.png（自己留著當參考）`　尺寸：16:9 橫式
+**站立待機（第一張，之後都上傳它當參考）**　存檔：`assets/characters/kingpin/idle.png`　尺寸：4 格橫排
 
 ```
-Character reference sheet of an original video game enemy character: a big burly local gang boss and vote broker, slicked-back black hair, gold-framed sunglasses, thick gold chain, purple flower-pattern silk shirt unbuttoned to the chest, big belly, gold rings, gold shoes, smug intimidating grin. Three views side by side: front view, side view facing right, back view, full body, the same character in all views, plain solid pure green background (#00FF00), no text. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Pixel art enemy sprite strip for a 2D beat 'em up game: a big burly local gang boss and vote broker, slicked-back black hair, gold-framed sunglasses, thick gold chain, purple flower-pattern silk shirt unbuttoned to the chest, big belly, gold rings, gold shoes, smug intimidating grin. fighting stance, slight breathing bob, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-### 動作（每張都上傳三視圖，一次只生一張）
-
-**站立待機**　存檔：`assets/characters/kingpin/idle.png`　尺寸：4 格橫排（每格 512×512）
+**走路**　存檔：`assets/characters/kingpin/walk.png`　尺寸：6 格橫排
 
 ```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: fighting stance, slight breathing bob, looping idle animation. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Same character as the attached image, same pixel art style and colors. walking forward, 6 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-**走路**　存檔：`assets/characters/kingpin/walk.png`　尺寸：6 格橫排（每格 512×512）
+**攻擊**　存檔：`assets/characters/kingpin/attack1.png`　尺寸：3 格橫排
 
 ```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: walking forward with a swagger, looping walk animation. 6 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Same character as the attached image, same pixel art style and colors. a punch: wind-up, full extension, recover, 3 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-**攻擊第一下**　存檔：`assets/characters/kingpin/attack1.png`　尺寸：3 格橫排（每格 512×512）
+**被打**　存檔：`assets/characters/kingpin/hurt.png`　尺寸：2 格橫排
 
 ```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: a quick jab punch: wind-up, full extension, recover. 3 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**攻擊第二下**　存檔：`assets/characters/kingpin/attack2.png`　尺寸：3 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: a wide hook punch: wind-up, full extension, recover. 3 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**被打**　存檔：`assets/characters/kingpin/hurt.png`　尺寸：2 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: comedic cartoon reaction: staggering backward with a funny surprised face. 2 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**被打飛**　存檔：`assets/characters/kingpin/fall.png`　尺寸：3 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: comically tumbling backward through the air like a slapstick cartoon. 3 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**倒地**　存檔：`assets/characters/kingpin/down.png`　尺寸：1 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: lying flat on the floor on his back with cartoon swirly eyes, horizontal pose. 1 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**起身**　存檔：`assets/characters/kingpin/getup.png`　尺寸：2 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: getting up from the ground: kneeling on one knee, then rising. 2 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**暈眩**　存檔：`assets/characters/kingpin/dizzy.png`　尺寸：3 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: dizzy and wobbling with cartoon stars around the head, looping. 3 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Same character as the attached image, same pixel art style and colors. staggering backward with a funny surprised face, 2 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
 ### 招式（同上）
 
-**鞭炮陣**　存檔：`assets/characters/kingpin/special_fwd.png`　尺寸：4 格橫排（每格 512×512）
+**鞭炮陣**　存檔：`assets/characters/kingpin/special_fwd.png`　尺寸：4 格橫排
 
 ```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: throwing three strings of lit red firecrackers forward at once in a wide spread. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Same character as the attached image, same pixel art style and colors. throwing lit red firecrackers forward, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-**角頭衝撞**　存檔：`assets/characters/kingpin/special_up.png`　尺寸：4 格橫排（每格 512×512）
+**角頭衝撞**　存檔：`assets/characters/kingpin/special_up.png`　尺寸：4 格橫排
 
 ```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: lowering his head and charging forward like a bull, dust clouds, belly first. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Same character as the attached image, same pixel art style and colors. charging forward head-down like a bull, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-**叫小弟**　存檔：`assets/characters/kingpin/special_down.png`　尺寸：4 格橫排（每格 512×512）
+**鞭炮雨**　存檔：`assets/characters/kingpin/super.png`　尺寸：4 格橫排
 
 ```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: clapping his hands and pointing forward commandingly, shouting orders. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Same character as the attached image, same pixel art style and colors. raising both arms and laughing while firecrackers rain down around him, 4 frames in one horizontal row. simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, normal adult proportions, side view facing right, full body, feet on the bottom edge, plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders.
 ```
 
-**鞭炮雨**　存檔：`assets/characters/kingpin/super.png`　尺寸：6 格橫排（每格 512×512）
+**頭像（大招橫幅用）**　存檔：`assets/portraits/kingpin.png`　尺寸：正方形
 
 ```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: raising both arms and laughing as many lit firecrackers rain down from the sky around him, sparks everywhere. 6 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-**勝利**　存檔：`assets/characters/kingpin/victory.png`　尺寸：4 格橫排（每格 512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a sprite strip of this character for a 2D fighting game: victory pose animation: arms crossed laughing smugly, flashing a fat red envelope. 4 frames arranged in a single horizontal row from left to right, side view facing right, full body, the same single character in every frame, feet touching the bottom edge of each frame, character centered in each frame and the same size in every frame, frames evenly spaced with equal widths, plain solid pure green background (#00FF00), no ground shadow, no text, no numbers, no watermark, no frame borders. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
-```
-
-### 畫面用圖（同上）
-
-**頭像（Boss 血條用）**　存檔：`assets/portraits/kingpin.png`　尺寸：正方形 1:1（512×512）
-
-```
-Use the attached three-view character sheet as the exact reference: same face, same hairstyle, same outfit and colors, same body proportions and the same comic illustration style. Draw a head and shoulders portrait of this character, facing slightly right, menacing smug expression, simple purple and gold gradient background, square image, the face fills most of the frame, no text. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art.
+Same character as the attached image: pixel art head and shoulders portrait, menacing smug face, simple purple and gold background, square image, no text.
 ```
 
 ---

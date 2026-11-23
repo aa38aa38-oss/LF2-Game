@@ -227,6 +227,7 @@ NPCS = [
     brief="這次要畫的是「偷拍狗仔」（專門偷拍、做假緋聞照的狗仔記者）。外型：鬼鬼祟祟的中年男子、反戴棒球帽、深色墨鏡、米色風衣、脖子上掛一台裝長鏡頭的大相機、奸笑。招式：舉相機閃光偷拍、丟出打了馬賽克的「合成照片」、往後開溜。",
     desc="a sneaky paparazzi photographer, backwards baseball cap, dark sunglasses, beige trench coat, a big DSLR camera with a long zoom lens hanging from his neck, sly grin",
     special=("special_fwd", "閃光偷拍", 4, "raising the camera to his eye and firing a blinding white flash forward"),
+    lean_extra=[("special_fwd", "閃光偷拍", 4, "raising a big camera to his eye and firing a white flash forward")],
     extra=[("special_up", "丟合成照", 4, "flicking a printed photo with a pink mosaic blur forward like a frisbee, sneaky grin"),
            ("special_down", "開溜", 4, "scurrying backward away from the viewer's right side, hunched, clutching the camera")],
     victory=None),
@@ -234,6 +235,9 @@ NPCS = [
     brief="這次要畫的是第一關 Boss「角頭樁腳王」（地方角頭兼樁腳，專門喬選票）。外型：高大魁梧、大肚子、油頭往後梳、金框墨鏡、粗金項鍊、紫色花襯衫釦子開到胸口、手戴金戒指、金色皮鞋、得意又兇的笑。招式：一次丟三串鞭炮、低頭衝撞、拍手叫小弟、讓鞭炮像雨一樣落下。金句：「這區的票，攏是阮在喬的！」",
     desc="a big burly local gang boss and vote broker, slicked-back black hair, gold-framed sunglasses, thick gold chain, purple flower-pattern silk shirt unbuttoned to the chest, big belly, gold rings, gold shoes, smug intimidating grin",
     special=("special_fwd", "鞭炮陣", 4, "throwing three strings of lit red firecrackers forward at once in a wide spread"),
+    lean_extra=[("special_fwd", "鞭炮陣", 4, "throwing lit red firecrackers forward"),
+                ("special_up", "角頭衝撞", 4, "charging forward head-down like a bull"),
+                ("super", "鞭炮雨", 4, "raising both arms and laughing while firecrackers rain down around him")],
     extra=[("special_up", "角頭衝撞", 4, "lowering his head and charging forward like a bull, dust clouds, belly first"),
            ("special_down", "叫小弟", 4, "clapping his hands and pointing forward commandingly, shouting orders"),
            ("super", "鞭炮雨", 6, "raising both arms and laughing as many lit firecrackers rain down from the sky around him, sparks everywhere")],
@@ -251,29 +255,32 @@ NPC_BASIC = [
   ('dizzy', '暈眩', 3, "dizzy and wobbling with cartoon stars around the head, looping"),
 ]
 
-def npc_sprite(n, frames, action):
-    return (f"{NPC_REF} Draw a sprite strip of this character for a 2D fighting game: {action}. "
-            f"{frames} frames arranged in a single horizontal row from left to right, {SPRITE_END}. Art style: {STYLE}.")
+# 敵人用簡單的 2D 像素風（省用量，有辨識度就好），不用三視圖：先生 idle，之後每張都上傳 idle 當參考
+NPC_STYLE = ("simple 16-bit pixel art game sprite, chunky dark outlines, limited color palette, clear readable silhouette, "
+             "normal adult proportions, side view facing right, full body, feet on the bottom edge, "
+             "plain solid pure green background (#00FF00), no text, no shadow, frames evenly spaced with equal widths, no frame borders")
+NPC_LEAN = [
+  ('idle', '站立待機（第一張，之後都上傳它當參考）', 4, "fighting stance, slight breathing bob"),
+  ('walk', '走路', 6, "walking forward"),
+  ('attack1', '攻擊', 3, "a punch: wind-up, full extension, recover"),
+  ('hurt', '被打', 2, "staggering backward with a funny surprised face"),
+]
 
 def npc_sections(n):
     items = []
-    items.append(dict(group='第零步：每次開新對話，先貼這段', name='遊戲說明＋這個角色的說明', file='（不用存檔）', size='文字',
-        prompt=NPC_BRIEF + n['brief'] + "\n\n如果了解了，請回答「了解」，然後等我下一步的指示。"))
-    items.append(dict(group='第一步：三視圖（之後每張都上傳它）', name='三視圖設定圖', file=f"assets/ref/{n['id']}.png（自己留著當參考）", size='16:9 橫式',
-        prompt=(f"Character reference sheet of an original video game enemy character: {n['desc']}. Three views side by side: front view, "
-                f"side view facing right, back view, full body, the same character in all views, plain solid pure green background (#00FF00), no text. Art style: {STYLE}.")))
-    for key, zh, fr, act in NPC_BASIC:
-        items.append(dict(group='動作（每張都上傳三視圖，一次只生一張）', name=zh, file=f"assets/characters/{n['id']}/{key}.png", frames=fr,
-            size=f"{fr} 格橫排（每格 512×512）", prompt=npc_sprite(n, fr, act)))
-    for key, zh, fr, act in [n['special']] + n.get('extra', []):
-        items.append(dict(group='招式（同上）', name=zh, file=f"assets/characters/{n['id']}/{key}.png", frames=fr,
-            size=f"{fr} 格橫排（每格 512×512）", prompt=npc_sprite(n, fr, act)))
-    if n.get('victory'):
-        items.append(dict(group='招式（同上）', name='勝利', file=f"assets/characters/{n['id']}/victory.png", frames=4,
-            size='4 格橫排（每格 512×512）', prompt=npc_sprite(n, 4, f"victory pose animation: {n['victory']}")))
+    for i, (key, zh, fr, act) in enumerate(NPC_LEAN):
+        if i == 0:
+            pr = f"Pixel art enemy sprite strip for a 2D beat 'em up game: {n['desc']}. {act}, {fr} frames in one horizontal row. {NPC_STYLE}."
+        else:
+            pr = f"Same character as the attached image, same pixel art style and colors. {act}, {fr} frames in one horizontal row. {NPC_STYLE}."
+        items.append(dict(group='動作（像素風，一次一張；第二張起都上傳 idle）', name=zh, file=f"assets/characters/{n['id']}/{key}.png", frames=fr,
+            size=f"{fr} 格橫排", prompt=pr))
+    for key, zh, fr, act in n.get('lean_extra', []):
+        items.append(dict(group='招式（同上）', name=zh, file=f"assets/characters/{n['id']}/{key}.png", frames=fr, size=f"{fr} 格橫排",
+            prompt=f"Same character as the attached image, same pixel art style and colors. {act}, {fr} frames in one horizontal row. {NPC_STYLE}."))
     if n.get('boss'):
-        items.append(dict(group='畫面用圖（同上）', name='頭像（Boss 血條用）', file=f"assets/portraits/{n['id']}.png", size='正方形 1:1（512×512）',
-            prompt=f"{NPC_REF} Draw a head and shoulders portrait of this character, facing slightly right, menacing smug expression, simple {n['color']} gradient background, square image, the face fills most of the frame, no text. Art style: {STYLE}."))
+        items.append(dict(group='招式（同上）', name='頭像（大招橫幅用）', file=f"assets/portraits/{n['id']}.png", size='正方形',
+            prompt=f"Same character as the attached image: pixel art head and shoulders portrait, menacing smug face, simple {n['color']} background, square image, no text."))
     return items
 
 S1_SCENE = "Art style: " + STYLE.replace("realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art", "detailed 2D side-scrolling beat 'em up background art") + ". Straight-on flat front view (orthographic, no perspective vanishing point), no people, no characters, no text, no readable signs (use colored blocks instead of words)."

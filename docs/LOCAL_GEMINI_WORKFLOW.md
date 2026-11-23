@@ -78,11 +78,12 @@
 | 項目 | 存檔 | 要生的圖 | 狀態 |
 |---|---|---|---|
 | 陣頭小弟（小怪） | `characters/gang/` | 三視圖、idle、walk、attack1、hurt | ✅ 已完成 |
-| 抗議群眾（小怪） | `characters/protester/` | 三視圖、idle、walk、attack1、hurt | |
-| 偷拍狗仔（小王） | `characters/paparazzi/` | 三視圖、idle、walk、attack1、hurt、special_fwd（閃光偷拍） | |
-| 角頭樁腳王（Boss） | `characters/kingpin/`、`portraits/kingpin.png` | 三視圖、idle、walk、attack1、hurt、special_fwd（鞭炮陣）、special_up（衝撞）、super（鞭炮雨）、頭像 | |
+| 抗議群眾（小怪） | `characters/protester/` | idle、walk、attack1、hurt | |
+| 偷拍狗仔（小王） | `characters/paparazzi/` | idle、walk、attack1、hurt、special_fwd（閃光偷拍） | |
+| 角頭樁腳王（Boss） | `characters/kingpin/`、`portraits/kingpin.png` | idle、walk、attack1、hurt、special_fwd（鞭炮陣）、special_up（衝撞）、super（鞭炮雨）、頭像 | |
 | 第一關背景 | `scenery/` | `s1_sky`（天空）、`s1_street`（騎樓街屋）、`s1_apartment`（老公寓）、`s1_temple`（宮廟） | |
 
+- **敵人一律用簡單的 2D 像素風**（使用者要求：有辨識度就好、省用量），**不用三視圖、不用第零步說明**：開新對話直接貼 idle 的 prompt，之後每張都上傳那張 idle 當參考。陣頭小弟已經是漫畫風，保留不用重做。
 - 角色的 prompt 在 `docs/GEMINI_PROMPTS.md` 的「第 1 關」各節；背景的 prompt 在「劇情第一關背景」那一節。照抄不要改。
 - 背景圖存成 `incoming/<批次>/assets/scenery/s1_xxx.png`。街屋、公寓、宮廟要有綠幕（天空部分是純綠，遊戲會去背）；天空那張不用綠幕。
 - 背景不用三視圖，也不用第零步說明，直接開新對話貼 prompt 即可。
