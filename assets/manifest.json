@@ -554,7 +554,7 @@
         "sheet": "assets/characters/gang/idle.webp",
         "frames": 4
       },
-      "_standH": 615.0,
+      "_standH": 250.0,
       "attack1": {
         "sheet": "assets/characters/gang/attack1.webp",
         "frames": 3

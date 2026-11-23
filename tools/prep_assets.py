@@ -22,7 +22,8 @@ from PIL import Image
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / 'assets'
 CELL = 512          # Gemini 原圖每格寬
-SCALE = 0.5         # 輸出縮放
+SCALE = 0.5         # 沒有站立圖可參考時的輸出縮放
+STAND_PX = 250      # 輸出時角色站立的高度（像素）；不管 Gemini 原圖多大，都縮成這個大小
 PAD = 6             # 每格邊緣留白（輸出像素）
 # 各動作預設格數（跟 docs/GEMINI_PROMPTS.md 一樣）；Gemini 畫的格數不同時，用 FRAMES_HINT 指定
 EXPECTED = {'idle': 4, 'walk': 6, 'run': 6, 'jump': 2, 'attack1': 3, 'attack2': 3, 'attack3': 4, 'jump_attack': 2,
@@ -134,7 +135,7 @@ def frame_info(mask, body):
     return dict(left=int(xs.min()), right=int(xs.max()), top=top, feet=feet, cx=cx, area=int(body.sum()))
 
 
-def process_strip(path, cid, anim, pal, ref_area):
+def process_strip(path, cid, anim, pal, ref_area, base=None, abs_ref=None):
     img = Image.open(path)
     rgba = key_green(img)
     H, W = rgba.shape[:2]
@@ -161,7 +162,15 @@ def process_strip(path, cid, anim, pal, ref_area):
             auto = float(np.clip((ref_area / med) ** 0.5, 0.4, 2.5))
             if abs(auto - 1) < 0.06:
                 auto = 1.0
-    sc = SCALE * auto * STRIP_SCALE.get(f'{cid}/{anim}', 1.0)
+    if abs_ref:
+        # 這批沒有站立圖：直接跟遊戲裡已經有的站立圖比身體面積，算出縮放
+        med = float(np.median([f['area'] for _, f in frames])) or 1
+        base, auto = float(np.clip((abs_ref / med) ** 0.5, 0.05, 5)), 1.0
+    if base is None:
+        # 站立圖：依第一格的身高決定這個角色的縮放，讓站立高度＝STAND_PX
+        h0 = frames[0][1]['feet'] - frames[0][1]['top']
+        base = STAND_PX / h0 if anim == 'idle' and h0 > 0 else SCALE
+    sc = base * auto * STRIP_SCALE.get(f'{cid}/{anim}', 1.0)
     half = max(max(f['cx'] - f['left'], f['right'] - f['cx']) for _, f in frames)
     up = max(f['feet'] - f['top'] for _, f in frames)
     ow = int(np.ceil((2 * half + 2) * sc)) + 2 * PAD
@@ -178,7 +187,7 @@ def process_strip(path, cid, anim, pal, ref_area):
     if anim == 'idle':
         stand = (frames[0][1]['feet'] - frames[0][1]['top']) * sc
     area = float(np.median([f['area'] for _, f in frames]))
-    return strip, len(frames), stand, auto, smart, area
+    return strip, len(frames), stand, auto, smart, area, base
 
 
 def crop_transparent(im, pad=8):
@@ -205,16 +214,23 @@ def main(dirs):
             outdir = OUT / 'characters' / cid
             outdir.mkdir(parents=True, exist_ok=True)
             files = sorted(cdir.glob('*.png'), key=lambda p: (p.stem != 'idle', p.stem))
-            pal, ref_area = None, None
+            pal, ref_area, base, abs_ref = None, None, None, None
             if files and files[0].stem == 'idle':
                 pal = build_palette(key_green(Image.open(files[0])))
+            elif files and (outdir / 'idle.webp').exists() and 'idle' in entry:
+                # 只補幾個動作：拿遊戲裡現有的站立圖當大小基準
+                arr = np.asarray(Image.open(outdir / 'idle.webp').convert('RGBA'))
+                pal = build_palette(arr)
+                k = entry['idle']['frames']
+                fw = arr.shape[1] // k
+                abs_ref = float(np.median([body_mask(arr[:, i * fw:(i + 1) * fw], pal).sum() for i in range(k)]))
             for f in files:
                 anim = f.stem
-                res = process_strip(f, cid, anim, pal, ref_area)
+                res = process_strip(f, cid, anim, pal, ref_area, base, abs_ref)
                 if not res:
                     print('  略過（沒有內容）', f)
                     continue
-                strip, n, stand, auto, smart, area = res
+                strip, n, stand, auto, smart, area, base = res
                 if anim == 'idle':
                     ref_area = area
                 print(f'    縮放 {auto:.2f}' + ('' if smart else '（平均切格）'), end='')
