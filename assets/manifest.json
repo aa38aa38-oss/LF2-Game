@@ -548,6 +548,25 @@
         "sheet": "assets/characters/guan/walk.webp",
         "frames": 8
       }
+    },
+    "gang": {
+      "idle": {
+        "sheet": "assets/characters/gang/idle.webp",
+        "frames": 4
+      },
+      "_standH": 615.0,
+      "attack1": {
+        "sheet": "assets/characters/gang/attack1.webp",
+        "frames": 3
+      },
+      "hurt": {
+        "sheet": "assets/characters/gang/hurt.webp",
+        "frames": 2
+      },
+      "walk": {
+        "sheet": "assets/characters/gang/walk.webp",
+        "frames": 6
+      }
     }
   },
   "posters": {
