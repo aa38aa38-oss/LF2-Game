@@ -720,6 +720,10 @@
       "special_fwd": {
         "sheet": "assets/characters/troll/special_fwd.webp",
         "frames": 4
+      },
+      "attack1": {
+        "sheet": "assets/characters/troll/attack1.webp",
+        "frames": 3
       }
     },
     "tycoon": {
