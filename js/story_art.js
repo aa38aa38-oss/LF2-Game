@@ -1,6 +1,7 @@
 // 劇情模式第一關「議員選舉」的程式繪圖背景（之後可換成 Gemini 圖）
 // 世界座標：畫面 y = 322 + z - 高度。一樓街道 z 0～186，二樓陽台 z -210～-130，頂樓 z -470～-390
 import { FONT_TC } from './util.js';
+import { ASSETS } from './assets.js';
 
 const FY = 322;
 const hash = (i) => {
@@ -387,12 +388,44 @@ export function gateLine(ctx, x, open, t) {
   ctx.fillText('得票不足禁止通行', x, FY - 32);
 }
 
+// ───── Gemini 背景圖（有圖就用圖，沒有就用上面程式畫的） ─────
+// s1_sky：天空＋遠方城市（視差捲動，左右重複）
+// s1_street：騎樓街屋立面（左右重複，底部＝地面）
+// s1_apartment：老公寓立面＋頂樓加蓋（底部＝地面，樓頂高度對齊頂樓地板）
+// s1_temple：宮廟正面（底部＝地面）
+function imgSky(ctx, x0, x1, cam, img) {
+  const H = 1100, W = (img.width * H) / img.height, off = cam.x * 0.55;
+  for (let i = Math.floor((x0 - off) / W) - 1; i * W + off < x1; i++) ctx.drawImage(img, off + i * W, FY + 40 - H, W + 1, H);
+}
+function imgStrip(ctx, x0, x1, a, b, img, h) {
+  const W = (img.width * h) / img.height;
+  for (let x = a; x < b; x += W) {
+    if (x + W < x0 || x > x1) continue;
+    const w = Math.min(W, b - x);
+    ctx.drawImage(img, 0, 0, (img.width * w) / W, img.height, x, FY - h, w, h);
+  }
+}
+function imgBox(ctx, x0, x1, img, x, w, top) {
+  if (x + w < x0 || x > x1) return;
+  ctx.drawImage(img, x, top, w, FY - top);
+}
+
 export function drawStage1(ctx, t, x0, x1, L, cam, gateOpen) {
-  sky(ctx, x0, x1, cam);
-  shophouses(ctx, x0, x1, 0, L.apt.x0 + 20, t);
-  shophouses(ctx, x0, x1, L.apt.x1 - 10, L.temple.x - 120, t);
-  apartment(ctx, x0, x1, L.apt);
-  temple(ctx, x0, x1, L.temple.x, t);
+  const S = ASSETS.scenery;
+  if (S.s1_sky) imgSky(ctx, x0, x1, cam, S.s1_sky);
+  else sky(ctx, x0, x1, cam);
+  if (S.s1_street) {
+    imgStrip(ctx, x0, x1, 0, L.apt.x0 + 20, S.s1_street, 470);
+    imgStrip(ctx, x0, x1, L.apt.x1 - 10, L.temple.x - 120, S.s1_street, 470);
+  } else {
+    shophouses(ctx, x0, x1, 0, L.apt.x0 + 20, t);
+    shophouses(ctx, x0, x1, L.apt.x1 - 10, L.temple.x - 120, t);
+  }
+  // 公寓：圖的上緣 = 頂樓加蓋的屋頂（頂樓地板往上 150）
+  if (S.s1_apartment) imgBox(ctx, x0, x1, S.s1_apartment, L.apt.x0, L.apt.x1 - L.apt.x0, FY + L.apt.roofZ - 150);
+  else apartment(ctx, x0, x1, L.apt);
+  if (S.s1_temple) imgBox(ctx, x0, x1, S.s1_temple, L.temple.x - 160, 1080, FY - 470);
+  else temple(ctx, x0, x1, L.temple.x, t);
   street(ctx, x0, x1, 0, L.floors[0].xMax + 60);
   street(ctx, x0, x1, L.floors[0].xMax + 60, L.floors[3].xMin, false);
   street(ctx, x0, x1, L.floors[3].xMin, L.worldW, true);

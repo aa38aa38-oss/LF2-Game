@@ -267,6 +267,18 @@ def main(dirs):
             im.save(OUT / 'select' / f'{f.stem}.webp', 'WEBP', quality=88, method=4)
             man['select'][f.stem] = f'assets/select/{f.stem}.webp'
             print('  select', f.stem)
+        # 劇情關卡的背景元件（街屋、公寓、宮廟有綠幕：去背；天空不去背）
+        for f in sorted((src / 'scenery').glob('*.png')) if (src / 'scenery').is_dir() else []:
+            if f.stem.endswith('_sky'):
+                im = Image.open(f).convert('RGB')
+            else:
+                im = Image.fromarray(key_green(Image.open(f)))
+            if im.width > 2400:
+                im = im.resize((2400, round(im.height * 2400 / im.width)), Image.LANCZOS)
+            (OUT / 'scenery').mkdir(exist_ok=True)
+            im.save(OUT / 'scenery' / f'{f.stem}.webp', 'WEBP', quality=86, method=4)
+            man.setdefault('scenery', {})[f.stem] = f'assets/scenery/{f.stem}.webp'
+            print('  scenery', f.stem, im.size)
         # 場景、首頁、開場（不去背）
         for f in sorted((src / 'stages').glob('*.png')) if (src / 'stages').is_dir() else []:
             im = Image.open(f).convert('RGB').resize((1920, 1080), Image.LANCZOS)

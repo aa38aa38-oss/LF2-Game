@@ -57,6 +57,15 @@
 
 ---
 
+## 自動模式（使用者已同意）
+
+使用者希望**不要一直確認**，一次自動完成整關的圖。規則：
+- 不用給使用者看三視圖或任何中間結果，照清單一路做到底
+- 每張生好就自己判斷：角色有沒有面向右、背景是不是純綠、格數大致對、畫風跟主角一致。明顯不對就在同一個 Gemini 對話請它重畫（同一張最多重試 2 次），還是不行就跳過、記下來
+- 全部做完後：`python tools/prep_assets.py incoming/<批次>` → 開本機伺服器進遊戲跑一遍劇情模式第一關，截 3～4 張關鍵畫面（街道小怪、頂樓小王、宮廟 Boss）
+- 截圖沒問題就直接 `git pull` → commit → push 到 main 和 gh-pages，最後**一次**回報：做了哪些、跳過哪些、遊戲截圖
+- Gemini 當天額度用完就停，回報停在哪一張，下次從那張繼續
+
 ## 要生哪些圖（精簡版，以省用量為主）
 
 遊戲有「缺的動作自動用最接近的頂替」，所以敵人只要生關鍵的幾張：
@@ -64,16 +73,21 @@
 - `attack1` 頂替第二、三下攻擊和特技；`hurt` 頂替被打飛、倒地
 - 一定要有 `idle`（其他動作的大小以它為基準）
 
-| 敵人 | ID | 要生的圖 | 狀態 |
-|---|---|---|---|
-| 陣頭小弟（小怪） | `gang` | 三視圖、idle、walk、attack1、hurt | ✅ 已完成 |
-| 抗議群眾（小怪） | `protester` | 三視圖、idle、walk、attack1、hurt | |
-| 偷拍狗仔（小王） | `paparazzi` | 三視圖、idle、walk、attack1、hurt、special_fwd（閃光偷拍） | |
-| 角頭樁腳王（Boss） | `kingpin` | 三視圖、idle、walk、attack1、hurt、special_fwd（鞭炮陣）、special_up（衝撞）、super（鞭炮雨）、頭像 | |
+### 第一關（議員選舉）全部清單
 
-prompt 都在 `docs/GEMINI_PROMPTS.md` 對應的「第 1 關」各節，照抄不要改。
+| 項目 | 存檔 | 要生的圖 | 狀態 |
+|---|---|---|---|
+| 陣頭小弟（小怪） | `characters/gang/` | 三視圖、idle、walk、attack1、hurt | ✅ 已完成 |
+| 抗議群眾（小怪） | `characters/protester/` | 三視圖、idle、walk、attack1、hurt | |
+| 偷拍狗仔（小王） | `characters/paparazzi/` | 三視圖、idle、walk、attack1、hurt、special_fwd（閃光偷拍） | |
+| 角頭樁腳王（Boss） | `characters/kingpin/`、`portraits/kingpin.png` | 三視圖、idle、walk、attack1、hurt、special_fwd（鞭炮陣）、special_up（衝撞）、super（鞭炮雨）、頭像 | |
+| 第一關背景 | `scenery/` | `s1_sky`（天空）、`s1_street`（騎樓街屋）、`s1_apartment`（老公寓）、`s1_temple`（宮廟） | |
+
+- 角色的 prompt 在 `docs/GEMINI_PROMPTS.md` 的「第 1 關」各節；背景的 prompt 在「劇情第一關背景」那一節。照抄不要改。
+- 背景圖存成 `incoming/<批次>/assets/scenery/s1_xxx.png`。街屋、公寓、宮廟要有綠幕（天空部分是純綠，遊戲會去背）；天空那張不用綠幕。
+- 背景不用三視圖，也不用第零步說明，直接開新對話貼 prompt 即可。
 
 ### 之後（可選）：六位主角的「迴旋攻擊」
 每人一張 `spin.png`（4 格），目前借用踢腿圖，不補也能玩。
-角色 ID：`su`（衝衝院長）、`wang`（堅哥）、`han`（發大財議長）、`ma`（慢跑總統）、`ko`（阿北）、`guan`（館長）。
+角色 ID：`su`、`wang`、`han`、`ma`、`ko`、`guan`。
 只補單張動作也沒關係，`prep_assets.py` 會拿遊戲裡現有的站立圖當大小基準。

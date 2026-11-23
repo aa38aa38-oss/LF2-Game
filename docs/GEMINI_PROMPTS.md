@@ -1786,6 +1786,32 @@ Use the attached three-view character sheet as the exact reference: same face, s
 
 ## 共用畫面（場景、首頁、開場）
 
+### 劇情第一關背景（4 張，生好放 assets/scenery/）
+
+**天空與遠方城市**　存檔：`assets/scenery/s1_sky.png`　尺寸：16:9（1920×1080）
+
+```
+A dusk sky over a Taiwanese city for a game background: deep purple at the top fading to warm orange and pink near the bottom, a few stars, a distant dark-purple city skyline silhouette with small lit windows along the bottom 30 percent, the left and right edges connect seamlessly when tiled. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, detailed 2D side-scrolling beat 'em up background art. Straight-on flat front view (orthographic, no perspective vanishing point), no people, no characters, no text, no readable signs (use colored blocks instead of words). Wide 16:9, no green screen.
+```
+
+**騎樓老街街屋（會左右重複）**　存檔：`assets/scenery/s1_street.png`　尺寸：3:1 超寬（2400×800）
+
+```
+A long row of old 3-to-4-story Taiwanese shophouses seen straight from the front, pastel concrete walls, metal window grilles, AC units, vertical shop signboards in red, yellow and blue with color blocks instead of text, red paper lanterns, election campaign flags hanging, and a covered arcade walkway (qilou) along the bottom 20 percent of the image. The bottom edge of the image is the ground line. Everything above the rooftops is plain solid pure green (#00FF00) for transparency. The left and right edges must connect seamlessly when tiled. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, detailed 2D side-scrolling beat 'em up background art. Straight-on flat front view (orthographic, no perspective vanishing point), no people, no characters, no text, no readable signs (use colored blocks instead of words). Very wide 3:1 image.
+```
+
+**菜市場老公寓（有頂樓加蓋）**　存檔：`assets/scenery/s1_apartment.png`　尺寸：約 2.7:1 超寬（2400×900）
+
+```
+The flat front facade of a wide old 5-story Taiwanese apartment building seen straight on. Layout from top to bottom: the top 24 percent is the rooftop area above a flat roof line, with an illegal corrugated tin rooftop shack on the left, a blue water tower on the right and TV antennas, and plain solid pure green (#00FF00) sky behind them; below the roof line are grey tiled walls with windows and metal grilles; between 64 and 80 percent height a long open-air corridor balcony runs across the full width with doors and windows behind it; the bottom 20 percent is a ground-floor traditional street market with colorful red, blue, green and yellow umbrellas and stalls. The bottom edge of the image is the ground line. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, detailed 2D side-scrolling beat 'em up background art. Straight-on flat front view (orthographic, no perspective vanishing point), no people, no characters, no text, no readable signs (use colored blocks instead of words). Very wide image, about 2.7 to 1.
+```
+
+**宮廟正面（Boss 戰）**　存檔：`assets/scenery/s1_temple.png`　尺寸：約 2.3:1 寬（2400×1040）
+
+```
+The front of a colorful traditional Taiwanese folk temple seen straight on: red walls and pillars, carved dragon columns, an ornate roof with green and yellow glazed tiles and upswept swallowtail ridges decorated with figurines, a big wooden main door in the center with a golden plaque (color block, no readable text), strings of red lanterns, a large bronze incense burner in front with smoke. The bottom edge of the image is the ground line. Everything above and around the temple is plain solid pure green (#00FF00) for transparency. Art style: clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, detailed 2D side-scrolling beat 'em up background art. Straight-on flat front view (orthographic, no perspective vanishing point), no people, no characters, no text, no readable signs (use colored blocks instead of words). Wide image, about 2.3 to 1.
+```
+
 ### 場景背景
 
 **立法院議場**　存檔：`assets/stages/legislature.png`　尺寸：16:9（1920×1080）

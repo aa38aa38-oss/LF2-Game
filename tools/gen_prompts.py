@@ -276,6 +276,18 @@ def npc_sections(n):
             prompt=f"{NPC_REF} Draw a head and shoulders portrait of this character, facing slightly right, menacing smug expression, simple {n['color']} gradient background, square image, the face fills most of the frame, no text. Art style: {STYLE}."))
     return items
 
+S1_SCENE = "Art style: " + STYLE.replace("realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art", "detailed 2D side-scrolling beat 'em up background art") + ". Straight-on flat front view (orthographic, no perspective vanishing point), no people, no characters, no text, no readable signs (use colored blocks instead of words)."
+COMMON_S1 = [
+  dict(group='劇情第一關背景（4 張，生好放 assets/scenery/）', name='天空與遠方城市', file='assets/scenery/s1_sky.png', size='16:9（1920×1080）',
+    prompt=f"A dusk sky over a Taiwanese city for a game background: deep purple at the top fading to warm orange and pink near the bottom, a few stars, a distant dark-purple city skyline silhouette with small lit windows along the bottom 30 percent, the left and right edges connect seamlessly when tiled. {S1_SCENE} Wide 16:9, no green screen."),
+  dict(group='劇情第一關背景（4 張，生好放 assets/scenery/）', name='騎樓老街街屋（會左右重複）', file='assets/scenery/s1_street.png', size='3:1 超寬（2400×800）',
+    prompt=f"A long row of old 3-to-4-story Taiwanese shophouses seen straight from the front, pastel concrete walls, metal window grilles, AC units, vertical shop signboards in red, yellow and blue with color blocks instead of text, red paper lanterns, election campaign flags hanging, and a covered arcade walkway (qilou) along the bottom 20 percent of the image. The bottom edge of the image is the ground line. Everything above the rooftops is plain solid pure green (#00FF00) for transparency. The left and right edges must connect seamlessly when tiled. {S1_SCENE} Very wide 3:1 image."),
+  dict(group='劇情第一關背景（4 張，生好放 assets/scenery/）', name='菜市場老公寓（有頂樓加蓋）', file='assets/scenery/s1_apartment.png', size='約 2.7:1 超寬（2400×900）',
+    prompt=f"The flat front facade of a wide old 5-story Taiwanese apartment building seen straight on. Layout from top to bottom: the top 24 percent is the rooftop area above a flat roof line, with an illegal corrugated tin rooftop shack on the left, a blue water tower on the right and TV antennas, and plain solid pure green (#00FF00) sky behind them; below the roof line are grey tiled walls with windows and metal grilles; between 64 and 80 percent height a long open-air corridor balcony runs across the full width with doors and windows behind it; the bottom 20 percent is a ground-floor traditional street market with colorful red, blue, green and yellow umbrellas and stalls. The bottom edge of the image is the ground line. {S1_SCENE} Very wide image, about 2.7 to 1."),
+  dict(group='劇情第一關背景（4 張，生好放 assets/scenery/）', name='宮廟正面（Boss 戰）', file='assets/scenery/s1_temple.png', size='約 2.3:1 寬（2400×1040）',
+    prompt=f"The front of a colorful traditional Taiwanese folk temple seen straight on: red walls and pillars, carved dragon columns, an ornate roof with green and yellow glazed tiles and upswept swallowtail ridges decorated with figurines, a big wooden main door in the center with a golden plaque (color block, no readable text), strings of red lanterns, a large bronze incense burner in front with smoke. The bottom edge of the image is the ground line. Everything above and around the temple is plain solid pure green (#00FF00) for transparency. {S1_SCENE} Wide image, about 2.3 to 1."),
+]
+
 COMMON = [
   dict(group='場景背景', name='立法院議場', file='assets/stages/legislature.png', size='16:9（1920×1080）',
     prompt=f"{STYLE}, side-scrolling beat 'em up stage background, interior of a parliament assembly hall, wooden walls, a raised speaker's podium in the center, two electronic voting result boards, rows of wooden desks with microphones along the back, press gallery balcony with camera flashes, the lower 46 percent of the image is an open empty teal carpet floor in perspective with a few scattered papers, the left and right edges should connect seamlessly when tiled, wide 16:9, no characters, no text"),
@@ -298,7 +310,7 @@ COMMON = [
 ]
 
 def build():
-    data = {'chars': [], 'common': COMMON}
+    data = {'chars': [], 'common': COMMON_S1 + COMMON}
     for c in CHARS:
         data['chars'].append({'id': c['id'], 'title': c['title'], 'quote': c['quote'], 'items': char_sections(c)})
     for n in NPCS:
