@@ -609,6 +609,37 @@
         "sheet": "assets/characters/protester/walk.webp",
         "frames": 4
       }
+    },
+    "kingpin": {
+      "idle": {
+        "sheet": "assets/characters/kingpin/idle.webp",
+        "frames": 4
+      },
+      "_standH": 250.0,
+      "attack1": {
+        "sheet": "assets/characters/kingpin/attack1.webp",
+        "frames": 3
+      },
+      "hurt": {
+        "sheet": "assets/characters/kingpin/hurt.webp",
+        "frames": 2
+      },
+      "special_fwd": {
+        "sheet": "assets/characters/kingpin/special_fwd.webp",
+        "frames": 4
+      },
+      "special_up": {
+        "sheet": "assets/characters/kingpin/special_up.webp",
+        "frames": 4
+      },
+      "super": {
+        "sheet": "assets/characters/kingpin/super.webp",
+        "frames": 4
+      },
+      "walk": {
+        "sheet": "assets/characters/kingpin/walk.webp",
+        "frames": 6
+      }
     }
   },
   "posters": {
@@ -625,7 +656,8 @@
     "ko": "assets/portraits/ko.webp",
     "su": "assets/portraits/su.webp",
     "ma": "assets/portraits/ma.webp",
-    "guan": "assets/portraits/guan.webp"
+    "guan": "assets/portraits/guan.webp",
+    "kingpin": "assets/portraits/kingpin.webp"
   },
   "select": {
     "han": "assets/select/han.webp"
@@ -640,5 +672,11 @@
     "rally": "assets/stages/rally.jpg",
     "studio": "assets/stages/studio.jpg",
     "title": "assets/stages/title.jpg"
+  },
+  "scenery": {
+    "s1_apartment": "assets/scenery/s1_apartment.webp",
+    "s1_sky": "assets/scenery/s1_sky.webp",
+    "s1_street": "assets/scenery/s1_street.webp",
+    "s1_temple": "assets/scenery/s1_temple.webp"
   }
 }

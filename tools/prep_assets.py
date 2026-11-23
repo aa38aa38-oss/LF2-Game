@@ -29,9 +29,9 @@ PAD = 6             # 每格邊緣留白（輸出像素）
 EXPECTED = {'idle': 4, 'walk': 6, 'run': 6, 'jump': 2, 'attack1': 3, 'attack2': 3, 'attack3': 4, 'jump_attack': 2,
             'run_attack': 3, 'defend': 1, 'hurt': 2, 'fall': 3, 'down': 1, 'getup': 2, 'dizzy': 3, 'roll': 4,
             'catch': 2, 'victory': 4, 'spin': 4, 'special': 4, 'special_fwd': 4, 'special_up': 4, 'special_down': 4, 'super': 6}
-FRAMES_HINT = {'protester/walk': 4, 'guan/walk': 8, 'guan/run': 8, 'guan/super': 8}
+FRAMES_HINT = {'protester/walk': 4, 'kingpin/hurt': 4, 'kingpin/super': 4, 'guan/walk': 8, 'guan/run': 8, 'guan/super': 8}
 # 只用其中幾格（原圖有幾格人形疊在一起、切不開時用）
-FRAME_PICK = {'guan/run': [0, 1, 2, 3, 6, 7]}
+FRAME_PICK = {'kingpin/hurt': [0, 1], 'guan/run': [0, 1, 2, 3, 6, 7]}
 STRIP_SCALE = {}    # 某條動作畫得特別大／小時，可手動縮放，例如 {'han/roll': 0.8}
 
 
@@ -48,6 +48,30 @@ def key_green(img):
     alpha[mid] = (255 * (1 - (ex[mid] - soft) / (hard - soft))).astype(np.int16)
     g2 = np.where(ex > 0, m, g)
     out = np.dstack([r, g2, b, alpha]).clip(0, 255).astype(np.uint8)
+    return out
+
+
+def key_green_outside(img):
+    """背景用：只去掉跟圖片邊緣連在一起的綠幕；被線條包住的綠色（例如宮廟的綠色琉璃瓦）保留原色。"""
+    from PIL import ImageDraw
+    src = np.asarray(img.convert('RGB'))
+    out = key_green(img)
+    hole = Image.fromarray(np.where(out[..., 3] < 128, 255, 0).astype(np.uint8)).copy()  # copy：fromarray 的圖是唯讀，floodfill 會沒作用
+    W, H = hole.size
+    for x in range(0, W, 4):
+        for y in (0, H - 1):
+            if hole.getpixel((x, y)) == 255:
+                ImageDraw.floodfill(hole, (x, y), 128)
+    for y in range(0, H, 4):
+        for x in (0, W - 1):
+            if hole.getpixel((x, y)) == 255:
+                ImageDraw.floodfill(hole, (x, y), 128)
+    # 被包住、但顏色是純綠幕（亮綠）的空隙（例如水塔腳中間）仍然去背
+    s = src.astype(np.int16)
+    screen = (s[..., 1] > 190) & (s[..., 0] < 110) & (s[..., 2] < 110)
+    inner = (np.asarray(hole) == 255) & ~screen
+    out[inner, :3] = src[inner]
+    out[inner, 3] = 255
     return out
 
 
@@ -272,7 +296,7 @@ def main(dirs):
             if f.stem.endswith('_sky'):
                 im = Image.open(f).convert('RGB')
             else:
-                im = Image.fromarray(key_green(Image.open(f)))
+                im = Image.fromarray(key_green_outside(Image.open(f)))
             if im.width > 2400:
                 im = im.resize((2400, round(im.height * 2400 / im.width)), Image.LANCZOS)
             (OUT / 'scenery').mkdir(exist_ok=True)
