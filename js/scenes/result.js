@@ -71,7 +71,8 @@ export class ResultScene {
   choose(i) {
     const g = this.g;
     g.audio.sfx('confirm');
-    if (i === 0) g.goVS({ ...this.d.cfg });
+    const cfg = this.d.cfg;
+    if (i === 0) cfg.mode === 'shaft' ? g.startShaft({ ...cfg, rivals: null }) : cfg.mode === 'story' ? g.startStory({ playerChar: cfg.playerChar, difficulty: cfg.difficulty }) : g.goVS({ ...cfg });
     else if (i === 1) g.goCharSelect();
     else g.goTitle();
   }

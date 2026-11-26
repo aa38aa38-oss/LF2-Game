@@ -409,5 +409,147 @@ Object.assign(MOVES, {
     super: MOVES.kingpin.super,
   },
 });
-// 幕後藏鏡人（第三關小王）沿用角頭樁腳王的招式（叫小弟會依關卡換成該關的小弟）
-MOVES.mastermind = MOVES.kingpin;
+// 幕後藏鏡人（第三關小王）：特技沿用角頭樁腳王（叫小弟會依關卡換成該關的小弟），大絕自己一套
+MOVES.mastermind = { ...MOVES.kingpin };
+
+// ───────── 小王、Boss 的大絕：每個人都不一樣 ─────────
+const target = (f, b) => b.nearestEnemy(f);
+Object.assign(MOVES.paparazzi, {
+  // 狗仔連拍：鏡頭一直追著你閃（每一下都會暈＋扣票），要一直跑位
+  super: {
+    dur: 2.4, aiRange: 600,
+    update(f, b) {
+      f.vx = f.vz = 0;
+      const t = target(f, b);
+      if (t) f.facing = sign(t.x - f.x) || f.facing;
+      f.mv.c = (f.mv.c || 0.5) - 1 / 60;
+      if (f.mv.c > 0 || f.stateT > 2.1) return;
+      f.mv.c = 0.38;
+      if (!t) return;
+      // 閃光打在「你剛剛站的位置」：一直移動就躲得掉
+      const x = f.mv.px != null ? f.mv.px : t.x, z = f.mv.pz != null ? f.mv.pz : t.z;
+      f.mv.px = t.x;
+      f.mv.pz = t.z;
+      b.sfx('camera');
+      b.fx.add({ type: 'ring', x, z, y: 60, life: 0.3, r: 120, color: '#ffffff' });
+      b.fx.add({ type: 'headflash', x, z, y: 90, dir: f.facing, life: 0.3 });
+      b.fx.add({ type: 'text', x, z, y: 150, text: pick(['喀嚓！', '獨家！', '拍到了！']), color: '#ffffff', size: 20, life: 0.6 });
+      for (const e of b.enemiesOf(f)) {
+        if (Math.abs(e.x - x) < 70 && Math.abs(e.z - z) < 30 && e.y < 40) b.applyHit(f, e, { dmg: 4, dizzy: 0.5, kb: 0, fall: 0, unblockable: true, scandal: 500, proj: true, dir: sign(e.x - f.x) || 1 });
+      }
+    },
+    pose: (f, T, t) => ({ aF: [1.6, 0.2], aB: [1.3, 0.4], prop: 'phone', tilt: Math.sin(t * 20) * 0.05, expr: 'smile' }),
+  },
+});
+Object.assign(MOVES.troll, {
+  // 網軍出征：一排排留言從畫面另一邊橫掃過來（跳起來或換前後位置躲）
+  super: {
+    dur: 2.2, aiRange: 900,
+    start(f, b) {
+      b.fx.add({ type: 'comment', text: '兄弟們，出征！', y: 150, life: 2 });
+    },
+    update(f, b) {
+      f.vx = f.vz = 0;
+      const t = target(f, b);
+      if (!t) return;
+      for (const [k, at] of [['a', 0.3], ['b', 0.9], ['c', 1.5]]) {
+        if (f.mv[k] || f.stateT < at) continue;
+        f.mv[k] = true;
+        b.sfx('sound');
+        const dir = sign(t.x - f.x) || 1;
+        const x = dir > 0 ? b.cam.x - 60 : b.cam.x + (b.viewW || 960) + 60;
+        const F = t.bounds || { zMin: 0, zMax: 186 };
+        // 每一排留下一個空隙，不然躲不掉
+        const lanes = 4, gap = Math.floor(Math.random() * lanes);
+        for (let i = 0; i < lanes; i++) {
+          if (i === gap) continue;
+          const z = F.zMin + ((i + 0.5) * (F.zMax - F.zMin)) / lanes;
+          b.spawnProj({
+            owner: f, kind: 'comment', text: pick(['下去！', '1450', '帶風向', '已檢舉', '笑死', '去死啦']), x, z, y: 40, vx: dir * 560,
+            life: 3, offOK: true, w: 34, zr: ((F.zMax - F.zMin) / lanes) * 0.5, h: 30, dmg: 5, stun: 0.35, kb: 120, pierce: true, noClash: true,
+          });
+        }
+      }
+    },
+    pose: (f, T, t) => ({ aF: [1.5, 0.3 + Math.sin(t * 30) * 0.12], aB: [1.2, 0.5 + Math.sin(t * 28) * 0.12], prop: 'phone', expr: 'smile' }),
+  },
+});
+Object.assign(MOVES.influencer, {
+  // 抖內愛心雨：愛心往上撒再追著你飛，自己還會被抖內回血
+  super: {
+    dur: 2, aiRange: 700,
+    start(f, b) {
+      b.fx.add({ type: 'live', life: 2.2 });
+    },
+    update(f, b) {
+      f.vx = f.vz = 0;
+      const t = target(f, b);
+      f.mv.c = (f.mv.c || 0) - 1 / 60;
+      if (f.mv.c > 0 || f.stateT > 1.6 || !t) return;
+      f.mv.c = 0.2;
+      b.sfx('coin');
+      b.spawnProj({
+        owner: f, kind: 'heart', x: f.x + rand(-30, 30), z: f.z, y: f.y + 120, vx: rand(-200, 200), vz: rand(-120, 120), vy: 0,
+        homing: t, life: 2.4, w: 20, zr: 18, h: 30, dmg: 4, stun: 0.3, kb: 60, noClash: true,
+      });
+      f.heal(f.maxHp * 0.015, f.maxHp * 0.015);
+      b.fx.add({ type: 'text', x: f.x + rand(-60, 60), z: f.z, y: 170, text: pick(['抖內 $100', '抖內 $500', '❤ 愛心 x10', '抖內 $1000']), color: '#ff7ad8', size: 14, life: 0.8 });
+    },
+    pose: (f, T, t) => ({ aF: [2.4 + Math.sin(t * 10) * 0.3, 0.3], aB: [1.4, 0.5], prop: 'phone', expr: 'smile' }),
+  },
+});
+MOVES.tycoon.super = {
+  // 金權推土機：先撒一排鈔票，接著推土機從後面整排輾過來（要跳過去）
+  dur: 2.4, aiRange: 900,
+  update(f, b) {
+    f.vx = f.vz = 0;
+    const t = target(f, b);
+    if (!f.mv.say) {
+      f.mv.say = true;
+      b.fx.add({ type: 'text', x: f.x, z: f.z, y: 170, text: '這塊地，我要了！', color: '#ffd84a', size: 24, life: 1.4 });
+    }
+    f.mv.c = (f.mv.c || 0) - 1 / 60;
+    if (f.mv.c <= 0 && f.stateT < 1.2 && t) {
+      f.mv.c = 0.12;
+      b.spawnProj({ owner: f, kind: 'coin', x: t.x + rand(-140, 140), z: t.z + rand(-20, 20), y: 420, vy: -150, gravity: 1300, life: 3, w: 16, zr: 16, h: 24, dmg: 2, stun: 0.2, kb: 20, vanishOnGround: true, noClash: true });
+    }
+    if (!f.mv.dozer && f.stateT > 1 && t) {
+      f.mv.dozer = true;
+      const dir = sign(t.x - f.x) || 1;
+      b.say('推土機來了！跳！', 1, '#ffd84a');
+      b.sfx('cutin');
+      b.spawnProj({
+        owner: f, kind: 'bulldozer', x: dir > 0 ? b.cam.x - 160 : b.cam.x + (b.viewW || 960) + 160, z: t.z, y: 0, vx: dir * 620,
+        life: 3.2, offOK: true, w: 80, zr: 46, h: 30, dmg: 18, knock: true, launch: 380, kb: 420, unblockable: true, pierce: true, noClash: true,
+      });
+    }
+  },
+  pose: (f, T, t) => ({ aF: [2.6 + Math.sin(t * 12) * 0.3, 0.2], aB: [2.4, 0.2], expr: 'smile' }),
+};
+MOVES.mastermind.super = {
+  // 黑手操盤：腳下出現紅色準星（會跟著你），一秒後黑手從天而降，連續四次
+  dur: 3.2, aiRange: 1000,
+  update(f, b) {
+    f.vx = f.vz = 0;
+    const t = target(f, b);
+    if (!t) return;
+    // 準星出現 0.75 秒後黑手落下（自己記時間，不靠場景的計時器）
+    f.mv.pend = f.mv.pend || [];
+    for (const m of f.mv.pend) {
+      if (m.done || f.stateT < m.at) continue;
+      m.done = true;
+      b.spawnProj({
+        owner: f, kind: 'blackhand', x: m.x, z: m.z, y: 360, vy: -1100, gravity: 600, life: 2, w: 40, zr: 30, h: 80, dmg: 14, knock: true, launch: 340, kb: 200, unblockable: true, noClash: true, vanishOnGround: true,
+        landBlast: { r: 80, zr: 34, dmg: 8, knock: true, launch: 300, kb: 200, unblockable: true },
+      });
+    }
+    f.mv.c = (f.mv.c || 0.2) - 1 / 60;
+    if (f.mv.c > 0 || f.mv.pend.length >= 4) return;
+    f.mv.c = 0.6;
+    const x = t.x + (t.vx || 0) * 0.3, z = t.z;
+    f.mv.pend.push({ at: f.stateT + 0.75, x, z });
+    b.spawnProj({ owner: f, kind: 'mark', x, z, y: 0, life: 0.85, nohit: true, noClash: true, w: 0 });
+    b.sfx('cutin');
+  },
+  pose: (f, T, t) => ({ aF: [2.2, 0.6 + Math.sin(t * 6) * 0.3], aB: [2.0, 0.4 + Math.cos(t * 6) * 0.3], expr: 'smile' }),
+};

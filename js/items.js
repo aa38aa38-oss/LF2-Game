@@ -1,16 +1,27 @@
-// 場上道具：目前只剩補血品（走過去自動吃）；武器的資料保留但不會出現（weight 0）
-// food：撿到立即使用；light：輕武器（拿在手上揮、跑步/跳躍中按攻擊丟出）；
+// 場上道具：補血品（走過去自動吃）、武器（主要角色站在旁邊按攻擊撿起來）
+// food：撿到立即使用；light：輕武器（拿在手上揮、跳躍中按攻擊丟出；dur＝能打中幾下，用完會爆掉）；
 // throw：只能丟（雞蛋）；heavy：重物（舉在頭上，按攻擊丟出）
 import { ARENA, rand, pick } from './util.js';
+import { ASSETS } from './assets.js';
+
+// 武器有 Gemini 圖（assets/scenery/prop_w_<種類>.webp）就用圖；這是圖在遊戲裡的高度
+const PROP_H = { bat: 60, wrench: 46, chain: 56, fchair: 54, sign: 62, flag: 70 };
 
 export const ITEM_DEFS = {
   bento: { name: '便當', type: 'food', hp: 70, cap: 40, weight: 3 },
   boba: { name: '珍奶', type: 'food', hp: 45, cap: 30, mp: 40, weight: 2 },
-  sign: { name: '抗議標語', type: 'light', dur: 10, dmg: 6, reach: 22, throwDmg: 16, weight: 0 },
+  // ───── 武器（台灣選舉場合常見的東西）─────
+  // 平衡：拿武器每下多 4～9 點傷害（×1.5），小怪一下就倒；約 10 下爆掉 ≒ 清掉 1～1.5 波小怪，
+  //       或打掉 Boss 約 1/4 血。太耐打（20 下）會整關都拿著、Boss 太好打；太少（5 下）撿了沒感覺。
+  bat: { name: '棒球棒', type: 'light', dur: 10, dmg: 7, reach: 30, throwDmg: 16, weight: 2, weapon: true },
+  wrench: { name: '修車扳手', type: 'light', dur: 12, dmg: 5, reach: 14, throwDmg: 18, weight: 2, weapon: true },
+  chain: { name: '鐵鍊', type: 'light', dur: 9, dmg: 5, reach: 46, throwDmg: 12, weight: 2, weapon: true },
+  fchair: { name: '鐵折疊椅', type: 'light', dur: 7, dmg: 9, reach: 24, throwDmg: 22, weight: 2, weapon: true },
+  sign: { name: '抗議標語', type: 'light', dur: 10, dmg: 6, reach: 22, throwDmg: 16, weight: 1, weapon: true },
   mic: { name: '麥克風', type: 'light', dur: 8, dmg: 4, reach: 10, throwDmg: 14, weight: 0 },
   egg: { name: '雞蛋', type: 'throw', throwDmg: 9, weight: 0 },
   chair: { name: '議場椅子', type: 'heavy', throwDmg: 28, weight: 0 },
-  flag: { name: '競選旗', type: 'light', dur: 10, dmg: 8, reach: 40, throwDmg: 14, weight: 0 },
+  flag: { name: '競選旗', type: 'light', dur: 12, dmg: 4, reach: 50, throwDmg: 14, weight: 1, weapon: true },
   broom: { name: '掃把', type: 'light', dur: 10, dmg: 7, reach: 32, throwDmg: 12, weight: 0 },
   slipper: { name: '藍白拖', type: 'throw', throwDmg: 10, weight: 0 },
   stool: { name: '塑膠椅', type: 'heavy', throwDmg: 22, weight: 0 },
@@ -23,6 +34,8 @@ export function randomItemKind() {
   for (const [k, d] of Object.entries(ITEM_DEFS)) for (let i = 0; i < d.weight; i++) list.push(k);
   return pick(list);
 }
+
+export const WEAPONS = Object.keys(ITEM_DEFS).filter((k) => ITEM_DEFS[k].weapon);
 
 export function newItem(kind, x, z, y = 520) {
   const d = ITEM_DEFS[kind];
@@ -39,6 +52,13 @@ export function drawItem(ctx, kind, x, y, rot = 0, s = 1) {
   ctx.translate(x, y);
   ctx.rotate(rot);
   ctx.scale(s, s);
+  const im = PROP_H[kind] && ASSETS.scenery['prop_w_' + kind];
+  if (im) {
+    const h = PROP_H[kind], w = (im.width * h) / im.height;
+    ctx.drawImage(im, -w / 2, -h, w, h);
+    ctx.restore();
+    return;
+  }
   ctx.lineWidth = 2;
   ctx.strokeStyle = '#15121a';
   switch (kind) {
@@ -158,6 +178,61 @@ export function drawItem(ctx, kind, x, y, rot = 0, s = 1) {
       ctx.fillRect(8, -20, 4, 20);
       ctx.fillStyle = 'rgba(255,255,255,0.4)';
       ctx.fillRect(-10, -25, 20, 2);
+      break;
+    case 'bat':
+      // 棒球棒（木頭色，握把纏膠帶）
+      ctx.fillStyle = '#d8a860';
+      ctx.beginPath();
+      ctx.moveTo(-2, 0);
+      ctx.lineTo(2, 0);
+      ctx.lineTo(5.5, -50);
+      ctx.quadraticCurveTo(0, -58, -5.5, -50);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#222';
+      ctx.fillRect(-2.5, -12, 5, 12);
+      break;
+    case 'wrench':
+      // 修車扳手
+      ctx.fillStyle = '#b8c0cc';
+      ctx.fillRect(-3, -34, 6, 34);
+      ctx.strokeRect(-3, -34, 6, 34);
+      ctx.beginPath();
+      ctx.arc(0, -38, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#15121a';
+      ctx.fillRect(-3, -48, 6, 9);
+      ctx.fillStyle = '#e8eef6';
+      ctx.fillRect(-1, -30, 2, 24);
+      break;
+    case 'chain': {
+      // 鐵鍊（一節一節的環）
+      ctx.strokeStyle = '#9aa2ae';
+      ctx.lineWidth = 3;
+      for (let i = 0; i < 7; i++) {
+        ctx.beginPath();
+        ctx.ellipse(Math.sin(i * 0.9) * 3, -4 - i * 7, i % 2 ? 2.5 : 4, 4.5, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.fillStyle = '#222';
+      ctx.fillRect(-3, -2, 6, 6);
+      break;
+    }
+    case 'fchair':
+      // 鐵折疊椅（摺起來拿）
+      ctx.fillStyle = '#7a8696';
+      ctx.fillRect(-12, -46, 4, 46);
+      ctx.fillRect(8, -46, 4, 46);
+      ctx.strokeRect(-12, -46, 4, 46);
+      ctx.strokeRect(8, -46, 4, 46);
+      ctx.fillStyle = '#4a5a70';
+      ctx.fillRect(-12, -46, 24, 14);
+      ctx.strokeRect(-12, -46, 24, 14);
+      ctx.fillStyle = '#5a6a80';
+      ctx.fillRect(-10, -24, 20, 6);
+      ctx.strokeRect(-10, -24, 20, 6);
       break;
     case 'chair':
       ctx.fillStyle = '#7b4f2a';

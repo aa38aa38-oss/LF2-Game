@@ -5,10 +5,17 @@ import { BattleScene } from './battle.js';
 import { AI } from './ai.js';
 import { CHARS, CHAR_BY_ID } from './characters.js';
 import './npcmoves.js';
-import { newItem } from './items.js';
+import { newItem, WEAPONS } from './items.js';
 import { ARENA, rand, pick, clamp, easeOut } from './util.js';
 import { txt, pixelText, panel, segBar, blink } from './ui.js';
 import { drawStoryStage } from './story_art.js';
+import { ShaftScene } from './shaft.js';
+import { EndingScene } from './scenes/ending.js';
+
+// 劇情模式各關的場景：第二關是「政見發表會・下樓梯 PK」，其他關是橫向清版
+export function storyScene(g, cfg) {
+  return (cfg.storyStage || 0) === 1 ? new ShaftScene(g, cfg) : new StoryScene(g, cfg);
+}
 
 const FY = ARENA.floorY;
 const STREET = { zMin: 0, zMax: 186 };
@@ -58,13 +65,17 @@ export const STAGE1 = {
   // 路上的道具：補血（便當、珍奶）、紅包（回血但扣票），走過去就自動吃
   items: [
     ['bento', 0, 760, 150],
+    ['bat', 0, 1100, 120],
     ['redenv', 0, 1640, 160],
+    ['wrench', 0, 2200, 90],
     ['bento', 0, 1980, 70],
     ['bento', 1, 2950, -170],
     ['boba', 2, 3150, -440],
     ['redenv', 2, 3600, -420],
     ['bento', 2, 3780, -440],
+    ['chain', 2, 3400, -430],
     ['bento', 3, 4350, 120],
+    ['fchair', 3, 4250, 60],
     ['redenv', 3, 4500, 60],
     ['bento', 3, 4620, 150],
     ['boba', 3, 5100, 90],
@@ -76,8 +87,9 @@ export const STAGE1 = {
 const R = 'R', Lf = 'L';
 export const STAGE2 = {
   id: 2,
+  // 注意：第二關現在改成「政見發表會・下樓梯 PK」（js/shaft.js）；這份橫向清版的地圖資料先留著備用
   name: '市長選舉',
-  sub: '夜市大街 → 捷運高架月台 → 市政府廣場',
+  sub: '政見發表會・下樓梯 PK',
   winTitle: '市長',
   goal: 40000,
   worldW: 6800,
@@ -177,13 +189,17 @@ export const STAGE3 = {
   boss: { floor: 3, x: 6600, lock: [6250, 7250], rivals: [1, 2], minion: 'reporter' },
   items: [
     ['bento', 0, 700, -130],
+    ['flag', 0, 550, -110],
     ['redenv', 0, 1000, -110],
     ['bento', 1, 2300, 120],
+    ['bat', 1, 2100, 60],
     ['redenv', 1, 2700, 60],
     ['boba', 1, 3200, 150],
     ['bento', 2, 3900, -270],
     ['redenv', 2, 4300, -260],
     ['bento', 3, 5000, 120],
+    ['fchair', 3, 4900, 60],
+    ['chain', 2, 3700, -260],
     ['redenv', 3, 5400, 60],
     ['redenv', 3, 5450, 150],
     ['bento', 3, 5750, 150],
@@ -226,6 +242,9 @@ const HAZARD = {
 };
 // 紅包上的暗示標語：讓玩家一看就知道收了會掉票
 const DIRTY = ['不法利益', '官商勾結', '黑金', '利益輸送', '政治獻金？', '圖利廠商'];
+// 紅包在畫面上放著沒人拿：幾秒後自動消失（最後 3 秒閃爍），過一陣子再從天上掉下來
+const REDENV_TTL = 10;
+const REDENV_BACK = [9, 15];
 
 // 環境傷害（計程車）的來源
 const ENV = { team: 9, x: 0, facing: 1, state: 'idle', combo: 0, comboT: 0, mp: 0, superDealt: null, char: { id: 'env', mul: { pow: 1 }, color: '#f4c20d' }, stats: { dmg: 0, maxCombo: 0, kos: 0 } };
@@ -262,7 +281,7 @@ export class StoryScene extends BattleScene {
     if (!GOD || this.phase === 'won' || this.phase === 'lost') return;
     const P = this.player, L = this.L;
     if (k === '1' || k === '2' || k === '3') {
-      this.g.setScene(new StoryScene(this.g, { ...this.cfg, storyStage: +k - 1, cp: 0, votes: 0 }));
+      this.g.setScene(storyScene(this.g, { ...this.cfg, storyStage: +k - 1, cp: 0, votes: 0, round: 0 }));
     } else if (k === 'g') {
       for (const f of this.enemiesAlive()) this.applyHit(P, f, { dmg: 99999, knock: true, launch: 300, kb: 300, unblockable: true, dir: Math.sign(f.x - P.x) || 1 });
       this.queue = [];
@@ -343,7 +362,7 @@ export class StoryScene extends BattleScene {
         const j = Math.floor(Math.random() * (i + 1));
         [pool[i], pool[j]] = [pool[j], pool[i]];
       }
-      cfg.rivals = pool.slice(0, 3);
+      cfg.rivals = pool.slice(0, 4);
     }
     this.minionT = 8;
     for (const [kind, fl, x, z] of L.items) {
@@ -351,9 +370,13 @@ export class StoryScene extends BattleScene {
       if (this.cp > 0 && x < cp.x - 300) continue;
       const it = newItem(kind, x, z, 0);
       it.floor = fl;
-      if (kind === 'redenv') it.label = DIRTY[this.items.filter((i) => i.kind === 'redenv').length % DIRTY.length];
+      if (kind === 'redenv') {
+        it.label = DIRTY[this.items.filter((i) => i.kind === 'redenv').length % DIRTY.length];
+        it.ttl = REDENV_TTL;
+      }
       this.items.push(it);
     }
+    this.respawns = [];
     this.cam = { x: cp.x - 480, y: 0 };
     this.updateCamera(0, true);
     this.stage = { id: `story${L.id}`, name: L.name, draw: (ctx, t, x0, x1) => drawStoryStage(ctx, t, x0, x1, L, this.cam, this.gateOpen) };
@@ -423,7 +446,8 @@ export class StoryScene extends BattleScene {
     f.ctrl = f.ai.ctrl;
     f.npcKind = id;
     f.mob = MOBS.has(id) || minion;
-    f.mp = (isBoss || id === 'rival') && !minion ? 40 : 0;
+    // 小王、Boss 一開始就有一些氣，打一陣子就會放大絕
+    f.mp = (isBoss || id === 'rival') && !minion ? 40 : MIDS.has(id) && !minion ? 30 : 0;
     // 劇情模式的敵人撿不到道具：不要讓 AI 跑去追地上的便當、紅包（以前 Boss 會因此一直往左走）
     f.ai.p.item = 0;
     this.setFloor(f, floorId);
@@ -464,7 +488,14 @@ export class StoryScene extends BattleScene {
       this.fx.add({ type: 'text', x: t.x, z: t.z, y: 150, text: pick(['啊～～！', '哇啊！', '救命啊！', '我錯了！', '下次不敢了！']), color: '#ffffff', size: 22, life: 0.9 });
       this.shake(6, 0.15);
       t.hitstop = Math.max(t.hitstop || 0, 0.06);
-      if (Math.random() < 0.35) {
+      const P = this.player;
+      const weaponsOut = this.items.filter((i) => i.def.weapon).length + (P.hold ? 1 : 0);
+      if (Math.random() < 0.12 && weaponsOut < 2) {
+        // 小怪偶爾掉武器（場上最多 2 把，不然一直有武器就沒意思了）
+        const it = newItem(pick(WEAPONS), t.x, t.z, 160);
+        it.floor = t.floor;
+        this.items.push(it);
+      } else if (Math.random() < 0.35) {
         const kind = pick(['bento', 'bento', 'boba']);
         const it = newItem(kind, t.x, t.z, 160);
         it.floor = t.floor;
@@ -557,11 +588,37 @@ export class StoryScene extends BattleScene {
       this.sfx('ko');
       return;
     }
+    this.updateRedEnvelopes(dt);
     this.updateLadders(dt);
     this.updateWaves();
     this.updateTaxi(dt);
     this.updateBossMinions(dt);
     this.hint = this.ladderHint();
+  }
+
+  // 紅包：在畫面裡放太久沒被拿走就消失，之後再從天上掉回原來的地方（換一個標語）
+  updateRedEnvelopes(dt) {
+    const x0 = this.cam.x, x1 = this.cam.x + (this.viewW || 960);
+    for (const it of this.items) {
+      if (it.kind !== 'redenv' || it.ttl == null || it.y > 5) continue;
+      if (it.x > x0 && it.x < x1 && it.floor === this.player.floor) it.ttl -= dt;
+      it.hide = it.ttl < 3 && Math.floor(this.time * 8) % 2 === 0;
+      if (it.ttl <= 0) {
+        it.gone = true;
+        this.fx.add({ type: 'text', x: it.x, z: it.z, y: 60, text: '咻～', color: '#ffd84a', size: 16, life: 0.6 });
+        this.respawns.push({ at: this.time + rand(...REDENV_BACK), floor: it.floor, x: it.x, z: it.z });
+      }
+    }
+    this.items = this.items.filter((it) => !it.gone);
+    const due = this.respawns.filter((r) => this.time >= r.at);
+    this.respawns = this.respawns.filter((r) => this.time < r.at);
+    for (const r of due) {
+      const it = newItem('redenv', r.x + rand(-60, 60), r.z, 420);
+      it.floor = r.floor;
+      it.ttl = REDENV_TTL;
+      it.label = pick(DIRTY);
+      this.items.push(it);
+    }
   }
 
   // 對手候選人（第二、三關 Boss）不會自己叫小弟：每隔一段時間由場外支持者補上手下
@@ -848,14 +905,16 @@ export class StoryScene extends BattleScene {
     const P = this.player;
     // 還有下一關：接著打（通關時間、下跪次數累計；得票每關重新算）
     if (this.stageIdx < STAGES.length - 1) {
-      this.g.setScene(new StoryScene(this.g, { ...this.cfg, storyStage: this.stageIdx + 1, cp: 0, votes: 0, clock: this.clock, kneels: this.kneels }));
+      this.g.setScene(storyScene(this.g, { ...this.cfg, storyStage: this.stageIdx + 1, cp: 0, votes: 0, round: 0, clock: this.clock, kneels: this.kneels }));
       return;
     }
+    // 全破：先演結局（升旗典禮 → 俯視落敗的對手 → 全劇終），再到結算畫面
     // 排行榜依通關速度：越快分數越高（5 分鐘破關約 7 萬分）
-    this.g.goResult({
+    const result = {
       cfg: { ...this.cfg, mode: 'story' }, win: true, score: Math.max(1000, Math.round(100000 - this.clock * 100)), wave: 1, clearTime: this.clock,
       stats: { ...P.stats }, playerChar: P.char, winnerChar: P.char, stage: 'legislature',
-    });
+    };
+    this.g.setScene(new EndingScene(this.g, { player: P.char.id, rivals: (this.cfg.rivals || []).slice(0, 4), result }));
   }
   onPointer(x, y) {
     if (this.phase === 'lost') {
@@ -884,8 +943,14 @@ export class StoryScene extends BattleScene {
       txt(ctx, p.text, p.x, FY + p.z - 150 - p.t * 40, { size: p.big ? 22 : p.warn ? 22 : 20, weight: 900, color: p.color, align: 'center', stroke: '#000', sw: 5, alpha: Math.max(0, a) });
     }
     // 地上的紅包：頭上掛暗示標語，一看就知道「收了會掉票」
+    // 主角旁邊的武器：提示「按攻擊撿起」
+    {
+      const P = this.player;
+      const w = !P.hold && this.items.find((it) => it.def.weapon && it.y <= 5 && it.floor === P.floor && Math.abs(it.x - P.x) < 52 && Math.abs(it.z - P.z) < 28);
+      if (w) txt(ctx, `按攻擊撿起「${w.def.name}」`, w.x, FY + w.z - 70, { size: 14, weight: 900, color: '#ffffff', align: 'center', stroke: '#000', sw: 4, alpha: blink(this.time, 3) ? 1 : 0.7 });
+    }
     for (const it of this.items) {
-      if (it.kind !== 'redenv' || it.y > 5) continue;
+      if (it.kind !== 'redenv' || it.y > 5 || it.hide) continue;
       const bx = it.x, by = FY + it.z - 12 - Math.sin(this.time * 3 + it.x) * 3;
       const label = it.label || '不法利益';
       ctx.save();

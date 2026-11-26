@@ -5,7 +5,8 @@ import { Input } from './input.js';
 import { Sound } from './audio.js';
 import { loadAssets, ASSETS } from './assets.js';
 import { clearTextCache, txt } from './ui.js';
-import { StoryScene } from './story.js';
+import { storyScene } from './story.js';
+import { ShaftScene } from './shaft.js';
 import { BattleScene } from './battle.js';
 import { IntroScene } from './scenes/intro.js';
 import { TitleScene } from './scenes/title.js';
@@ -153,7 +154,8 @@ class Game {
   goStageSelect() { this.setScene(new StageSelectScene(this)); }
   goVS(cfg) { this.setScene(new VSScene(this, cfg)); }
   startBattle(cfg) { this.setScene(new BattleScene(this, cfg)); }
-  startStory(cfg) { this.setScene(new StoryScene(this, cfg)); }
+  startStory(cfg) { this.setScene(storyScene(this, cfg)); }
+  startShaft(cfg) { this.setScene(new ShaftScene(this, cfg)); }
   goResult(data) { this.setScene(new ResultScene(this, data)); }
   goLeaderboard(highlight) { this.setScene(new LeaderboardScene(this, highlight)); }
 

@@ -5,9 +5,10 @@ import { txt, pixelText, panel, Hotspots } from '../ui.js';
 import { menuBg, poseOf } from './common.js';
 
 const MODES = [
-  { id: 'story', name: '劇情模式', desc: ['立委 → 市長 → 總統，三關打到底！', '打倒對手拉選票。'], chars: [2] },
-  { id: '1v1', name: '單挑模式', desc: ['自己挑對手，', '一對一打到剩一個！'], chars: [0, 2] },
-  { id: 'brawl', name: '四人大亂鬥', desc: ['四位政治人物同場混戰，', '誰都可以打！'], chars: [1, 3, 4, 5] },
+  { id: 'story', name: '劇情模式', desc: ['立委→市長→總統', '三關打到底！'], chars: [2] },
+  { id: '1v1', name: '單挑模式', desc: ['自己挑對手，', '一對一打到底！'], chars: [0, 2] },
+  { id: 'brawl', name: '四人大亂鬥', desc: ['四人同場混戰，', '誰都可以打！'], chars: [1, 3, 4] },
+  { id: 'shaft', name: '下樓梯 PK', desc: ['政見發表會', '下樓梯連贏三戰！'], chars: [5, 0] },
 ];
 const DIFFS = [['easy', '簡單'], ['normal', '普通'], ['hard', '困難']];
 
@@ -57,11 +58,11 @@ export class ModeScene {
     const p = g.beginPix();
     menuBg(p, this.t, 'legislature', 0.6);
     MODES.forEach((m, i) => {
-      const cx = 180 + i * 300;
+      const cx = 130 + i * 233;
       m.chars.forEach((ci, k) => {
         const ch = CHARS[ci];
         const n = m.chars.length;
-        const x = cx + (k - (n - 1) / 2) * (n > 2 ? 52 : 80);
+        const x = cx + (k - (n - 1) / 2) * (n > 2 ? 50 : 70);
         drawChar(p, ch, poseOf(ch, i === this.sel ? 'walk' : 'idle', this.t + k), x, 330, k < n / 2 ? 1 : -1, n > 2 ? 1.25 : 1.6, i === this.sel ? 1 : 0.6, false, this.t);
       });
     });
@@ -70,7 +71,7 @@ export class ModeScene {
     pixelText(ctx, '選擇模式', 480, 46, { size: 48, scale: 3, color: '#8CFF5B', color2: '#2fbf2f', outline: '#062006' });
     this.hot.clear();
     MODES.forEach((m, i) => {
-      const x = 40 + i * 300, y = 90, w = 280, h = 340;
+      const x = 18 + i * 233, y = 90, w = 224, h = 340;
       const sel = i === this.sel;
       ctx.strokeStyle = sel ? '#ffd84a' : '#555';
       ctx.lineWidth = sel ? 5 : 2;
@@ -81,7 +82,7 @@ export class ModeScene {
       }
       ctx.fillStyle = 'rgba(0,0,0,0.75)';
       ctx.fillRect(x + 3, y + 250, w - 6, 87);
-      txt(ctx, m.name, x + w / 2, y + 30, { size: 30, weight: 900, color: sel ? '#ffd84a' : '#ddd', align: 'center', stroke: '#000', sw: 6 });
+      txt(ctx, m.name, x + w / 2, y + 30, { size: 26, weight: 900, color: sel ? '#ffd84a' : '#ddd', align: 'center', stroke: '#000', sw: 6 });
       m.desc.forEach((d, k) => txt(ctx, d, x + w / 2, y + 280 + k * 26, { size: 17, weight: 700, color: '#fff', align: 'center' }));
       this.hot.add(x, y, w, h, () => (this.sel === i ? this.choose() : ((this.sel = i), this.g.audio.sfx('move'))));
     });

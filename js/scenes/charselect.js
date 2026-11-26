@@ -35,6 +35,9 @@ export class CharSelectScene {
       if (g.flow.mode === 'story') {
         return g.startStory({ playerChar: ch.id, difficulty: g.flow.difficulty });
       }
+      if (g.flow.mode === 'shaft') {
+        return g.startShaft({ playerChar: ch.id, difficulty: g.flow.difficulty, mode: 'shaft', standalone: true });
+      }
       if (g.flow.mode === '1v1') {
         this.step = 1;
         this.sel = (this.sel + 1) % CHARS.length;

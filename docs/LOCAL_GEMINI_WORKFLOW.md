@@ -103,6 +103,21 @@
 | 第三關背景 | `scenery/s3_sky、s3_street、s3_stage、s3_stand、s3_palace` | ✅ 已完成 |
 | 路上危險物 | `scenery/prop_taxi（圍事計程車）、prop_scooter、prop_truck` | ✅ 已完成 |
 
+### 第四批：下樓梯 PK、武器、結局（程式已做好，沒圖會用程式畫的暫代）
+
+第二關改成「政見發表會・下樓梯 PK」（`js/shaft.js`），也可以從主選單直接玩；原本第二關的橫向背景和敵人圖先留著不用刪。
+prompt 都在 `docs/GEMINI_PROMPTS.md` 的「共用畫面」裡，**不用第零步說明**，開新對話直接貼。
+
+| 順序 | 圖 | 存檔（`incoming/<批次>/` 底下） | 參考圖 | 狀態 |
+|---|---|---|---|---|
+| 1 | 下樓梯 PK 背景：電視辯論舞台（不用綠幕） | `assets/scenery/pk_sky.png` | 不用 | ⬜ |
+| 2～7 | 武器 6 張（綠幕、直立、握把朝下） | `assets/scenery/prop_w_bat.png`、`prop_w_wrench.png`、`prop_w_chain.png`、`prop_w_fchair.png`、`prop_w_sign.png`、`prop_w_flag.png` | 不用 | ⬜ |
+| 8～19 | 結局 12 張：6 位主角 × 2（升旗典禮、俯視落敗對手） | `assets/stages/ending1_<id>.png`、`assets/stages/ending2_<id>.png` | `assets/select/<id>.webp`（有的話）＋ `assets/characters/<id>/idle.webp` | ⬜ |
+
+- 武器不用重畫角色：遊戲會把武器圖畫在角色手上。
+- 結局圖被 Gemini 拒絕（涉及真人）：開新對話、只上傳參考圖再試一次；還是不行就跳過，遊戲會用角色動作圖自動拼出結局。
+- 驗收：主選單「下樓梯 PK」玩一場、劇情第一關撿武器打到爆掉；結局可以在網址加 `?tester=lf2god`，進劇情按 W 一路過關看到。
+
 ### 之後（可選）：六位主角的「迴旋攻擊」
 每人一張 `spin.png`（4 格），目前借用踢腿圖，不補也能玩。
 角色 ID：`su`、`wang`、`han`、`ma`、`ko`、`guan`。

@@ -193,6 +193,8 @@ export class Fighter {
     if (this.char.npc && this.readSpecial(b)) return;
     if (c.pressed('attack')) {
       if (this.tryCatch(b)) return;
+      // 站在武器旁邊按攻擊：撿起來（主要角色才可以）
+      if (!this.running && b.tryPickup && b.tryPickup(this)) return;
       if (dz > 0 && !dx && this.spinCD <= 0) {
         // 按著 ↓ ＋攻擊：迴旋攻擊
         this.startAttack('spin');

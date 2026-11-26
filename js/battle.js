@@ -12,7 +12,7 @@ import { ITEM_DEFS, spawnRandomItem, newItem, drawItem } from './items.js';
 import { txt, pixelText, segBar, panel, blink, Hotspots } from './ui.js';
 import { makeDoors, updateDoors, drawDoors, drawDoorLabels } from './doors.js';
 
-export const MODE_NAME = { '1v1': '單挑模式', brawl: '四人大亂鬥', survival: '連戰生存', story: '劇情模式' };
+export const MODE_NAME = { '1v1': '單挑模式', brawl: '四人大亂鬥', survival: '連戰生存', story: '劇情模式', shaft: '下樓梯 PK' };
 const DIFF_MUL = { easy: 0.8, normal: 1, hard: 1.3 };
 
 export class BattleScene {
@@ -159,15 +159,35 @@ export class BattleScene {
       if (Math.abs(t.y - f.y) > 70) continue;
       f.hitList.add(t);
       const r = this.applyHit(f, t, h);
-      // 武器不會壞（參考吞食天地）：一直拿在手上打，直到被打倒才掉落
-      if (r && W) this.shake(3, 0.06);
+      // 武器有耐用度：每打中一下（擋下也算）扣 1，用完就爆掉
+      if (r && W && f.hold === W) {
+        this.shake(3, 0.06);
+        W.dur--;
+        if (W.dur <= 0) this.breakHeld(f);
+      }
     }
   }
+  breakHeld(f) {
+    const it = f.hold;
+    if (!it) return;
+    f.hold = null;
+    const x = f.x + f.facing * 40, y = f.y + 70;
+    this.fx.add({ type: 'spark', x, z: f.z, y, life: 0.35, big: true, color: '#ffffff' });
+    this.fx.add({ type: 'ring', x, z: f.z, y, life: 0.3, r: 70, color: '#ffd84a' });
+    this.fx.add({ type: 'text', x: f.x, z: f.z, y: 150, text: `${it.def.name}爆掉了！`, color: '#ff9a3a', size: 20, life: 1 });
+    // 碎片往四面八方飛（用飛行道具做，不會打到人）
+    for (let i = 0; i < 5; i++) {
+      this.spawnProj({ owner: f, kind: 'shard', item: it, x, z: f.z, y, vx: rand(-260, 260), vy: rand(200, 420), gravity: 1300, life: 0.9, nohit: true, noClash: true, vanishOnGround: true, rot: rand(0, 6) });
+    }
+    this.sfx('heavy');
+  }
   // ───── 道具 ─────
+  // 撿武器：只有主要角色（不是 NPC 敵人）能撿，手上已經有東西就不撿
   tryPickup(f) {
+    if (f.char.npc || f.hold) return false;
     let best = null, bd = 1e9;
     for (const it of this.items) {
-      if (it.y > 5) continue;
+      if (it.y > 5 || it.def.type === 'food' || (it.floor != null && f.floor != null && it.floor !== f.floor)) continue;
       const d = Math.abs(it.x - f.x) + Math.abs(it.z - f.z) * 1.5;
       if (Math.abs(it.x - f.x) < 52 && Math.abs(it.z - f.z) < 28 && d < bd) {
         bd = d;
@@ -188,7 +208,7 @@ export class BattleScene {
     } else {
       f.hold = best;
       this.sfx('coin');
-      this.fx.add({ type: 'text', x: f.x, z: f.z, y: 120, text: D.name, color: '#ffd84a', size: 18, life: 0.7 });
+      this.fx.add({ type: 'text', x: f.x, z: f.z, y: 120, text: D.dur ? `${D.name}（可打 ${best.dur} 下）` : D.name, color: '#ffd84a', size: 18, life: 0.9 });
     }
     return true;
   }
@@ -593,12 +613,13 @@ export class BattleScene {
           continue;
         }
       }
-      if (p.kind !== 'wave' && (p.x < -50 || p.x > (this.worldW || WORLD_W) + 50)) {
+      if (p.kind !== 'wave' && !p.offOK && (p.x < -50 || p.x > (this.worldW || WORLD_W) + 50)) {
         p.dead = true;
         if (p.kind === 'item') this.landItem(p.item, p.x, p.z);
         continue;
       }
       if (p.trap && !p.landed) continue;
+      if (p.nohit) continue;
       for (const f of this.fighters) {
         if (f.team === p.team || f.dead || f.hp <= 0 || p.hits.has(f)) continue;
         if (Math.abs(f.x - p.x) > p.w) continue;
@@ -713,6 +734,7 @@ export class BattleScene {
         this.drawSlash(p, f);
       } else if (d.it) {
         const it = d.it;
+        if (it.hide) continue;
         const bob = it.y <= 0 ? Math.sin(this.time * 4 + it.x) * 1.5 : 0;
         drawItem(p, it.kind, it.x, ARENA.floorY + it.z - it.y + bob, 0, 1.15);
       } else this.drawProj(p, d.pr);
@@ -993,6 +1015,128 @@ export class BattleScene {
         ctx.strokeRect(-60, -44, 120, 34);
         break;
       }
+      case 'comment': {
+        // 網軍留言：對話框＋酸言酸語
+        ctx.translate(x, y - 24);
+        ctx.font = "900 15px 'Noto Sans TC',sans-serif";
+        const w = ctx.measureText(p.text).width + 16;
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#1a3a7a';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.rect(-w / 2, -14, w, 26);
+        ctx.moveTo(-6, 12);
+        ctx.lineTo(-12, 20);
+        ctx.lineTo(2, 12);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#d8202a';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(p.text, 0, -1);
+        break;
+      }
+      case 'heart': {
+        ctx.translate(x, y - 18);
+        const s = 1 + Math.sin(p.t * 16) * 0.12;
+        ctx.scale(s, s);
+        ctx.fillStyle = '#ff4a9a';
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, 8);
+        ctx.bezierCurveTo(-16, -4, -9, -16, 0, -7);
+        ctx.bezierCurveTo(9, -16, 16, -4, 0, 8);
+        ctx.fill();
+        ctx.stroke();
+        break;
+      }
+      case 'bulldozer': {
+        // 推土機（財團的大絕）
+        const d = sign(p.vx) || 1;
+        ctx.translate(x, y);
+        ctx.scale(d, 1);
+        ctx.fillStyle = '#f0b020';
+        ctx.strokeStyle = '#15121a';
+        ctx.lineWidth = 3;
+        ctx.fillRect(-90, -78, 110, 52);
+        ctx.strokeRect(-90, -78, 110, 52);
+        ctx.fillRect(-60, -118, 52, 40);
+        ctx.strokeRect(-60, -118, 52, 40);
+        ctx.fillStyle = '#9fd4ff';
+        ctx.fillRect(-54, -112, 40, 26);
+        ctx.fillStyle = '#3a3a44';
+        ctx.fillRect(-96, -28, 124, 28);
+        ctx.strokeRect(-96, -28, 124, 28);
+        for (let i = 0; i < 5; i++) {
+          ctx.fillStyle = '#666';
+          ctx.beginPath();
+          ctx.arc(-84 + i * 25, -14, 9, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        // 鏟子
+        ctx.fillStyle = '#c8c8c8';
+        ctx.beginPath();
+        ctx.moveTo(30, -70);
+        ctx.lineTo(62, -84);
+        ctx.lineTo(66, 0);
+        ctx.lineTo(30, 0);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#d8202a';
+        ctx.font = "900 16px 'Noto Sans TC',sans-serif";
+        ctx.textAlign = 'center';
+        ctx.fillText('都更', -35, -46);
+        break;
+      }
+      case 'mark': {
+        // 黑手的準星：紅圈越縮越小
+        const k = Math.min(1, p.t / 0.75);
+        ctx.translate(x, y);
+        ctx.scale(1, 0.32);
+        ctx.strokeStyle = Math.floor(p.t * 12) % 2 ? '#ff2a2a' : '#ffffff';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc(0, 0, 90 - k * 40, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(-60, 0);
+        ctx.lineTo(60, 0);
+        ctx.moveTo(0, -60);
+        ctx.lineTo(0, 60);
+        ctx.stroke();
+        break;
+      }
+      case 'blackhand': {
+        // 從天而降的黑手
+        ctx.translate(x, y);
+        ctx.fillStyle = '#1a0a24';
+        ctx.strokeStyle = '#8a3ad8';
+        ctx.lineWidth = 3;
+        ctx.fillRect(-14, -260, 28, 200);
+        ctx.beginPath();
+        ctx.moveTo(-34, -70);
+        ctx.lineTo(34, -70);
+        ctx.lineTo(30, 0);
+        ctx.lineTo(-30, 0);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        for (let i = 0; i < 4; i++) {
+          ctx.fillRect(-30 + i * 16, 0, 11, 20);
+          ctx.strokeRect(-30 + i * 16, 0, 11, 20);
+        }
+        break;
+      }
+      case 'shard': {
+        // 武器爆掉的碎片
+        ctx.translate(x, y);
+        ctx.rotate(p.rot + p.t * 14);
+        ctx.scale(0.45, 0.45);
+        drawItem(ctx, p.item.kind, 0, 20, 0, 1);
+        break;
+      }
       case 'crate':
         ctx.translate(x, y - 16);
         ctx.rotate(p.t * 5);
@@ -1160,7 +1304,11 @@ export class BattleScene {
     txt(ctx, f.char.title, nx, y + 8, { size: 15, weight: 900, color: '#fff', align: al, stroke: '#000', sw: 3 });
     txt(ctx, f === this.player ? 'P1' : 'CPU', mirror ? bx : bx + bw, y + 8, { size: 9, font: 'px', color: f === this.player ? '#5cff7a' : '#ff8a8a', align: mirror ? 'left' : 'right' });
     segBar(ctx, bx, y + 20, bw, 15, f.hp / f.maxHp, { segs: w > 300 ? 22 : 14, colors: ['#46e04a', '#ffd84a', '#ff4a3a'], mirror, ghost: f.cap / f.maxHp });
-    if (f.hold) txt(ctx, `持：${f.hold.def.name}`, mirror ? bx + bw : bx + bw, y + 60, { size: 10, weight: 900, color: '#ffd84a', align: 'right', stroke: '#000', sw: 3 });
+    if (f.hold) {
+      const H = f.hold, D = H.def;
+      const tag = D.dur ? `持：${D.name}　${'▮'.repeat(Math.max(0, H.dur))}${'▯'.repeat(Math.max(0, D.dur - H.dur))}` : `持：${D.name}`;
+      txt(ctx, tag, bx + bw, y + 60, { size: 10, weight: 900, color: D.dur && H.dur <= 3 ? '#ff6a4a' : '#ffd84a', align: 'right', stroke: '#000', sw: 3 });
+    }
     const full = f.mp >= 100;
     const mc = full ? (blink(this.time, 4) ? '#ffe14a' : '#ff9a2a') : '#3a8cff';
     segBar(ctx, bx, y + 42, bw * 0.78, 8, f.mp / 100, { segs: 10, color: mc, mirror });

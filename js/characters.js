@@ -154,8 +154,8 @@ export const NPCS = [
     },
   },
   {
-    id: 'paparazzi', title: '偷拍狗仔', npc: true, quote: '', color: '#b59a6a', color2: '#2e2414',
-    specials: [{ name: '閃光偷拍' }, { name: '緋聞合成照' }, { name: '開溜' }], superMove: { name: '' }, stats: { pow: 3, spd: 4, def: 2 },
+    id: 'paparazzi', title: '偷拍狗仔', npc: true, quote: '獨家！明天頭版就是你！', color: '#b59a6a', color2: '#2e2414',
+    specials: [{ name: '閃光偷拍' }, { name: '緋聞合成照' }, { name: '開溜' }], superMove: { name: '狗仔連拍' }, stats: { pow: 3, spd: 4, def: 2 },
     mul: { pow: 0.85, spd: 1.1, def: 0.95 },
     look: {
       skin: '#e2b088', hair: 'short', hairColor: '#2a2420', glasses: 'rect', brows: 'flat', mask: null,
@@ -173,8 +173,8 @@ export const NPCS = [
   },
   // ───── 第二關「市長選舉」─────
   {
-    id: 'troll', title: '網軍小編', npc: true, quote: '', color: '#3a7ad8', color2: '#0e1e3a',
-    specials: [{ name: '截圖帶風向' }, { name: '假新聞' }, { name: '下線' }], superMove: { name: '' }, stats: { pow: 3, spd: 4, def: 2 },
+    id: 'troll', title: '網軍小編', npc: true, quote: '兄弟們，出征！', color: '#3a7ad8', color2: '#0e1e3a',
+    specials: [{ name: '截圖帶風向' }, { name: '假新聞' }, { name: '下線' }], superMove: { name: '網軍出征' }, stats: { pow: 3, spd: 4, def: 2 },
     mul: { pow: 0.9, spd: 1.1, def: 0.95 },
     look: {
       skin: '#f0c49a', hair: 'short', hairColor: '#2a2a40', glasses: 'round', brows: 'flat',
@@ -183,7 +183,7 @@ export const NPCS = [
   },
   {
     id: 'tycoon', title: '財團董事長', npc: true, boss: true, quote: '市政府的標案，早就內定好了！', color: '#c8a030', color2: '#2a1e04',
-    specials: [{ name: '撒鈔票' }, { name: '推土機衝撞' }, { name: '叫保鑣' }], superMove: { name: '錢坑' }, stats: { pow: 5, spd: 2, def: 5 },
+    specials: [{ name: '撒鈔票' }, { name: '推土機衝撞' }, { name: '叫保鑣' }], superMove: { name: '金權推土機' }, stats: { pow: 5, spd: 2, def: 5 },
     mul: { pow: 1.05, spd: 0.92, def: 1.15 },
     look: {
       skin: '#eab78a', hair: 'side', hairColor: '#d8d8d8', glasses: 'rect', brows: 'angry',
@@ -248,8 +248,8 @@ export const NPCS = [
   },
   // 第三關小王
   {
-    id: 'influencer', title: '直播網紅', npc: true, quote: '', color: '#ff7ad8', color2: '#2a0a24',
-    specials: [{ name: '直播閃光' }, { name: '留言轟炸' }, { name: '叫粉絲' }], superMove: { name: '' }, stats: { pow: 3, spd: 4, def: 2 },
+    id: 'influencer', title: '直播網紅', npc: true, quote: '寶寶們，愛心刷起來！', color: '#ff7ad8', color2: '#2a0a24',
+    specials: [{ name: '直播閃光' }, { name: '留言轟炸' }, { name: '叫粉絲' }], superMove: { name: '抖內愛心雨' }, stats: { pow: 3, spd: 4, def: 2 },
     mul: { pow: 0.9, spd: 1.1, def: 0.95 },
     look: {
       skin: '#f6caa0', hair: 'side', hairColor: '#ff7ad8', glasses: 'round', brows: 'soft',
@@ -259,7 +259,7 @@ export const NPCS = [
   // ───── 第三關「總統選舉」最終 Boss ─────
   {
     id: 'mastermind', title: '幕後藏鏡人', npc: true, boss: true, quote: '這場選舉，從頭到尾都是我在操盤。', color: '#5a1a8a', color2: '#12041e',
-    specials: [{ name: '黑金鞭炮陣' }, { name: '黑箱衝撞' }, { name: '動員全部人馬' }], superMove: { name: '黑金風暴' }, stats: { pow: 5, spd: 4, def: 5 },
+    specials: [{ name: '黑金鞭炮陣' }, { name: '黑箱衝撞' }, { name: '動員全部人馬' }], superMove: { name: '黑手操盤' }, stats: { pow: 5, spd: 4, def: 5 },
     mul: { pow: 1.3, spd: 1.08, def: 1.3 },
     look: {
       skin: '#d9a57a', hair: 'long', hairColor: '#0e0c12', glasses: 'rect', brows: 'intense',

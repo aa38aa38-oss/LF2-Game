@@ -358,6 +358,27 @@ COMMON_S3 = [
     prompt=f"The front of a grand historic presidential office building seen straight on: red brick and white stone Baroque facade, a tall central clock tower, arched windows, a big central gate, flags on both sides, lit by golden spotlights at night. The bottom edge of the image is the ground line. Everything above and around the building is plain solid pure green (#00FF00) for transparency. {S1_SCENE} Wide image, about 2.6 to 1."),
 ]
 
+# 第二關「市長選舉」改成「政見發表會・下樓梯 PK」（js/shaft.js）：一張全螢幕背景，中間要暗、乾淨（台階和角色疊在上面）
+PK = '第二關「政見發表會・下樓梯 PK」背景（1 張，生好放 assets/scenery/）'
+COMMON_PK = [
+  dict(group=PK, name='市長政見發表會的電視辯論舞台', file='assets/scenery/pk_sky.png', size='16:9（1920×1080）',
+    prompt=f"The inside of a televised mayoral election debate hall seen straight on, used as a full-screen game background: heavy red velvet curtains on the far left and right edges, two wooden candidate podiums with microphones at the bottom left and bottom right corners, a dark navy blue back wall with a big banner made of color blocks (no readable text), soft spotlight beams from the top, TV cameras and a silhouette audience along the very bottom edge. The CENTER 70 percent of the image must stay dark, plain and uncluttered (it will be covered by game platforms and characters). {S1_SCENE} Wide 16:9, no green screen."),
+]
+
+# 武器（主要角色撿起來拿在手上揮）：插畫風、直立、握把在下面、綠幕；檔名 prop_w_<種類>（prep_assets 會自動裁切縮小）
+WG = '武器道具（6 張，插畫風，生好放 assets/scenery/）'
+W_STYLE = ("Art style: clean hand-drawn comic illustration, bold black outlines, flat cel-shaded colors, video game item icon. "
+           "The object stands perfectly upright and vertical, handle or grip at the bottom, centered, fills most of the image height, "
+           "plain solid pure green background (#00FF00), no hands, no people, no text, no shadow.")
+COMMON_W = [
+  dict(group=WG, name='棒球棒', file='assets/scenery/prop_w_bat.png', size='1:2 直式', prompt=f"A game weapon item: a worn wooden baseball bat with black grip tape on the handle and a few dents. {W_STYLE}"),
+  dict(group=WG, name='修車扳手', file='assets/scenery/prop_w_wrench.png', size='1:2 直式', prompt=f"A game weapon item: a big heavy chrome adjustable wrench from a scooter repair shop, a little greasy, red rubber grip on the handle. {W_STYLE}"),
+  dict(group=WG, name='鐵鍊', file='assets/scenery/prop_w_chain.png', size='1:2 直式', prompt=f"A game weapon item: a thick steel chain hanging straight down with a black taped grip at the bottom end, shiny metal links. {W_STYLE}"),
+  dict(group=WG, name='鐵折疊椅', file='assets/scenery/prop_w_fchair.png', size='1:2 直式', prompt=f"A game weapon item: a folded grey metal folding chair (the classic wrestling chair) seen from the side, folded flat and standing upright. {W_STYLE}"),
+  dict(group=WG, name='抗議標語牌', file='assets/scenery/prop_w_sign.png', size='1:2 直式', prompt=f"A game weapon item: a hand-made protest placard on a wooden stick, white board with red and black color blocks instead of words. {W_STYLE}"),
+  dict(group=WG, name='競選旗', file='assets/scenery/prop_w_flag.png', size='1:2 直式', prompt=f"A game weapon item: a long election campaign flag on a silver pole, a bright orange flag with color blocks instead of words, slightly waving. {W_STYLE}"),
+]
+
 COMMON = [
   dict(group='場景背景', name='立法院議場', file='assets/stages/legislature.png', size='16:9（1920×1080）',
     prompt=f"{STYLE}, side-scrolling beat 'em up stage background, interior of a parliament assembly hall, wooden walls, a raised speaker's podium in the center, two electronic voting result boards, rows of wooden desks with microphones along the back, press gallery balcony with camera flashes, the lower 46 percent of the image is an open empty teal carpet floor in perspective with a few scattered papers, the left and right edges should connect seamlessly when tiled, wide 16:9, no characters, no text"),
@@ -379,8 +400,19 @@ COMMON = [
     prompt=f"{STYLE}, six caricature politicians charging forward together on a campaign rally stage, speed lines, explosive energy, fighting game opening screen, wide 16:9, no text. Attach the six character reference sheets."),
 ]
 
+# 劇情模式全破的結局（每位主角 2 張，存 assets/stages/ending1_<id>.png、ending2_<id>.png）
+EG = '結局（每位主角 2 張；上傳那位主角的立繪 assets/select/<id>.webp 和站立圖 assets/characters/<id>/idle.webp 當參考）'
+def ending_items():
+    out = []
+    for c in CHARS:
+        out.append(dict(group=EG, name=f"{c['title']}・結局 1：總統府升旗典禮", file=f"assets/stages/ending1_{c['id']}.png", size='16:9（1920×1080）',
+          prompt=f"Use the attached images as the exact reference for the character: same face, same hairstyle, same outfit and colors, same body proportions. A triumphant ending scene for a video game: the character from the attached reference images stands proudly in the center on a red-carpeted ceremony stage in front of a grand red brick presidential office building with a clock tower, saluting during a morning flag-raising ceremony, a flag being raised on a tall flagpole on the right, golden morning sunlight, confetti, an honor guard and a cheering crowd silhouette waving small flags at the bottom. Keep the top 15 percent of the image simple sky for a caption. {STYLE}, wide 16:9, no text."))
+        out.append(dict(group=EG, name=f"{c['title']}・結局 2：俯視落敗的對手", file=f"assets/stages/ending2_{c['id']}.png", size='16:9（1920×1080）',
+          prompt=f"Use the attached images as the exact reference for the character: same face, same hairstyle, same outfit and colors, same body proportions. A dramatic comic-style ending scene for a video game: the character from the attached reference images stands tall on the right side, seen from a low angle, clenching a fierce fist and looking down with a cold confident glare. At the bottom left, three generic defeated rival politicians in rumpled suits are sprawled on the ground in a cartoon dust cloud, ties loose, cartoon swirly eyes and little stars over their heads, faces turned away so they are not recognizable. Dark red background with dramatic speed lines. Keep the top-left area simple for a caption. {STYLE}, wide 16:9, no text."))
+    return out
+
 def build():
-    data = {'chars': [], 'common': COMMON_S1 + PROPS + COMMON_S2 + COMMON_S3 + COMMON}
+    data = {'chars': [], 'common': COMMON_S1 + PROPS + COMMON_S2 + COMMON_PK + COMMON_W + COMMON_S3 + COMMON + ending_items()}
     for c in CHARS:
         data['chars'].append({'id': c['id'], 'title': c['title'], 'quote': c['quote'], 'items': char_sections(c)})
     for n in NPCS:
