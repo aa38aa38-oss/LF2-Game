@@ -302,7 +302,11 @@ def main(dirs):
                 bb = im.getchannel('A').point(lambda v: 255 if v > 24 else 0).getbbox()
                 if bb:
                     im = im.crop(bb)
-                im = im.resize((480, round(im.height * 480 / im.width)), Image.LANCZOS)
+                if f.stem.startswith('prop_w_'):
+                    # 武器（直立）：依高度縮到 360，不然細長的武器會變得非常大
+                    im = im.resize((max(1, round(im.width * 360 / im.height)), 360), Image.LANCZOS)
+                else:
+                    im = im.resize((480, round(im.height * 480 / im.width)), Image.LANCZOS)
             if im.width > 2400:
                 im = im.resize((2400, round(im.height * 2400 / im.width)), Image.LANCZOS)
             (OUT / 'scenery').mkdir(exist_ok=True)

@@ -110,9 +110,9 @@ prompt 都在 `docs/GEMINI_PROMPTS.md` 的「共用畫面」裡，**不用第零
 
 | 順序 | 圖 | 存檔（`incoming/<批次>/` 底下） | 參考圖 | 狀態 |
 |---|---|---|---|---|
-| 1 | 下樓梯 PK 背景：電視辯論舞台（不用綠幕） | `assets/scenery/pk_sky.png` | 不用 | ⬜ |
-| 2～7 | 武器 6 張（綠幕、直立、握把朝下） | `assets/scenery/prop_w_bat.png`、`prop_w_wrench.png`、`prop_w_chain.png`、`prop_w_fchair.png`、`prop_w_sign.png`、`prop_w_flag.png` | 不用 | ⬜ |
-| 8～19 | 結局 12 張：6 位主角 × 2（升旗典禮、俯視落敗對手） | `assets/stages/ending1_<id>.png`、`assets/stages/ending2_<id>.png` | `assets/select/<id>.webp`（有的話）＋ `assets/characters/<id>/idle.webp` | ⬜ |
+| 1 | 下樓梯 PK 背景：電視辯論舞台（不用綠幕） | `assets/scenery/pk_sky.png` | 不用 | ✅ |
+| 2～7 | 武器 6 張（綠幕、直立、握把朝下） | `assets/scenery/prop_w_bat.png`、`prop_w_wrench.png`、`prop_w_chain.png`、`prop_w_fchair.png`、`prop_w_sign.png`、`prop_w_flag.png` | 不用 | ✅ |
+| 8～19 | 結局 12 張：6 位主角 × 2（升旗典禮、俯視落敗對手） | `assets/stages/ending1_<id>.png`、`assets/stages/ending2_<id>.png` | `assets/select/<id>.webp`（有的話）＋ `assets/characters/<id>/idle.webp` | ✅ |
 
 - 武器不用重畫角色：遊戲會把武器圖畫在角色手上。
 - 結局圖被 Gemini 拒絕（涉及真人）：開新對話、只上傳參考圖再試一次；還是不行就跳過，遊戲會用角色動作圖自動拼出結局。

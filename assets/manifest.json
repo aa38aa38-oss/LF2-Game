@@ -793,7 +793,19 @@
     "legislature": "assets/stages/legislature.jpg",
     "rally": "assets/stages/rally.jpg",
     "studio": "assets/stages/studio.jpg",
-    "title": "assets/stages/title.jpg"
+    "title": "assets/stages/title.jpg",
+    "ending1_guan": "assets/stages/ending1_guan.jpg",
+    "ending1_han": "assets/stages/ending1_han.jpg",
+    "ending1_ko": "assets/stages/ending1_ko.jpg",
+    "ending1_ma": "assets/stages/ending1_ma.jpg",
+    "ending1_su": "assets/stages/ending1_su.jpg",
+    "ending1_wang": "assets/stages/ending1_wang.jpg",
+    "ending2_guan": "assets/stages/ending2_guan.jpg",
+    "ending2_han": "assets/stages/ending2_han.jpg",
+    "ending2_ko": "assets/stages/ending2_ko.jpg",
+    "ending2_ma": "assets/stages/ending2_ma.jpg",
+    "ending2_su": "assets/stages/ending2_su.jpg",
+    "ending2_wang": "assets/stages/ending2_wang.jpg"
   },
   "scenery": {
     "s1_apartment": "assets/scenery/s1_apartment.webp",
@@ -811,6 +823,13 @@
     "s3_sky": "assets/scenery/s3_sky.webp",
     "s3_stage": "assets/scenery/s3_stage.webp",
     "s3_stand": "assets/scenery/s3_stand.webp",
-    "s3_street": "assets/scenery/s3_street.webp"
+    "s3_street": "assets/scenery/s3_street.webp",
+    "pk_sky": "assets/scenery/pk_sky.webp",
+    "prop_w_bat": "assets/scenery/prop_w_bat.webp",
+    "prop_w_chain": "assets/scenery/prop_w_chain.webp",
+    "prop_w_fchair": "assets/scenery/prop_w_fchair.webp",
+    "prop_w_flag": "assets/scenery/prop_w_flag.webp",
+    "prop_w_sign": "assets/scenery/prop_w_sign.webp",
+    "prop_w_wrench": "assets/scenery/prop_w_wrench.webp"
   }
 }
