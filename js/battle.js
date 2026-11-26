@@ -12,6 +12,8 @@ import { ITEM_DEFS, spawnRandomItem, newItem, drawItem } from './items.js';
 import { txt, pixelText, segBar, panel, blink, Hotspots } from './ui.js';
 import { makeDoors, updateDoors, drawDoors, drawDoorLabels } from './doors.js';
 
+// 拿武器時攻擊距離多出來的長度（武器本身的長度＋28）
+export const weaponReach = (W) => (W.def.reach || 0) + 28;
 export const MODE_NAME = { '1v1': '單挑模式', brawl: '四人大亂鬥', survival: '連戰生存', story: '劇情模式', shaft: '下樓梯 PK' };
 const DIFF_MUL = { easy: 0.8, normal: 1, hard: 1.3 };
 
@@ -149,8 +151,10 @@ export class BattleScene {
   }
   meleeHit(f, a) {
     const W = f.hold && f.hold.def.type === 'light' && !a.air ? f.hold : null;
-    const reach = (f.char.look.prop === 'gavel' ? 1.12 : 1) + (W ? W.def.reach / a.x1 : 0);
+    // 拿武器打人：攻擊距離變長（武器長度＋28）、前後深度也比較寬
+    const reach = (f.char.look.prop === 'gavel' ? 1.12 : 1) + (W ? weaponReach(W) / a.x1 : 0);
     const h = { ...a, dmg: (a.dmg + (W ? W.def.dmg : 0)) * f.char.mul.pow };
+    if (W) a = { ...a, zr: a.zr + 10 };
     for (const t of this.fighters) {
       if (t === f || t.team === f.team || t.dead || f.hitList.has(t)) continue;
       const dx = (t.x - f.x) * f.facing;
@@ -171,6 +175,7 @@ export class BattleScene {
     const it = f.hold;
     if (!it) return;
     f.hold = null;
+    f.grabCD = 0.8;
     const x = f.x + f.facing * 40, y = f.y + 70;
     this.fx.add({ type: 'spark', x, z: f.z, y, life: 0.35, big: true, color: '#ffffff' });
     this.fx.add({ type: 'ring', x, z: f.z, y, life: 0.3, r: 70, color: '#ffd84a' });
@@ -216,6 +221,7 @@ export class BattleScene {
     const it = f.hold;
     if (!it) return;
     f.hold = null;
+    f.grabCD = 0.8;
     const heavy = it.def.type === 'heavy';
     this.spawnProj({
       owner: f, kind: 'item', item: it, x: f.x + f.facing * 24, z: f.z, y: f.y + (heavy ? 110 : 70),
@@ -230,6 +236,7 @@ export class BattleScene {
     const it = f.hold;
     if (!it) return;
     f.hold = null;
+    f.grabCD = 0.8;
     it.x = f.x;
     it.z = f.z;
     it.y = Math.max(20, f.y + 40);
@@ -275,6 +282,19 @@ export class BattleScene {
     }
     // 補血品：走過去就自動吃（不用按鍵）。劇情模式只有主角會吃
     if (!this.fightOn) return;
+    // 武器：主要角色走過去就直接拿起來（不用按鍵、不會停下來）；剛丟掉／爆掉的 0.8 秒內不會馬上又撿
+    for (const f of this.fighters) {
+      if (f.grabCD > 0) f.grabCD -= dt;
+      if (f.char.npc || f.hold || f.dead || f.hp <= 0 || f.y > 5 || f.climb || f.grabCD > 0) continue;
+      if (!['idle', 'walk', 'run'].includes(f.state)) continue;
+      const it = this.items.find((it) => it.y <= 5 && it.def.weapon && (it.floor == null || f.floor == null || it.floor === f.floor) && Math.abs(it.x - f.x) < 46 && Math.abs(it.z - f.z) < 26);
+      if (!it) continue;
+      this.items.splice(this.items.indexOf(it), 1);
+      f.hold = it;
+      this.sfx('coin');
+      this.fx.add({ type: 'ring', x: f.x, z: f.z, y: 60, life: 0.3, r: 60, color: '#ffd84a' });
+      this.fx.add({ type: 'text', x: f.x, z: f.z, y: 130, text: it.def.dur ? `拿起${it.def.name}！（可打 ${it.dur} 下）` : `拿起${it.def.name}！`, color: '#ffd84a', size: 18, life: 0.9 });
+    }
     for (const f of this.fighters) {
       if (f.dead || f.hp <= 0 || f.y > 5 || f.climb || (this.cfg.mode === 'story' && f.team !== 0)) continue;
       const it = this.items.find((it) => it.y <= 5 && it.def.type === 'food' && Math.abs(it.x - f.x) < 42 && Math.abs(it.z - f.z) < 26);
@@ -1188,50 +1208,127 @@ export class BattleScene {
   }
 
   // 斬擊軌跡：出拳、揮武器時畫出一道弧形刀光，看得出攻擊範圍
+  // 攻擊的刀光：放蕩不羈的「水墨狂草」風格——粗獷的毛筆筆觸、邊緣粗糙、
+  // 墨色陰影、尾巴拖出乾筆飛白和甩出去的墨點；拿武器時更大、帶金橘色
   drawSlash(p, f) {
     const a = ATK[f.state];
     if (!a || f.dead) return;
     const T = f.stateT;
-    if (T < a.on * 0.5 || T > a.off + 0.08) return;
+    if (T < a.on * 0.5 || T > a.off + 0.12) return;
     const prog = Math.min(1, Math.max(0, (T - a.on * 0.5) / (a.off - a.on * 0.5 + 0.0001)));
-    const fade = T > a.off ? 1 - (T - a.off) / 0.08 : 1;
+    const fade = T > a.off ? 1 - (T - a.off) / 0.12 : 1;
     const W = f.hold && f.hold.def && f.hold.def.type === 'light';
-    const R = (a.x1 + (W ? (f.hold.def.reach || 0) : 0)) * 0.92;
-    const cy = ARENA.floorY + f.z - f.y - 62 * (f.scale || 1);
+    const sc = f.scale || 1;
+    const R = (a.x1 + (W ? weaponReach(f.hold) : 0)) * 0.92;
+    const cy = ARENA.floorY + f.z - f.y - 62 * sc;
     const down = f.state === 'jatk' || f.state === 'djatk' || f.state === 'dive';
+    const heavy = a.heavy || W;
+    const col = W ? '#ff9a2a' : f.char.color;
+    const thick = (heavy ? 30 : 20) * (W ? 1.25 : 1);
+    // 同一下攻擊用同一組亂數，筆觸才不會每一幀亂跳
+    if (f.slashState !== f.state || T < (f.slashT || 0)) {
+      f.slashState = f.state;
+      f.atkSeed = 1 + Math.floor(Math.random() * 1000);
+    }
+    f.slashT = T;
+    const seed = f.atkSeed;
+    const hs = (i) => {
+      const s = Math.sin((i + seed) * 127.1) * 43758.5453;
+      return s - Math.floor(s);
+    };
+    // 沿著橢圓（ry＝縱向比例）從 b0 畫到 b1 的毛筆筆觸
+    const brush = (b0, b1, r, ry, w, jitter) => {
+      const n = 30, outer = [], inner = [];
+      for (let i = 0; i <= n; i++) {
+        const u = i / n, ang = b0 + (b1 - b0) * u;
+        // 起筆重、收筆細（尾巴拉成尖）
+        const tw = w * Math.pow(Math.sin(Math.PI * Math.min(1, 0.12 + u * 0.95)), 0.55) * (1.15 - u * 0.55);
+        const j = (hs(i) - 0.5) * jitter;
+        const ro = r + tw * 0.5 + j, ri = r - tw * 0.5 + j * 0.4;
+        outer.push([Math.cos(ang) * ro, Math.sin(ang) * ro * ry]);
+        inner.push([Math.cos(ang) * ri, Math.sin(ang) * ri * ry]);
+      }
+      p.beginPath();
+      p.moveTo(outer[0][0], outer[0][1]);
+      for (const q of outer) p.lineTo(q[0], q[1]);
+      for (let i = inner.length - 1; i >= 0; i--) p.lineTo(inner[i][0], inner[i][1]);
+      p.closePath();
+    };
+    let b0, b1, ry = 1;
     if (f.state === 'spin') {
-      // 迴旋攻擊：一整圈刀光
-      p.save();
-      p.translate(f.x, cy + 20);
-      p.globalCompositeOperation = 'lighter';
-      p.lineCap = 'round';
-      for (const [w, col, al] of [[22, f.char.color, 0.55], [9, '#ffffff', 0.95]]) {
-        p.globalAlpha = al * fade;
-        p.strokeStyle = col;
-        p.lineWidth = w;
+      b0 = -Math.PI / 2;
+      b1 = b0 + Math.PI * 2 * prog;
+      ry = 0.42;
+    } else {
+      b0 = down ? -0.4 : f.state === 'a3' ? -1.6 : f.state === 'a2' ? 0.8 : f.state === 'ratk' ? -0.35 : -1.0;
+      const e = down ? 1.4 : f.state === 'a3' ? 1.1 : f.state === 'a2' ? -0.7 : f.state === 'ratk' ? 0.35 : 0.65;
+      b1 = b0 + (e - b0) * prog;
+    }
+    p.save();
+    p.translate(f.x, cy + (f.state === 'spin' ? 20 : 0));
+    p.scale(f.facing, 1);
+    // 1. 墨色陰影（往下偏一點，像墨暈開）
+    p.globalAlpha = 0.5 * fade;
+    p.fillStyle = '#0b0710';
+    p.save();
+    p.translate(4, 5);
+    brush(b0, b1, R, ry, thick * 1.3, thick * 0.5);
+    p.fill();
+    p.restore();
+    // 2. 主筆觸（角色色／武器的金橘色）＋粗黑邊
+    p.globalAlpha = 0.92 * fade;
+    p.fillStyle = col;
+    brush(b0, b1, R, ry, thick, thick * 0.45);
+    p.fill();
+    p.strokeStyle = '#120a14';
+    p.lineWidth = 2.5;
+    p.stroke();
+    // 3. 發光的白色筆芯
+    p.globalCompositeOperation = 'lighter';
+    p.globalAlpha = 0.9 * fade;
+    p.fillStyle = '#fff6d8';
+    brush(b0 + (b1 - b0) * 0.08, b1, R, ry, thick * 0.32, thick * 0.12);
+    p.fill();
+    p.globalCompositeOperation = 'source-over';
+    // 4. 乾筆飛白：尾段拖出幾條斷斷續續的細線
+    p.lineCap = 'round';
+    for (let k = 0; k < 5; k++) {
+      const rr = R + (k - 2) * thick * 0.24;
+      const s0 = b0 + (b1 - b0) * (0.45 + hs(40 + k) * 0.25);
+      const s1 = b1 + (b1 - b0) * (0.06 + hs(50 + k) * 0.12);
+      p.globalAlpha = (0.45 + hs(60 + k) * 0.4) * fade;
+      p.strokeStyle = k % 2 ? '#120a14' : col;
+      p.lineWidth = 1.5 + hs(70 + k) * 2.5;
+      p.setLineDash([6 + hs(80 + k) * 14, 4 + hs(90 + k) * 10]);
+      p.beginPath();
+      p.ellipse(0, 0, rr, rr * ry, 0, Math.min(s0, s1), Math.max(s0, s1));
+      p.stroke();
+    }
+    p.setLineDash([]);
+    // 5. 甩出去的墨點（在筆尖附近往外噴）
+    const tip = b1;
+    for (let k = 0; k < (heavy ? 9 : 5); k++) {
+      const d = R + (hs(100 + k) - 0.3) * thick * 2.2;
+      const ang = tip + (hs(110 + k) - 0.5) * 0.5 + prog * 0.15 * k;
+      const sz = 1.5 + hs(120 + k) * (heavy ? 5 : 3.5);
+      p.globalAlpha = (0.6 + hs(130 + k) * 0.4) * fade;
+      p.fillStyle = k % 3 ? '#120a14' : col;
+      p.beginPath();
+      p.arc(Math.cos(ang) * d, Math.sin(ang) * d * ry, sz, 0, Math.PI * 2);
+      p.fill();
+    }
+    // 6. 重擊：身後拉出速度線
+    if (heavy && f.state !== 'spin') {
+      p.globalAlpha = 0.5 * fade;
+      p.strokeStyle = '#ffffff';
+      for (let k = 0; k < 4; k++) {
+        const y = -40 + k * 22 + (hs(140 + k) - 0.5) * 10;
+        p.lineWidth = 2;
         p.beginPath();
-        p.ellipse(0, 0, R, R * 0.42, 0, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * prog);
+        p.moveTo(-30 - hs(150 + k) * 20, y);
+        p.lineTo(-90 - hs(160 + k) * 60, y);
         p.stroke();
       }
-      p.restore();
-      return;
-    }
-    const a0 = down ? -0.4 : f.state === 'a3' ? -1.4 : f.state === 'a2' ? 0.7 : -0.9;
-    const a1 = down ? 1.3 : f.state === 'a3' ? 0.9 : f.state === 'a2' ? -0.5 : 0.5;
-    const end = a0 + (a1 - a0) * prog;
-    p.save();
-    p.translate(f.x, cy);
-    p.scale(f.facing, 1);
-    p.globalCompositeOperation = 'lighter';
-    p.lineCap = 'round';
-    const heavy = a.heavy;
-    for (const [w, col, al] of [[heavy ? 26 : 18, f.char.color, 0.55], [heavy ? 12 : 8, '#ffffff', 0.95]]) {
-      p.globalAlpha = al * fade;
-      p.strokeStyle = col;
-      p.lineWidth = w;
-      p.beginPath();
-      p.arc(0, 0, R, Math.min(a0, end), Math.max(a0, end));
-      p.stroke();
     }
     p.restore();
   }

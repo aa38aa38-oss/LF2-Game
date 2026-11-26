@@ -280,6 +280,7 @@ export class Fighter {
 
   startAttack(name) {
     this.setState(name);
+    this.swingP = 0;
     this.queue = false;
     this.vx = 0;
     this.vz = 0;
@@ -288,6 +289,8 @@ export class Fighter {
   attackUpdate(dt, b) {
     const a = ATK[this.state];
     const T = this.stateT;
+    // 揮擊進度（0＝舉起、1＝揮到底）：畫手上武器的揮動用
+    this.swingP = Math.max(0, Math.min(1, (T - a.on * 0.4) / Math.max(0.001, Math.min(a.off, 0.6) - a.on * 0.4)));
     if (a.lunge && T < a.off) this.vx = this.facing * a.lunge * (1 - T / a.off);
     if (this.state === 'ratk') this.vx *= Math.exp(-4 * dt);
     if (T >= a.on && T <= a.off) b.meleeHit(this, a);

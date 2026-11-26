@@ -951,11 +951,11 @@ export class StoryScene extends BattleScene {
       txt(ctx, p.text, p.x, FY + p.z - 150 - p.t * 40, { size: p.big ? 22 : p.warn ? 22 : 20, weight: 900, color: p.color, align: 'center', stroke: '#000', sw: 5, alpha: Math.max(0, a) });
     }
     // 地上的紅包：頭上掛暗示標語，一看就知道「收了會掉票」
-    // 主角旁邊的武器：提示「按攻擊撿起」
+    // 主角旁邊的武器：提示「走過去就能拿」
     {
       const P = this.player;
       const w = !P.hold && this.items.find((it) => it.def.weapon && it.y <= 5 && it.floor === P.floor && Math.abs(it.x - P.x) < 52 && Math.abs(it.z - P.z) < 28);
-      if (w) txt(ctx, `按攻擊撿起「${w.def.name}」`, w.x, FY + w.z - 70, { size: 14, weight: 900, color: '#ffffff', align: 'center', stroke: '#000', sw: 4, alpha: blink(this.time, 3) ? 1 : 0.7 });
+      if (w) txt(ctx, `走過去拿起「${w.def.name}」`, w.x, FY + w.z - 70, { size: 14, weight: 900, color: '#ffffff', align: 'center', stroke: '#000', sw: 4, alpha: blink(this.time, 3) ? 1 : 0.7 });
     }
     for (const it of this.items) {
       if (it.kind !== 'redenv' || it.y > 5 || it.hide) continue;

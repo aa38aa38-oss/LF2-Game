@@ -833,12 +833,7 @@ export function drawFighter(ctx, f, alpha = 1) {
   if (f.hold && f.hold.def && f.hold.def.type === 'heavy') drawItem(ctx, f.hold.kind, sx, sy - 112 * (f.scale || 1), 0, 1.2);
   // 手上的武器：插畫角色、或程式畫沒有內建的道具，都在手的位置畫出來
   else if (f.hold && f.hold.def && (img || !['mic', 'sign', 'egg'].includes(f.hold.kind)) && f.state !== 'down' && f.state !== 'fall') {
-    const atk = ['a1', 'a2', 'a3', 'jatk', 'djatk', 'ratk'].includes(f.state);
-    ctx.save();
-    ctx.translate(sx + f.facing * (atk ? 40 : 24), sy - 66 * (f.scale || 1));
-    ctx.scale(f.facing, 1);
-    drawItem(ctx, f.hold.kind, 0, 18, atk ? 1.2 : 0.35, 1.05);
-    ctx.restore();
+    drawHeldWeapon(ctx, f, sx, sy);
   }
   if (f.state === 'dizzy') {
     for (let i = 0; i < 3; i++) {
@@ -846,6 +841,55 @@ export function drawFighter(ctx, f, alpha = 1) {
       drawStar(ctx, sx + Math.cos(a) * 16, sy - 112 + Math.sin(a) * 5, 4, '#ffe14a');
     }
   }
+}
+
+// ───── 拿著武器打人：武器跟著招式揮動（以肩膀為支點旋轉），揮動時留下殘影 ─────
+// rot：0＝武器直立、正值＝往前倒。[起始角度, 結束角度, 大小]
+const SWING = {
+  a1: [-2.0, 1.9, 1.5], // 第一下：從肩後往前劈下
+  a2: [2.3, -0.6, 1.5], // 第二下：由下往上撈
+  a3: [-2.8, 2.5, 1.7], // 第三下：舉高整圈大力揮
+  jatk: [-1.4, 2.8, 1.5], // 跳躍攻擊：往下砸
+  djatk: [-1.4, 2.8, 1.6],
+  dive: [-1.2, 2.9, 1.6],
+};
+const easeSwing = (t) => 1 - Math.pow(1 - Math.max(0, Math.min(1, t)), 3);
+function drawHeldWeapon(ctx, f, sx, sy) {
+  const sc = f.scale || 1, kind = f.hold.kind, st = f.state;
+  const sw = SWING[st];
+  ctx.save();
+  if (st === 'ratk') {
+    // 衝刺攻擊：武器往前直刺
+    const p = easeSwing(f.swingP || 0);
+    ctx.translate(sx + f.facing * (14 + p * 46) * sc, sy - 62 * sc);
+    ctx.scale(f.facing, 1);
+    drawItem(ctx, kind, 0, 6, Math.PI / 2, 1.5);
+  } else if (st === 'spin') {
+    // 迴旋攻擊：武器跟著轉一圈
+    ctx.translate(sx, sy - 64 * sc);
+    ctx.scale(f.facing, 1);
+    drawItem(ctx, kind, 0, 6, f.stateT * 16, 1.5);
+  } else if (sw) {
+    const [r0, r1, s] = sw;
+    const p = f.swingP || 0;
+    ctx.translate(sx + f.facing * 20 * sc, sy - 74 * sc);
+    ctx.scale(f.facing, 1);
+    // 殘影：前幾個角度畫淡淡的武器，看起來在甩
+    if (p > 0.05 && p < 1) {
+      for (const [dp, al] of [[0.3, 0.12], [0.2, 0.2], [0.1, 0.32]]) {
+        ctx.globalAlpha = al;
+        drawItem(ctx, kind, 0, 6, r0 + (r1 - r0) * easeSwing(p - dp), s);
+      }
+      ctx.globalAlpha = 1;
+    }
+    drawItem(ctx, kind, 0, 6, r0 + (r1 - r0) * easeSwing(p), s);
+  } else {
+    // 平常：武器扛在手上（微微往前斜）
+    ctx.translate(sx + f.facing * 24 * sc, sy - 66 * sc);
+    ctx.scale(f.facing, 1);
+    drawItem(ctx, kind, 0, 18, 0.35, 1.05);
+  }
+  ctx.restore();
 }
 
 export function drawStar(ctx, x, y, r, color) {
