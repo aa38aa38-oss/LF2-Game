@@ -3,7 +3,7 @@ import { specialDef, specialCD } from './moves.js';
 import { W, H, store } from './util.js';
 import { Input } from './input.js';
 import { Sound } from './audio.js';
-import { loadAssets, ASSETS } from './assets.js';
+import { loadAssets, ASSETS, whenAssetsReady } from './assets.js';
 import { clearTextCache, txt } from './ui.js';
 import { storyScene } from './story.js';
 import { ShaftScene } from './shaft.js';
@@ -152,10 +152,10 @@ class Game {
   goMode() { this.setScene(new ModeScene(this)); }
   goCharSelect() { this.setScene(new CharSelectScene(this)); }
   goStageSelect() { this.setScene(new StageSelectScene(this)); }
-  goVS(cfg) { this.setScene(new VSScene(this, cfg)); }
-  startBattle(cfg) { this.setScene(new BattleScene(this, cfg)); }
-  startStory(cfg) { this.setScene(storyScene(this, cfg)); }
-  startShaft(cfg) { this.setScene(new ShaftScene(this, cfg)); }
+  goVS(cfg) { whenAssetsReady(() => this.setScene(new VSScene(this, cfg))); }
+  startBattle(cfg) { whenAssetsReady(() => this.setScene(new BattleScene(this, cfg))); }
+  startStory(cfg) { whenAssetsReady(() => this.setScene(storyScene(this, cfg))); }
+  startShaft(cfg) { whenAssetsReady(() => this.setScene(new ShaftScene(this, cfg))); }
   goResult(data) { this.setScene(new ResultScene(this, data)); }
   goLeaderboard(highlight) { this.setScene(new LeaderboardScene(this, highlight)); }
 

@@ -39,8 +39,11 @@ function chroma(img, hex, tol) {
 }
 
 function loadImg(src, key, tol) {
+  // 整理工具輸出的 .webp 已經去好背（透明），不用再逐像素去綠幕；只有舊的 .png 原圖才需要
+  if (/\.webp(\?|$)/i.test(src)) key = null;
   return new Promise((res) => {
     const im = new Image();
+    im.decoding = 'async';
     im.onload = () => res(key ? chroma(im, key, tol) : im);
     im.onerror = () => {
       console.warn('[assets] 找不到圖檔：', src);
@@ -64,7 +67,16 @@ export async function loadAssets() {
   ASSETS.spriteH = man.spriteHeight || 128; // 角色圖在遊戲裡的高度
   const key = man.chromaKey || null;
   const tol = man.chromaTolerance || 120;
-  const jobs = [];
+  // 分兩批：選單會用到的（站立、走路、勝利、選角圖、頭像、開場與選單背景）先載完就開遊戲，
+  // 其他動作、關卡背景、結局圖在背景繼續載；開打前若還沒載完會等一下（ASSETS.ready）
+  const MENU_ANIMS = new Set(['idle', 'walk', 'victory']);
+  const MENU_STAGES = /^(intro_\d|title|studio|legislature|rally)$/;
+  const critical = [], rest = [];
+  const jobs = {
+    push(p, crit) {
+      (crit ? critical : rest).push(p);
+    },
+  };
   for (const [cid, anims] of Object.entries(man.characters || {})) {
     ASSETS.chars[cid] = {};
     // _standH：整理工具算出的「站立高度」，用來讓所有動作縮放比例一致
@@ -86,24 +98,49 @@ export async function loadAssets() {
               c.getContext('2d').drawImage(im, i * fw, 0, fw, fh, 0, 0, fw, fh);
               arr[i] = c;
             }
-          })
+          }),
+          MENU_ANIMS.has(anim)
         );
         continue;
       }
       const n = spec;
       const arr = (ASSETS.chars[cid][anim] = new Array(n).fill(null));
       for (let i = 1; i <= n; i++) {
-        jobs.push(loadImg(`assets/characters/${cid}/${anim}_${i}.png`, key, tol).then((im) => (arr[i - 1] = im)));
+        jobs.push(loadImg(`assets/characters/${cid}/${anim}_${i}.png`, key, tol).then((im) => (arr[i - 1] = im)), MENU_ANIMS.has(anim));
       }
     }
   }
   for (const group of ['posters', 'portraits', 'stages', 'select', 'scenery']) {
     for (const [id, path] of Object.entries(man[group] || {})) {
       const ck = group === 'stages' || group === 'portraits' ? null : key;
-      jobs.push(loadImg(path, ck, tol).then((im) => im && (ASSETS[group][id] = im)));
+      const crit = group === 'portraits' || group === 'select' || (group === 'stages' && MENU_STAGES.test(id));
+      jobs.push(loadImg(path, ck, tol).then((im) => im && (ASSETS[group][id] = im)), crit);
     }
   }
-  await Promise.all(jobs);
+  await Promise.all(critical);
+  ASSETS.ready = Promise.all(rest).then(() => {
+    ASSETS.allLoaded = true;
+  });
+}
+
+// 開打前呼叫：其餘素材還沒載完就先顯示「載入中」，載完再執行 fn
+export function whenAssetsReady(fn) {
+  if (!ASSETS.ready || ASSETS.allLoaded) return fn();
+  const el = document.getElementById('loading');
+  if (el) {
+    el.textContent = '載入角色中…';
+    el.style.display = '';
+  }
+  // 等待中重複按確定，只執行最後一次
+  const first = !ASSETS.pending;
+  ASSETS.pending = fn;
+  if (!first) return;
+  ASSETS.ready.then(() => {
+    if (el) el.style.display = 'none';
+    const f = ASSETS.pending;
+    ASSETS.pending = null;
+    f();
+  });
 }
 
 export function charFrame(cid, anim, t, fps = 8, loop = true) {
