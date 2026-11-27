@@ -762,6 +762,386 @@
         "sheet": "assets/characters/votebuyer/attack1.webp",
         "frames": 3
       }
+    },
+    "chiang": {
+      "idle": {
+        "sheet": "assets/characters/chiang/idle.webp",
+        "frames": 4
+      },
+      "_standH": 250.0,
+      "attack1": {
+        "sheet": "assets/characters/chiang/attack1.webp",
+        "frames": 3
+      },
+      "attack2": {
+        "sheet": "assets/characters/chiang/attack2.webp",
+        "frames": 3
+      },
+      "attack3": {
+        "sheet": "assets/characters/chiang/attack3.webp",
+        "frames": 4
+      },
+      "catch": {
+        "sheet": "assets/characters/chiang/catch.webp",
+        "frames": 2
+      },
+      "defend": {
+        "sheet": "assets/characters/chiang/defend.webp",
+        "frames": 1
+      },
+      "dizzy": {
+        "sheet": "assets/characters/chiang/dizzy.webp",
+        "frames": 3
+      },
+      "down": {
+        "sheet": "assets/characters/chiang/down.webp",
+        "frames": 1
+      },
+      "fall": {
+        "sheet": "assets/characters/chiang/fall.webp",
+        "frames": 3
+      },
+      "getup": {
+        "sheet": "assets/characters/chiang/getup.webp",
+        "frames": 2
+      },
+      "hurt": {
+        "sheet": "assets/characters/chiang/hurt.webp",
+        "frames": 2
+      },
+      "jump": {
+        "sheet": "assets/characters/chiang/jump.webp",
+        "frames": 2
+      },
+      "jump_attack": {
+        "sheet": "assets/characters/chiang/jump_attack.webp",
+        "frames": 2
+      },
+      "roll": {
+        "sheet": "assets/characters/chiang/roll.webp",
+        "frames": 4
+      },
+      "run": {
+        "sheet": "assets/characters/chiang/run.webp",
+        "frames": 6
+      },
+      "run_attack": {
+        "sheet": "assets/characters/chiang/run_attack.webp",
+        "frames": 3
+      },
+      "special_down": {
+        "sheet": "assets/characters/chiang/special_down.webp",
+        "frames": 4
+      },
+      "special_fwd": {
+        "sheet": "assets/characters/chiang/special_fwd.webp",
+        "frames": 4
+      },
+      "special_up": {
+        "sheet": "assets/characters/chiang/special_up.webp",
+        "frames": 4
+      },
+      "spin": {
+        "sheet": "assets/characters/chiang/spin.webp",
+        "frames": 4
+      },
+      "super": {
+        "sheet": "assets/characters/chiang/super.webp",
+        "frames": 6
+      },
+      "victory": {
+        "sheet": "assets/characters/chiang/victory.webp",
+        "frames": 4
+      },
+      "walk": {
+        "sheet": "assets/characters/chiang/walk.webp",
+        "frames": 6
+      }
+    },
+    "hsieh": {
+      "idle": {
+        "sheet": "assets/characters/hsieh/idle.webp",
+        "frames": 4
+      },
+      "_standH": 250.0,
+      "attack1": {
+        "sheet": "assets/characters/hsieh/attack1.webp",
+        "frames": 3
+      },
+      "attack2": {
+        "sheet": "assets/characters/hsieh/attack2.webp",
+        "frames": 3
+      },
+      "attack3": {
+        "sheet": "assets/characters/hsieh/attack3.webp",
+        "frames": 4
+      },
+      "catch": {
+        "sheet": "assets/characters/hsieh/catch.webp",
+        "frames": 2
+      },
+      "defend": {
+        "sheet": "assets/characters/hsieh/defend.webp",
+        "frames": 1
+      },
+      "dizzy": {
+        "sheet": "assets/characters/hsieh/dizzy.webp",
+        "frames": 3
+      },
+      "down": {
+        "sheet": "assets/characters/hsieh/down.webp",
+        "frames": 1
+      },
+      "fall": {
+        "sheet": "assets/characters/hsieh/fall.webp",
+        "frames": 3
+      },
+      "getup": {
+        "sheet": "assets/characters/hsieh/getup.webp",
+        "frames": 2
+      },
+      "hurt": {
+        "sheet": "assets/characters/hsieh/hurt.webp",
+        "frames": 2
+      },
+      "jump": {
+        "sheet": "assets/characters/hsieh/jump.webp",
+        "frames": 2
+      },
+      "jump_attack": {
+        "sheet": "assets/characters/hsieh/jump_attack.webp",
+        "frames": 2
+      },
+      "roll": {
+        "sheet": "assets/characters/hsieh/roll.webp",
+        "frames": 4
+      },
+      "run": {
+        "sheet": "assets/characters/hsieh/run.webp",
+        "frames": 6
+      },
+      "run_attack": {
+        "sheet": "assets/characters/hsieh/run_attack.webp",
+        "frames": 3
+      },
+      "special_down": {
+        "sheet": "assets/characters/hsieh/special_down.webp",
+        "frames": 4
+      },
+      "special_fwd": {
+        "sheet": "assets/characters/hsieh/special_fwd.webp",
+        "frames": 4
+      },
+      "special_up": {
+        "sheet": "assets/characters/hsieh/special_up.webp",
+        "frames": 4
+      },
+      "spin": {
+        "sheet": "assets/characters/hsieh/spin.webp",
+        "frames": 4
+      },
+      "super": {
+        "sheet": "assets/characters/hsieh/super.webp",
+        "frames": 6
+      },
+      "victory": {
+        "sheet": "assets/characters/hsieh/victory.webp",
+        "frames": 4
+      },
+      "walk": {
+        "sheet": "assets/characters/hsieh/walk.webp",
+        "frames": 6
+      }
+    },
+    "shen": {
+      "idle": {
+        "sheet": "assets/characters/shen/idle.webp",
+        "frames": 4
+      },
+      "_standH": 250.0,
+      "attack1": {
+        "sheet": "assets/characters/shen/attack1.webp",
+        "frames": 3
+      },
+      "attack2": {
+        "sheet": "assets/characters/shen/attack2.webp",
+        "frames": 3
+      },
+      "attack3": {
+        "sheet": "assets/characters/shen/attack3.webp",
+        "frames": 4
+      },
+      "catch": {
+        "sheet": "assets/characters/shen/catch.webp",
+        "frames": 2
+      },
+      "defend": {
+        "sheet": "assets/characters/shen/defend.webp",
+        "frames": 1
+      },
+      "dizzy": {
+        "sheet": "assets/characters/shen/dizzy.webp",
+        "frames": 3
+      },
+      "down": {
+        "sheet": "assets/characters/shen/down.webp",
+        "frames": 1
+      },
+      "fall": {
+        "sheet": "assets/characters/shen/fall.webp",
+        "frames": 3
+      },
+      "getup": {
+        "sheet": "assets/characters/shen/getup.webp",
+        "frames": 2
+      },
+      "hurt": {
+        "sheet": "assets/characters/shen/hurt.webp",
+        "frames": 2
+      },
+      "jump": {
+        "sheet": "assets/characters/shen/jump.webp",
+        "frames": 2
+      },
+      "jump_attack": {
+        "sheet": "assets/characters/shen/jump_attack.webp",
+        "frames": 2
+      },
+      "roll": {
+        "sheet": "assets/characters/shen/roll.webp",
+        "frames": 4
+      },
+      "run": {
+        "sheet": "assets/characters/shen/run.webp",
+        "frames": 6
+      },
+      "run_attack": {
+        "sheet": "assets/characters/shen/run_attack.webp",
+        "frames": 3
+      },
+      "special_down": {
+        "sheet": "assets/characters/shen/special_down.webp",
+        "frames": 4
+      },
+      "special_fwd": {
+        "sheet": "assets/characters/shen/special_fwd.webp",
+        "frames": 4
+      },
+      "special_up": {
+        "sheet": "assets/characters/shen/special_up.webp",
+        "frames": 4
+      },
+      "spin": {
+        "sheet": "assets/characters/shen/spin.webp",
+        "frames": 4
+      },
+      "super": {
+        "sheet": "assets/characters/shen/super.webp",
+        "frames": 6
+      },
+      "victory": {
+        "sheet": "assets/characters/shen/victory.webp",
+        "frames": 4
+      },
+      "walk": {
+        "sheet": "assets/characters/shen/walk.webp",
+        "frames": 6
+      }
+    },
+    "tsai": {
+      "idle": {
+        "sheet": "assets/characters/tsai/idle.webp",
+        "frames": 4
+      },
+      "_standH": 250.0,
+      "attack1": {
+        "sheet": "assets/characters/tsai/attack1.webp",
+        "frames": 3
+      },
+      "attack2": {
+        "sheet": "assets/characters/tsai/attack2.webp",
+        "frames": 3
+      },
+      "attack3": {
+        "sheet": "assets/characters/tsai/attack3.webp",
+        "frames": 4
+      },
+      "catch": {
+        "sheet": "assets/characters/tsai/catch.webp",
+        "frames": 2
+      },
+      "defend": {
+        "sheet": "assets/characters/tsai/defend.webp",
+        "frames": 1
+      },
+      "dizzy": {
+        "sheet": "assets/characters/tsai/dizzy.webp",
+        "frames": 3
+      },
+      "down": {
+        "sheet": "assets/characters/tsai/down.webp",
+        "frames": 1
+      },
+      "fall": {
+        "sheet": "assets/characters/tsai/fall.webp",
+        "frames": 3
+      },
+      "getup": {
+        "sheet": "assets/characters/tsai/getup.webp",
+        "frames": 2
+      },
+      "hurt": {
+        "sheet": "assets/characters/tsai/hurt.webp",
+        "frames": 2
+      },
+      "jump": {
+        "sheet": "assets/characters/tsai/jump.webp",
+        "frames": 2
+      },
+      "jump_attack": {
+        "sheet": "assets/characters/tsai/jump_attack.webp",
+        "frames": 2
+      },
+      "roll": {
+        "sheet": "assets/characters/tsai/roll.webp",
+        "frames": 4
+      },
+      "run": {
+        "sheet": "assets/characters/tsai/run.webp",
+        "frames": 6
+      },
+      "run_attack": {
+        "sheet": "assets/characters/tsai/run_attack.webp",
+        "frames": 3
+      },
+      "special_down": {
+        "sheet": "assets/characters/tsai/special_down.webp",
+        "frames": 4
+      },
+      "special_fwd": {
+        "sheet": "assets/characters/tsai/special_fwd.webp",
+        "frames": 4
+      },
+      "special_up": {
+        "sheet": "assets/characters/tsai/special_up.webp",
+        "frames": 4
+      },
+      "spin": {
+        "sheet": "assets/characters/tsai/spin.webp",
+        "frames": 4
+      },
+      "super": {
+        "sheet": "assets/characters/tsai/super.webp",
+        "frames": 6
+      },
+      "victory": {
+        "sheet": "assets/characters/tsai/victory.webp",
+        "frames": 4
+      },
+      "walk": {
+        "sheet": "assets/characters/tsai/walk.webp",
+        "frames": 6
+      }
     }
   },
   "posters": {
@@ -770,7 +1150,11 @@
     "ko": "assets/posters/ko.webp",
     "su": "assets/posters/su.webp",
     "ma": "assets/posters/ma.webp",
-    "guan": "assets/posters/guan.webp"
+    "guan": "assets/posters/guan.webp",
+    "chiang": "assets/posters/chiang.webp",
+    "hsieh": "assets/posters/hsieh.webp",
+    "shen": "assets/posters/shen.webp",
+    "tsai": "assets/posters/tsai.webp"
   },
   "portraits": {
     "han": "assets/portraits/han.webp",
@@ -779,10 +1163,18 @@
     "su": "assets/portraits/su.webp",
     "ma": "assets/portraits/ma.webp",
     "guan": "assets/portraits/guan.webp",
-    "kingpin": "assets/portraits/kingpin.webp"
+    "kingpin": "assets/portraits/kingpin.webp",
+    "chiang": "assets/portraits/chiang.webp",
+    "hsieh": "assets/portraits/hsieh.webp",
+    "shen": "assets/portraits/shen.webp",
+    "tsai": "assets/portraits/tsai.webp"
   },
   "select": {
-    "han": "assets/select/han.webp"
+    "han": "assets/select/han.webp",
+    "chiang": "assets/select/chiang.webp",
+    "hsieh": "assets/select/hsieh.webp",
+    "shen": "assets/select/shen.webp",
+    "tsai": "assets/select/tsai.webp"
   },
   "stages": {
     "intro_1": "assets/stages/intro_1.jpg",
@@ -805,7 +1197,14 @@
     "ending2_ko": "assets/stages/ending2_ko.jpg",
     "ending2_ma": "assets/stages/ending2_ma.jpg",
     "ending2_su": "assets/stages/ending2_su.jpg",
-    "ending2_wang": "assets/stages/ending2_wang.jpg"
+    "ending2_wang": "assets/stages/ending2_wang.jpg",
+    "ending1_chiang": "assets/stages/ending1_chiang.jpg",
+    "ending1_hsieh": "assets/stages/ending1_hsieh.jpg",
+    "ending1_shen": "assets/stages/ending1_shen.jpg",
+    "ending1_tsai": "assets/stages/ending1_tsai.jpg",
+    "ending2_chiang": "assets/stages/ending2_chiang.jpg",
+    "ending2_shen": "assets/stages/ending2_shen.jpg",
+    "ending2_tsai": "assets/stages/ending2_tsai.jpg"
   },
   "scenery": {
     "s1_apartment": "assets/scenery/s1_apartment.webp",

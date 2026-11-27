@@ -831,7 +831,7 @@ export class BattleScene {
     switch (p.kind) {
       case 'sound': {
         const d = sign(p.vx);
-        ctx.strokeStyle = '#ffd84a';
+        ctx.strokeStyle = p.color || '#ffd84a';
         ctx.lineCap = 'round';
         for (let i = 0; i < 3; i++) {
           ctx.globalAlpha = 1 - i * 0.28;
@@ -1203,6 +1203,8 @@ export class BattleScene {
         ctx.stroke();
         break;
       }
+      default:
+        drawProjExtra(ctx, p, x, y);
     }
     ctx.restore();
   }
@@ -1575,5 +1577,257 @@ export class BattleScene {
       txt(ctx, (sel ? '▶ ' : '　') + o, 480, y, { size: 22, weight: 900, align: 'center', color: sel ? '#ffd84a' : '#fff' });
       this.hot.add(360, y - 18, 240, 36, () => this.pauseChoose(i));
     });
+  }
+}
+
+// ───────── 第二批主角的投射物（黑熊、手冊、白皮書、貓、辣椒火、掌風、虱目魚、洋流、煙火、巨貓、金龍） ─────────
+function drawProjExtra(ctx, p, x, y) {
+  const d = sign(p.vx) || p.dir || 1;
+  const OL = '#111';
+  const blob = (cx, cy, rx, ry, fill) => {
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+    ctx.fillStyle = fill;
+    ctx.fill();
+    ctx.strokeStyle = OL;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  };
+  switch (p.kind) {
+    case 'bear': {
+      // 往前撲的小黑熊
+      const hop = Math.abs(Math.sin(p.t * 14)) * 10;
+      ctx.translate(x, y - 26 - hop);
+      ctx.scale(d, 1);
+      blob(0, 0, 26, 20, '#1b1b1b');
+      blob(22, -14, 14, 13, '#1b1b1b');
+      blob(16, -27, 5, 5, '#1b1b1b');
+      blob(28, -26, 5, 5, '#1b1b1b');
+      ctx.fillStyle = '#f4f4f4';
+      ctx.beginPath();
+      ctx.moveTo(-8, -8);
+      ctx.lineTo(10, -8);
+      ctx.lineTo(1, 2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(25, -18, 3, 3);
+      blob(32, -11, 5, 4, '#6b4a2e');
+      break;
+    }
+    case 'book':
+    case 'paper': {
+      const big = p.kind === 'book';
+      ctx.translate(x, y - (big ? 16 : 0));
+      ctx.rotate(p.t * (big ? 7 : 16) * d);
+      const w = big ? 30 : 22, h = big ? 22 : 16;
+      ctx.fillStyle = big ? '#2a5a3a' : '#ffffff';
+      ctx.fillRect(-w / 2, -h / 2, w, h);
+      ctx.strokeStyle = OL;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(-w / 2, -h / 2, w, h);
+      ctx.fillStyle = big ? '#ffd84a' : '#3b7dd8';
+      ctx.fillRect(-w / 2 + 3, -2, w - 6, big ? 4 : 3);
+      break;
+    }
+    case 'cat': {
+      const run = Math.sin(p.t * 26) * 5;
+      ctx.translate(x, y - 18);
+      ctx.scale(d, 1);
+      blob(0, 0, 20, 11, '#9a8a78');
+      blob(18, -8, 10, 9, '#9a8a78');
+      ctx.fillStyle = '#9a8a78';
+      ctx.beginPath();
+      ctx.moveTo(12, -14);
+      ctx.lineTo(14, -24);
+      ctx.lineTo(19, -15);
+      ctx.moveTo(19, -15);
+      ctx.lineTo(25, -23);
+      ctx.lineTo(26, -12);
+      ctx.fill();
+      ctx.strokeStyle = OL;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-18, -2);
+      ctx.quadraticCurveTo(-32, -18, -26, -26);
+      ctx.stroke();
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(-10, 8);
+      ctx.lineTo(-10 + run, 16);
+      ctx.moveTo(10, 8);
+      ctx.lineTo(10 - run, 16);
+      ctx.stroke();
+      break;
+    }
+    case 'chili': {
+      // 辣椒火焰：紅橘火團＋小辣椒
+      ctx.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < 5; i++) {
+        const k = (p.t * 6 + i * 0.2) % 1;
+        const r = 14 + k * 22;
+        ctx.globalAlpha = 0.8 * (1 - k);
+        ctx.fillStyle = i % 2 ? '#ff3b1a' : '#ffa21a';
+        ctx.beginPath();
+        ctx.arc(x - d * i * 12, y - 10 + Math.sin(p.t * 20 + i) * 6, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 1;
+      ctx.translate(x, y - 10);
+      ctx.rotate(p.t * 12);
+      ctx.fillStyle = '#e8121a';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 12, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#2e9a2e';
+      ctx.fillRect(10, -2, 5, 4);
+      break;
+    }
+    case 'palm': {
+      // 金色掌風
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = 0.85;
+      ctx.translate(x, y);
+      ctx.scale(d, 1);
+      const g = ctx.createRadialGradient(0, 0, 4, 0, 0, 34);
+      g.addColorStop(0, 'rgba(255,240,160,1)');
+      g.addColorStop(1, 'rgba(255,170,20,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(0, 0, 34, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffd84a';
+      ctx.fillRect(-6, -14, 14, 28);
+      for (let i = 0; i < 4; i++) ctx.fillRect(8, -14 + i * 7, 12, 5);
+      ctx.fillRect(-2, -22, 6, 10);
+      break;
+    }
+    case 'fish': {
+      ctx.translate(x, y - 12);
+      ctx.rotate(p.t * 10 * d);
+      blob(0, 0, 22, 8, '#c7d2dc');
+      ctx.fillStyle = '#c7d2dc';
+      ctx.beginPath();
+      ctx.moveTo(-20, 0);
+      ctx.lineTo(-32, -9);
+      ctx.lineTo(-32, 9);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = OL;
+      ctx.fillRect(13, -3, 3, 3);
+      break;
+    }
+    case 'sea': {
+      // 洋流：深藍大浪＋白色浪花
+      const a = Math.max(0, 1 - p.t / p.life);
+      ctx.globalAlpha = Math.min(1, a * 1.6);
+      ctx.translate(x, y);
+      ctx.scale(d, 1);
+      const g = ctx.createLinearGradient(0, -170, 0, 0);
+      g.addColorStop(0, '#5cc0ff');
+      g.addColorStop(1, '#0d3a7a');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.moveTo(-70, 0);
+      ctx.quadraticCurveTo(-60, -120, 10, -160);
+      ctx.quadraticCurveTo(60, -170, 50, -120);
+      ctx.quadraticCurveTo(20, -130, 26, -90);
+      ctx.quadraticCurveTo(40, -40, 60, 0);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = '#06204a';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      for (let i = 0; i < 6; i++) {
+        ctx.beginPath();
+        ctx.arc(6 + i * 8, -160 + Math.sin(p.t * 18 + i) * 4 + (i > 3 ? 10 : 0), 7, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      for (let i = 0; i < 4; i++) ctx.fillRect(-40 + i * 18, -20 - ((p.t * 260 + i * 41) % 110), 5, 14);
+      break;
+    }
+    case 'firework': {
+      // 落下的煙火：彩色星星＋拖尾
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.fillStyle = `hsl(${p.hue || 0},100%,65%)`;
+      ctx.globalAlpha = 0.5;
+      ctx.fillRect(x - 2, y - 40, 4, 30);
+      ctx.globalAlpha = 1;
+      ctx.translate(x, y - 8);
+      ctx.rotate(p.t * 8);
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++) {
+        const r = i % 2 ? 5 : 12;
+        ctx.lineTo(Math.cos((i * Math.PI) / 5) * r, Math.sin((i * Math.PI) / 5) * r);
+      }
+      ctx.closePath();
+      ctx.fill();
+      break;
+    }
+    case 'bigcat': {
+      // 巨貓衝鋒
+      const run = Math.sin(p.t * 22) * 10;
+      const body = p.tabby ? '#9a8a78' : '#f2efe8';
+      const spot = p.tabby ? '#5e5245' : '#e08a3a';
+      ctx.translate(x, y - 60 - Math.abs(run) * 0.5);
+      ctx.scale(d * 2.2, 2.2);
+      blob(0, 0, 26, 14, body);
+      ctx.fillStyle = spot;
+      for (let i = 0; i < 3; i++) ctx.fillRect(-14 + i * 10, -12, 4, 10);
+      blob(24, -10, 13, 11, body);
+      ctx.fillStyle = body;
+      ctx.beginPath();
+      ctx.moveTo(16, -17);
+      ctx.lineTo(18, -30);
+      ctx.lineTo(24, -19);
+      ctx.moveTo(26, -19);
+      ctx.lineTo(33, -29);
+      ctx.lineTo(34, -15);
+      ctx.fill();
+      ctx.fillStyle = OL;
+      ctx.fillRect(28, -13, 3, 3);
+      ctx.strokeStyle = OL;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(-14, 10);
+      ctx.lineTo(-14 + run * 0.6, 24);
+      ctx.moveTo(12, 10);
+      ctx.lineTo(12 - run * 0.6, 24);
+      ctx.moveTo(-24, -2);
+      ctx.quadraticCurveTo(-40, -20, -32, -30);
+      ctx.stroke();
+      break;
+    }
+    case 'dragon': {
+      // 金龍：龍頭＋波浪身體
+      const ang = Math.atan2((p.vz || 0) * 0.3, p.vx || d);
+      ctx.translate(x, y);
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.fillStyle = 'rgba(255,200,60,0.35)';
+      ctx.beginPath();
+      ctx.arc(0, 0, 30, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.rotate(ang);
+      ctx.strokeStyle = '#d99a10';
+      ctx.lineWidth = 9;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      for (let i = 0; i <= 6; i++) ctx.lineTo(-i * 9, Math.sin(p.t * 16 - i * 0.9) * 7);
+      ctx.stroke();
+      ctx.strokeStyle = '#ffe07a';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+      blob(6, 0, 12, 8, '#ffcf33');
+      ctx.fillStyle = '#ff3b1a';
+      ctx.fillRect(14, 2, 8, 3);
+      ctx.fillStyle = OL;
+      ctx.fillRect(7, -5, 3, 3);
+      break;
+    }
   }
 }

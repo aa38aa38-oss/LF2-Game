@@ -608,6 +608,290 @@ const EXTRA = {
 };
 for (const [id, ex] of Object.entries(EXTRA)) Object.assign(MOVES[id], ex);
 
+// ═════════ 第二批主角：黑熊教授、帥氣市長、辣台妹總統、龍介仙 ═════════
+// 投射物丟出時機共用：stateT 過了 at 秒就發射一次
+const fireOnce = (f, at, fn) => {
+  if (!f.mv.fired && f.stateT > at) {
+    f.mv.fired = true;
+    fn();
+  }
+};
+const throwPose = (T, at) => (T < at ? { aF: [2.9, 0.2], aB: [2.6, 0.3], tilt: -0.2 } : { aF: [1.5, 0], aB: [1.3, 0.2], tilt: 0.3 });
+
+Object.assign(MOVES, {
+  // ───────── 黑熊教授 ─────────
+  shen: {
+    special: {
+      name: '演講音波', cost: 20, dur: 0.55, ai: 'proj',
+      update(f, b) {
+        fireOnce(f, 0.2, () => {
+          b.sfx('sound');
+          b.spawnProj({
+            owner: f, kind: 'sound', color: '#8fd4ff', x: f.x + f.facing * 40, z: f.z, y: f.y + 70, vx: f.facing * 480,
+            life: 1.3, w: 26, h: 50, dmg: 15, stun: 0.5, kb: 150, fall: 45,
+          });
+        });
+      },
+      pose: (f, T) => ({ aF: [1.6, 0.4], aB: [1.2, 0.5], prop: 'mic', tilt: 0.15, expr: 'shout' }),
+    },
+    specialUp: {
+      name: '黑熊撲擊', cost: 22, dur: 0.6, ai: 'mid', range: 260,
+      update(f, b) {
+        fireOnce(f, 0.18, () => {
+          b.sfx('throw');
+          b.spawnProj({
+            owner: f, kind: 'bear', x: f.x + f.facing * 40, z: f.z, y: 0, vx: f.facing * 560,
+            life: 0.75, w: 40, zr: 30, h: 80, dmg: 17, knock: true, launch: 320, kb: 240,
+          });
+        });
+      },
+      pose: (f, T) => ({ aF: [1.57, 0], aB: [0.8, 0.6], tilt: 0.2, expr: 'shout' }),
+    },
+    specialDown: {
+      name: '丟防衛手冊', cost: 22, dur: 0.55, ai: 'proj',
+      update(f, b) {
+        fireOnce(f, 0.25, () => {
+          b.sfx('throw');
+          b.spawnProj({
+            owner: f, kind: 'book', x: f.x + f.facing * 30, z: f.z, y: 80, vx: f.facing * 520, vy: 180, gravity: 1100,
+            life: 2, w: 30, zr: 26, h: 44, dmg: 20, knock: true, launch: 300, kb: 180, vanishOnGround: true,
+          });
+        });
+      },
+      pose: (f, T) => throwPose(T, 0.25),
+    },
+    super: {
+      // 洋流：三道大浪接連往前橫掃，前兩道把人捲住，最後一道打飛
+      dur: 1.9, aiRange: 700, aiZ: 90,
+      update(f, b) {
+        f.vx = f.vz = 0;
+        const n = f.mv.n || 0;
+        if (n < 3 && f.stateT > 0.35 + n * 0.3) {
+          f.mv.n = n + 1;
+          const last = n === 2;
+          b.sfx('wave');
+          b.shake(8, 0.3);
+          b.spawnProj({
+            owner: f, kind: 'sea', x: f.x + f.facing * 30, z: f.z, y: 0, vx: f.facing * 700, life: 1.1, w: 60, zr: 95, h: 170,
+            pierce: true, unblockable: true, dir: f.facing,
+            ...(last ? { dmg: 30, knock: true, launch: 480, kb: 360 } : { dmg: 10, stun: 0.5, kb: 120, fall: 0 }),
+          });
+        }
+      },
+      pose: (f, T) => (T < 0.35 ? { aF: [2.8, 0.2], aB: [2.6, 0.2], prop: 'mic', expr: 'shout' } : { aF: [1.57, 0], aB: [1.4, 0.2], prop: 'mic', tilt: 0.25, expr: 'shout' }),
+    },
+  },
+
+  // ───────── 帥氣市長 ─────────
+  chiang: {
+    special: {
+      name: '帥氣閃光', cost: 22, dur: 0.55, ai: 'close', range: 160,
+      update(f, b) {
+        fireOnce(f, 0.18, () => {
+          b.sfx('flash');
+          b.fx.add({ type: 'headflash', x: f.x + f.facing * 30, z: f.z, y: f.y + 96, life: 0.45, dir: f.facing });
+          b.fx.add({ type: 'text', x: f.x + f.facing * 40, z: f.z, y: 140, text: '帥！', color: '#bfe4ff', size: 26, life: 0.7 });
+          b.areaHit(f, { x0: -10, x1: 170, zr: 46, dmg: 7, dizzy: 1.5, kb: 0 });
+        });
+      },
+      pose: (f, T) => ({ aF: [2.2, 0.3], aB: [0.6, 1.4], tilt: 0.05, expr: 'smile' }),
+    },
+    specialUp: {
+      name: '白皮書連發', cost: 20, dur: 0.5, ai: 'proj',
+      update(f, b) {
+        fireOnce(f, 0.2, () => {
+          b.sfx('throw');
+          for (const vz of [-95, 0, 95]) {
+            b.spawnProj({
+              owner: f, kind: 'paper', x: f.x + f.facing * 30, z: f.z, y: f.y + 62, vx: f.facing * 540, vz,
+              life: 0.95, w: 20, h: 40, dmg: 9, stun: 0.32, kb: 70,
+            });
+          }
+        });
+      },
+      pose: (f, T) => throwPose(T, 0.2),
+    },
+    specialDown: {
+      name: '晨跑衝刺', cost: 18, dur: 0.6, ai: 'mid', range: 230,
+      update(f, b) {
+        f.vx = f.stateT < 0.4 ? f.facing * 660 : f.vx * 0.85;
+        if (f.stateT < 0.42) b.areaHit(f, { x0: -5, x1: 50, zr: 24, dmg: 14, knock: true, launch: 280, kb: 280, fall: 80 });
+        afterimage(b, f, 0.05);
+      },
+      pose: (f, T, t) => {
+        const s = Math.sin(t * 24);
+        return { tilt: 0.35, lF: [s + 0.2, -1.2], lB: [-s + 0.2, -1.2], aF: [0.3 - s * 0.8, 1.9], aB: [0.3 + s * 0.8, 1.9], expr: 'smile' };
+      },
+    },
+    super: {
+      // 團結向前：煙火落在每個對手頭上，最後一發大煙火炸飛
+      dur: 2.1, aiRange: 800,
+      update(f, b) {
+        f.vx = f.vz = 0;
+        const m = f.mv;
+        m.c = (m.c || 0) - 1 / 60;
+        m.n = m.n || new Map();
+        const foes = b.enemiesOf(f).filter((e) => Math.abs(e.x - f.x) < 850);
+        if (m.c <= 0 && f.stateT > 0.25 && f.stateT < 1.5) {
+          m.c = 0.16;
+          for (const e of foes) {
+            const k = m.n.get(e) || 0;
+            if (k >= 7) continue;
+            m.n.set(e, k + 1);
+            b.spawnProj({
+              owner: f, kind: 'firework', hue: (k * 57) % 360, x: e.x + rand(-14, 14), z: Math.max((e.bounds || ARENA).zMin, Math.min((e.bounds || ARENA).zMax, e.z + rand(-8, 8))),
+              y: 420, vy: -340, gravity: 1200, life: 3, w: 22, zr: 24, h: 30, dmg: 3.5, stun: 0.32, kb: 10, fall: 0, vanishOnGround: true, unblockable: true,
+            });
+          }
+          b.sfx('coin');
+        }
+        if (!m.big && f.stateT > 1.6) {
+          m.big = true;
+          b.sfx('zap');
+          b.shake(10, 0.4);
+          b.fx.add({ type: 'screenflash', color: '#ffe9a8', life: 0.25 });
+          for (const e of foes) {
+            b.fx.add({ type: 'ring', x: e.x, z: e.z, y: 80, life: 0.6, r: 90, color: pick(['#ff5a5a', '#ffd84a', '#5cc8ff', '#7cff7a']) });
+            b.applyHit(f, e, { dmg: 22, knock: true, launch: 400, kb: 160, unblockable: true });
+          }
+        }
+      },
+      pose: (f, T, t) => ({ aF: [2.9, 0.1], aB: [0.6, 1.4], expr: 'shout', bob: Math.abs(Math.sin(t * 8)) * 3 }),
+    },
+  },
+
+  // ───────── 辣台妹總統 ─────────
+  tsai: {
+    special: {
+      name: '貓咪出擊', cost: 20, dur: 0.5, ai: 'proj',
+      update(f, b) {
+        fireOnce(f, 0.18, () => {
+          b.sfx('special');
+          b.spawnProj({
+            owner: f, kind: 'cat', x: f.x + f.facing * 36, z: f.z, y: 0, vx: f.facing * 520,
+            life: 1.1, w: 30, zr: 26, h: 40, dmg: 13, stun: 0.45, kb: 110, fall: 45,
+          });
+        });
+      },
+      pose: (f, T) => ({ aF: [1.57, 0], aB: [0.6, 1.2], tilt: 0.1, expr: 'smile' }),
+    },
+    specialUp: {
+      name: '辣椒火焰', cost: 22, dur: 0.6, ai: 'close', range: 200,
+      update(f, b) {
+        fireOnce(f, 0.2, () => {
+          b.sfx('wave');
+          b.spawnProj({
+            owner: f, kind: 'chili', x: f.x + f.facing * 40, z: f.z, y: f.y + 60, vx: f.facing * 420,
+            life: 0.6, w: 40, zr: 30, h: 60, dmg: 16, knock: true, launch: 260, kb: 200, pierce: true,
+          });
+        });
+      },
+      pose: (f, T) => ({ aF: [1.57, 0], aB: [1.4, 0.2], tilt: 0.25, expr: 'shout' }),
+    },
+    specialDown: {
+      name: '眼鏡閃光', cost: 22, dur: 0.55, ai: 'close', range: 150,
+      update(f, b) {
+        fireOnce(f, 0.2, () => {
+          b.sfx('flash');
+          b.fx.add({ type: 'headflash', x: f.x + f.facing * 8, z: f.z, y: f.y + 110, life: 0.45, dir: f.facing });
+          for (const e of b.enemiesOf(f)) {
+            if (Math.abs(e.x - f.x) < 160 && Math.abs(e.z - f.z) < 46 && e.y < 60) b.applyHit(f, e, { dmg: 6, dizzy: 1.6, kb: 0, dir: sign(e.x - f.x) || 1 });
+          }
+        });
+      },
+      pose: () => ({ aF: [2.6, 1.6], aB: [0.6, 1.2], expr: 'smile' }),
+    },
+    super: {
+      // 巨貓衝鋒：兩隻巨貓前後衝過全場
+      dur: 1.6, aiRange: 650, aiZ: 90,
+      update(f, b) {
+        f.vx = f.vz = 0;
+        const n = f.mv.n || 0;
+        if (n < 2 && f.stateT > 0.35 + n * 0.3) {
+          f.mv.n = n + 1;
+          b.sfx('heavy');
+          b.shake(9, 0.35);
+          b.spawnProj({
+            owner: f, kind: 'bigcat', tabby: n === 0, x: f.x - f.facing * 20, z: f.z + (n ? 22 : -22), y: 0, vx: f.facing * 760, life: 1.3, w: 70, zr: 70, h: 150,
+            dmg: 26, knock: true, launch: 460, kb: 340, pierce: true, unblockable: true, dir: f.facing,
+          });
+        }
+      },
+      pose: () => ({ aF: [1.57, 0], aB: [0.6, 1.2], tilt: 0.05, expr: 'smile' }),
+    },
+  },
+
+  // ───────── 龍介仙 ─────────
+  hsieh: {
+    special: {
+      name: '布袋戲掌', cost: 20, dur: 0.5, ai: 'proj',
+      update(f, b) {
+        fireOnce(f, 0.18, () => {
+          b.sfx('special');
+          b.spawnProj({
+            owner: f, kind: 'palm', x: f.x + f.facing * 40, z: f.z, y: f.y + 66, vx: f.facing * 500,
+            life: 1.2, w: 30, h: 50, dmg: 15, stun: 0.5, kb: 160, fall: 45,
+          });
+        });
+      },
+      pose: (f, T) => ({ aF: [1.57, 0], aB: [1.2, 0.6], tilt: 0.2, expr: 'shout' }),
+    },
+    specialUp: {
+      name: '台語大聲公', cost: 22, dur: 0.6, ai: 'crowd',
+      update(f, b) {
+        fireOnce(f, 0.25, () => {
+          b.sfx('sound');
+          b.shake(6, 0.2);
+          b.fx.add({ type: 'ring', x: f.x, z: f.z, y: 60, life: 0.45, r: 160, color: '#ffb02e' });
+          b.fx.add({ type: 'text', x: f.x, z: f.z, y: 130, text: '恁聽乎清楚！', color: '#ffb02e', size: 24, life: 0.8 });
+          for (const e of b.enemiesOf(f)) {
+            if (Math.abs(e.x - f.x) < 160 && Math.abs(e.z - f.z) < 44 && e.y < 60) b.applyHit(f, e, { dmg: 16, knock: true, launch: 320, kb: 260, dir: sign(e.x - f.x) || 1 });
+          }
+        });
+      },
+      pose: (f, T) => (T < 0.25 ? { aF: [2.4, 0.4], aB: [2.2, 0.4], expr: 'shout' } : { aF: [1.57, 0], aB: [1.4, 0.3], tilt: 0.3, expr: 'shout' }),
+    },
+    specialDown: {
+      name: '丟虱目魚', cost: 22, dur: 0.55, ai: 'proj',
+      update(f, b) {
+        fireOnce(f, 0.25, () => {
+          b.sfx('throw');
+          b.spawnProj({
+            owner: f, kind: 'fish', x: f.x + f.facing * 30, z: f.z, y: 80, vx: f.facing * 560, vy: 160, gravity: 1000,
+            life: 2, w: 34, zr: 24, h: 40, dmg: 20, knock: true, launch: 300, kb: 180, vanishOnGround: true,
+          });
+        });
+      },
+      pose: (f, T) => throwPose(T, 0.25),
+    },
+    super: {
+      // 金龍出海：五道金龍追著對手咬，最後兩道把人打倒
+      dur: 1.4, aiRange: 800,
+      update(f, b) {
+        f.vx = f.vz = 0;
+        const n = f.mv.n || 0;
+        if (n < 5 && f.stateT > 0.3 + n * 0.14) {
+          f.mv.n = n + 1;
+          const foes = b.enemiesOf(f).filter((e) => Math.abs(e.x - f.x) < 900);
+          foes.sort((a, c) => Math.abs(a.x - f.x) - Math.abs(c.x - f.x));
+          const tgt = foes.length ? foes[n % foes.length] : null;
+          const last = n >= 3;
+          b.spawnProj({
+            owner: f, kind: 'dragon', homing: tgt, x: f.x + f.facing * 20, z: f.z, y: f.y + 90,
+            vx: f.facing * rand(260, 360), vz: rand(-160, 160), life: 2.8, w: 30, zr: 28, h: 44, unblockable: true, noClash: true,
+            ...(last ? { dmg: 14, knock: true, launch: 340, kb: 170, fall: 80 } : { dmg: 8, stun: 0.4, kb: 30, fall: 0 }),
+          });
+          b.sfx('special');
+        }
+      },
+      pose: (f, T, t) => {
+        const k = Math.floor(t * 10) % 2;
+        return { aF: k ? [2.6, 0.3] : [1.57, 0], aB: k ? [1.57, 0] : [2.6, 0.3], expr: 'shout', tilt: 0.1 };
+      },
+    },
+  },
+});
+
 // 技能冷卻秒數：沒特別指定就依原本的耗氣換算（耗 25 氣 ≈ 6 秒）
 // 可選角色的技能冷卻整體縮短（敵人的招式 cost 是 0，不受影響）
 export const CD_SCALE = 0.65;

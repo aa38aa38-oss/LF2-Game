@@ -102,8 +102,11 @@ export class CharSelectScene {
     pixelText(ctx, this.step === 0 ? '選擇你的角色' : '選擇你的對手', 480, 36, { size: 40, scale: 3, color: this.step === 0 ? '#8CFF5B' : '#ff7a5a', color2: this.step === 0 ? '#2fbf2f' : '#c0301a', outline: '#060606' });
     // 角色卡
     this.hot.clear();
+    // 角色卡：人數多時自動縮小，一排排完（6 人時跟原本一樣大）
+    const N = CHARS.length, step = Math.min(152, 940 / N), s = Math.round(step * 0.78);
+    const cx0 = 480 - (N * step) / 2 + (step - s) / 2;
     CHARS.forEach((c, i) => {
-      const x = 32 + i * 152, y = 66, s = 118;
+      const x = cx0 + i * step, y = 66;
       const sel = i === this.sel;
       const taken = this.step === 1 && c.id === this.picked;
       ctx.fillStyle = 'rgba(0,0,0,0.7)';
@@ -114,7 +117,7 @@ export class CharSelectScene {
         ctx.fillRect(x, y, s, s);
         txt(ctx, '1P', x + s / 2, y + s / 2, { size: 20, font: 'px', color: '#5cff7a', align: 'center' });
       }
-      txt(ctx, c.title, x + s / 2, y + s + 15, { size: 16, weight: 900, color: sel ? '#ffd84a' : '#ddd', align: 'center' });
+      txt(ctx, c.title, x + s / 2, y + s + 15, { size: N > 6 ? 13 : 16, weight: 900, color: sel ? '#ffd84a' : '#ddd', align: 'center' });
       if (sel && blink(t, 3)) {
         ctx.strokeStyle = this.step === 0 ? '#5cff7a' : '#ff5a5a';
         ctx.lineWidth = 4;

@@ -39,12 +39,13 @@ const SLIDES = [
     },
   },
   {
-    text: '六位政壇傳奇，同時被叫進了議場……',
+    text: '政壇傳奇們，同時被叫進了議場……',
     draw(p, t) {
       p.fillStyle = '#05040c';
       p.fillRect(0, 0, 960, 540);
       CHARS.forEach((ch, i) => {
-        const x = 130 + i * 140;
+        const gap = Math.min(140, 820 / (CHARS.length - 1));
+        const x = 480 - ((CHARS.length - 1) * gap) / 2 + i * gap;
         const g = p.createRadialGradient(x, 120, 10, x, 420, 260);
         g.addColorStop(0, 'rgba(255,240,200,0.25)');
         g.addColorStop(1, 'rgba(0,0,0,0)');
@@ -55,8 +56,8 @@ const SLIDES = [
         p.lineTo(x + 90, 470);
         p.lineTo(x - 90, 470);
         p.fill();
-        const reveal = t > 0.4 + i * 0.35;
-        const draw = () => drawChar(p, ch, poseOf(ch, 'idle', t + i), x, 470, i < 3 ? 1 : -1, 2.1, 1, false, t);
+        const reveal = t > 0.4 + i * (2.1 / CHARS.length);
+        const draw = () => drawChar(p, ch, poseOf(ch, 'idle', t + i), x, 470, i < CHARS.length / 2 ? 1 : -1, 2.1 * Math.min(1, 7 / CHARS.length + 0.1), 1, false, t);
         if (reveal) draw();
         else silhouette(p, draw);
       });
@@ -107,7 +108,7 @@ const SLIDES = [
       }
       CHARS.forEach((ch, i) => {
         const row = i % 2;
-        const x = 120 + i * 135 + Math.sin(t * 3 + i) * 10;
+        const x = 120 + i * Math.min(135, 720 / (CHARS.length - 1)) + Math.sin(t * 3 + i) * 10;
         drawChar(p, ch, poseOf(ch, 'run', t * 1.2 + i), x, 400 + row * 90, 1, 2.0, 1, false, t);
       });
     },

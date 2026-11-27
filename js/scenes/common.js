@@ -17,6 +17,10 @@ export function poseOf(ch, state, t, stateT = t) {
 
 export function drawLineup(p, t, y = 470, scale = 1.6, gap = 140, opts = {}) {
   const n = CHARS.length;
+  // 人數多時縮小間距與大小，整排塞進畫面
+  const k = Math.min(1, 860 / ((n - 1) * gap));
+  gap *= k;
+  scale *= Math.max(0.7, k);
   const x0 = 480 - ((n - 1) * gap) / 2;
   CHARS.forEach((ch, i) => {
     const st = opts.state || 'idle';

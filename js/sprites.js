@@ -726,6 +726,10 @@ export const POSTER_POSE = {
   ma: { aF: [0.4, 1.9], aB: [-0.8, 1.9], lF: [0.9, -1.2], lB: [-0.7, -0.4], tilt: 0.2, expr: 'smile', prop: 'banana' },
   ko: { aF: [1.2, 1.2], aB: [0.2, 1.4], lF: [0.3, -0.2], lB: [-0.3, 0], tilt: 0.05, expr: 'flat', prop: 'scalpel' },
   guan: { aF: [2.8, 0.2], aB: [1.2, 1.8], lF: [0.5, -0.3], lB: [-0.5, 0], tilt: 0.1, expr: 'shout', prop: 'phone' },
+  shen: { aF: [1.6, 0.4], aB: [-0.3, -1.2], lF: [0.4, -0.2], lB: [-0.4, 0], tilt: 0.1, expr: 'shout', prop: 'mic' },
+  chiang: { aF: [1.57, 0], aB: [0.6, 1.4], lF: [0.4, -0.2], lB: [-0.4, 0], tilt: 0.05, expr: 'smile' },
+  tsai: { aF: [2.6, 1.6], aB: [0.6, 1.2], lF: [0.3, -0.2], lB: [-0.3, 0], tilt: 0, expr: 'smile' },
+  hsieh: { aF: [1.57, 0], aB: [2.4, 0.4], lF: [0.6, -0.4], lB: [-0.5, 0], tilt: 0.2, expr: 'shout', prop: 'finger' },
 };
 
 // ---------- 主要繪製 ----------
