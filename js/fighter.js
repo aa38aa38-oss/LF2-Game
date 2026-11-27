@@ -189,6 +189,13 @@ export class Fighter {
       b.startSuper(this);
       return;
     }
+    // 迴旋踢專用鍵（觸控「旋踢」鈕、鍵盤 S／L）：不用再按 ↓＋攻
+    if (c.pressed('spin') && this.spinCD <= 0) {
+      this.startAttack('spin');
+      this.spinCD = 2.5;
+      b.sfx('whiff');
+      return;
+    }
     // 劇情模式的敵人才有自己的特技；可選角色只用共用的簡易指令
     if (this.char.npc && this.readSpecial(b)) return;
     if (c.pressed('attack')) {

@@ -136,7 +136,7 @@ export class CharSelectScene {
       segBar(ctx, 486, y - 6, 120, 12, v / 5, { segs: 5, color: ['#ff6a4a', '#5cc8ff', '#7cff7a'][i] });
     });
     // 共用指令招式（每個角色都一樣）
-    [['連按攻', '三段連招'], ['→＋攻', '前衝攻擊'], ['跳中攻', '從天而降'], ['↓＋攻', '迴旋攻擊']].forEach(([k, n], i) => {
+    [['連按攻', '三段連招'], ['→＋攻', '前衝攻擊'], ['跳中攻', '從天而降'], ['S／旋踢', '迴旋踢']].forEach(([k, n], i) => {
       const y = 284 + i * 26;
       txt(ctx, k, 630, y, { size: 13, weight: 900, color: '#8ab8ff' });
       txt(ctx, n, 700, y, { size: 15, weight: 900, color: '#fff' });

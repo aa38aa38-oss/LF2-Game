@@ -1529,7 +1529,7 @@ export class BattleScene {
   drawSkillBar(ctx) {
     const P = this.player;
     if (!P || P.dead || document.body.classList.contains('touch')) return;
-    const cmds = [['X', '連按＝三段連招'], ['→＋X', '前衝攻擊'], ['跳中 X', '從天而降'], ['↓＋X', '迴旋攻擊', P.spinCD]];
+    const cmds = [['X', '連按＝三段連招'], ['→＋X', '前衝攻擊'], ['跳中 X', '從天而降'], ['S', '迴旋踢', P.spinCD]];
     const y = 500, x0 = 10 - this.g.ox;
     let x = x0;
     for (const [k, name, cd] of cmds) {

@@ -36,7 +36,7 @@ FRAME_PICK = {'reporter/idle': [0, 2, 3], 'kingpin/hurt': [0, 1], 'guan/run': [0
               # 第二批主角：Gemini 加了動態模糊的格子不用
               'hsieh/walk': [0, 4, 5, 6, 7], 'shen/walk': [0, 5, 6], 'shen/run': [0, 3, 4, 5],
               'chiang/walk': [0, 4, 6, 7], 'chiang/run': [0, 4, 5],
-              'tsai/super': [0, 1, 2]}
+              'tsai/super': [0, 1, 2], 'chiang/idle': [0, 2, 3], 'chiang/victory': [0, 2, 3], 'shen/victory': [0, 2, 3]}
 STRIP_SCALE = {}    # 某條動作畫得特別大／小時，可手動縮放，例如 {'han/roll': 0.8}
 
 

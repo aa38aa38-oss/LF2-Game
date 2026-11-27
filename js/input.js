@@ -1,13 +1,14 @@
 // 輸入系統：每位玩家一個 Controller。
 // 鍵盤、觸控、電腦 AI、以及之後的「手機搖桿」都只要操作 Controller 就能控制角色。
 
-// 鍵盤只有三個動作鍵：X 攻擊、空白鍵 跳、C 大絕；方向鍵移動。
+// 鍵盤動作鍵：X 攻擊、空白鍵 跳、C 大絕、S 迴旋踢；方向鍵移動。
 // 另一套 A／D／R（以及舊的 J／K／I）也保留。招式都用「方向＋攻擊」組合出來。
 const KEYMAP = {
   ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',
   KeyX: 'attack', KeyA: 'attack', KeyJ: 'attack', KeyZ: 'attack',
   Space: 'jump', KeyD: 'jump', KeyK: 'jump',
   KeyC: 'super', KeyR: ['super', 'rank'], KeyI: 'super', KeyV: 'super',
+  KeyS: 'spin', KeyL: 'spin',
   Enter: 'start', NumpadEnter: 'start',
   KeyP: 'pause', Escape: 'pause',
   KeyM: 'mute',

@@ -766,7 +766,7 @@
     "chiang": {
       "idle": {
         "sheet": "assets/characters/chiang/idle.webp",
-        "frames": 4
+        "frames": 3
       },
       "_standH": 250.0,
       "attack1": {
@@ -851,7 +851,7 @@
       },
       "victory": {
         "sheet": "assets/characters/chiang/victory.webp",
-        "frames": 4
+        "frames": 3
       },
       "walk": {
         "sheet": "assets/characters/chiang/walk.webp",
@@ -1041,7 +1041,7 @@
       },
       "victory": {
         "sheet": "assets/characters/shen/victory.webp",
-        "frames": 4
+        "frames": 3
       },
       "walk": {
         "sheet": "assets/characters/shen/walk.webp",
