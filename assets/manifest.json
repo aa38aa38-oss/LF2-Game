@@ -1204,7 +1204,8 @@
     "ending1_tsai": "assets/stages/ending1_tsai.jpg",
     "ending2_chiang": "assets/stages/ending2_chiang.jpg",
     "ending2_shen": "assets/stages/ending2_shen.jpg",
-    "ending2_tsai": "assets/stages/ending2_tsai.jpg"
+    "ending2_tsai": "assets/stages/ending2_tsai.jpg",
+    "ending2_hsieh": "assets/stages/ending2_hsieh.jpg"
   },
   "scenery": {
     "s1_apartment": "assets/scenery/s1_apartment.webp",
