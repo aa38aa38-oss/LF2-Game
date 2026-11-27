@@ -172,6 +172,26 @@ export class ShaftScene {
       this.pop(this.P, '密技啟動！無敵', '#ff5adc');
       this.sfx('super');
     }
+    // 劇情模式第二關專用密技：連續按「攻」9 下 → 開啟密技並直接通過這關（每兩下間隔 2 秒內）
+    if (!this.cfg.standalone && ['intro', 'vs', 'fight', 'roundwin'].includes(this.phase)) {
+      const k = (this.skip9 = this.skip9 || { n: 0, t: 0 });
+      k.t += dt;
+      if (k.t > 2) k.n = 0;
+      if (c.pressed('jump') || c.pressed('spin') || c.pressed('super')) k.n = 0;
+      if (c.pressed('attack')) {
+        k.n++;
+        k.t = 0;
+        if (k.n >= 9) {
+          k.n = 0;
+          CHEAT.on = true;
+          this.say('密技！直接通過第二關', 2, '#ff5adc');
+          this.sfx('super');
+          this.setPhase('won');
+          this.g.audio.playBgm('menu');
+          return;
+        }
+      }
+    }
     if (CHEAT.on && this.phase === 'fight' && this.P && !this.P.dead) {
       this.P.hp = MAXHP;
       for (const o of this.chars) {
