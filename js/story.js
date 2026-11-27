@@ -1,6 +1,7 @@
 // 劇情模式：一路打到當選總統。三關：立委選舉 → 市長選舉 → 總統選舉（最終關難度大幅提升）
 // 地圖是「樓層式 2.5D」：每層樓是一段可以前後走的地板，用不同的前後深度（z）表示，
 // 所以不同樓層的人自然打不到彼此；樓層之間用鷹架樓梯連接，鏡頭會上下左右跟著走。
+import { CHEAT, readCheat } from './cheat.js';
 import { BattleScene } from './battle.js';
 import { AI } from './ai.js';
 import { CHARS, CHAR_BY_ID } from './characters.js';
@@ -279,10 +280,33 @@ if (GOD && typeof window !== 'undefined') {
 }
 
 export class StoryScene extends BattleScene {
-  // 測試模式：主角打人傷害 ×20
+  // 測試模式：主角打人傷害 ×20；密技：主角不受傷
   applyHit(src, t, h) {
-    if (GOD && src === this.player && t !== this.player) h = { ...h, dmg: h.dmg * 20 };
+    if (CHEAT.on && t === this.player) return false;
+    if ((GOD || CHEAT.on) && src === this.player && t !== this.player) h = { ...h, dmg: h.dmg * 20 };
     return super.applyHit(src, t, h);
+  }
+
+  // 每幀讀取按鍵，比對密技順序（共用 cheat.js）
+  readCheat(dt) {
+    this.cheatSt = this.cheatSt || {};
+    if (readCheat(this.cheatSt, this.player.ctrl, dt)) {
+      this.say('密技啟動！無敵模式', 2, '#ff5adc');
+      this.sfx('super');
+    }
+  }
+
+  // 密技效果：無敵、氣滿、碰到的敵人直接打倒
+  applyCheat() {
+    const P = this.player;
+    P.hp = P.maxHp;
+    P.cap = P.maxHp;
+    P.mp = 100;
+    for (const f of this.enemiesAlive()) {
+      if (Math.abs(f.x - P.x) < 70 && Math.abs(f.z - P.z) < 34 && Math.abs((f.y || 0) - (P.y || 0)) < 90) {
+        super.applyHit(P, f, { dmg: 99999, knock: true, launch: 360, kb: 320, unblockable: true, dir: Math.sign(f.x - P.x) || P.facing });
+      }
+    }
   }
 
   debugKey(k) {
@@ -584,6 +608,9 @@ export class StoryScene extends BattleScene {
       }
     }
     this.fighters = this.fighters.filter((f) => !(f.goneT > 1.3));
+    // 密技：按鍵比對＋無敵、碰到就打倒
+    this.readCheat(dt);
+    if (CHEAT.on) this.applyCheat();
     // 測試模式：無敵、氣永遠滿
     if (GOD) {
       P.hp = P.maxHp;
@@ -1038,6 +1065,11 @@ export class StoryScene extends BattleScene {
     txt(ctx, bossFight ? '打倒 Boss 就當選！' : `打倒敵人加票；被偷拍、收紅包（不法利益）會扣票`, gx, 64, { size: 11, color: bossFight ? '#ff9a7a' : '#9a9ab0' });
     const m = Math.floor(this.clock / 60), sec = Math.floor(this.clock % 60);
     txt(ctx, `⏱ ${m}:${String(sec).padStart(2, '0')}${this.kneels ? `　跪了 ${this.kneels} 次` : ''}`, gx + gw, 64, { size: 13, weight: 900, color: '#ffd84a', align: 'right' });
+    if (CHEAT.on) {
+      ctx.fillStyle = 'rgba(120,0,90,0.8)';
+      ctx.fillRect(10, GOD ? 114 : 90, 250, 22);
+      txt(ctx, '密技：無敵中・碰到就打倒・氣全滿', 18, GOD ? 125 : 101, { size: 12, weight: 900, color: '#ffd0f4' });
+    }
     if (GOD) {
       ctx.fillStyle = 'rgba(120,0,0,0.8)';
       ctx.fillRect(10, 90, 600, 22);

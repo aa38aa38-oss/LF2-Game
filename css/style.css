@@ -157,6 +157,9 @@ body.touch[data-scene='battle'] #touch {
 .acts .atk { right: 8px; bottom: 8px; width: 96px; height: 96px; font-size: 32px; background: rgba(255, 90, 60, 0.35); }
 .acts .jmp { right: 122px; bottom: 14px; }
 .acts .spn { right: 112px; bottom: 112px; width: 62px; height: 62px; font-size: 17px; background: rgba(80, 150, 255, 0.35); }
+body[data-mode='shaft'] .acts .jmp,
+body[data-mode='shaft'] .acts .sup,
+body[data-mode='shaft'] .acts .spn { display: none; }
 .acts .sup { right: 22px; bottom: 124px; width: 76px; height: 76px; font-size: 20px; background: rgba(120, 100, 40, 0.35); }
 .acts .sup.ready { background: rgba(255, 200, 40, 0.75); box-shadow: 0 0 18px #ffd84a; animation: pulse 0.6s infinite alternate; }
 @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }

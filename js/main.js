@@ -108,6 +108,8 @@ class Game {
     this.scene = s;
     this.fade = 1;
     document.body.dataset.scene = s instanceof BattleScene ? 'battle' : 'menu';
+    // 下樓梯 PK：觸控只留「攻」鍵（CSS 看 data-mode）
+    document.body.dataset.mode = s instanceof ShaftScene ? 'shaft' : '';
     this.input.p1.reset();
     if (s.enter) s.enter();
   }

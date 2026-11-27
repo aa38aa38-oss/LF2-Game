@@ -4,7 +4,7 @@
 
 ## 怎麼用
 
-**畫風**：照發大財議長那張成功的立繪（手繪諷刺漫畫風、約六頭身）。**Gemini 會擋**：寫真實姓名又附真人照片的圖，以及真人「被打」的畫面，所以 prompt 都不寫姓名，被打、倒地也寫成卡通搞笑的反應。
+**畫風**：照發大財院長那張成功的立繪（手繪諷刺漫畫風、約六頭身）。**Gemini 會擋**：寫真實姓名又附真人照片的圖，以及真人「被打」的畫面，所以 prompt 都不寫姓名，被打、倒地也寫成卡通搞笑的反應。
 
 1. **每個角色開一個新對話**，先貼「第零步」（遊戲說明＋角色說明），等 Gemini 回「了解」。
 2. **第一步・立繪**：上傳 2～3 張清楚的照片（正面、側面、全身，自己上網找），貼「做法 A」。不夠像就貼「不夠像時」那段修。滿意後存成 `assets/select/<角色>.png`，這張直接當選角立繪。被拒絕就開新對話改用「做法 B」。
@@ -48,7 +48,7 @@
 
 ### 第一步：角色立繪（上傳 2～3 張照片＋貼這段）
 
-**做法 A：上傳照片（畫法跟發大財議長那張一樣）**　存檔：`assets/select/su.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
+**做法 A：上傳照片（畫法跟發大財院長那張一樣）**　存檔：`assets/select/su.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
 
 ```
 請參考附上的照片，畫一張這個角色的「諷刺漫畫風」全身立繪：乾淨的手繪漫畫插畫風（不是像素風），正常成人比例約六頭身，不要大頭。
@@ -266,7 +266,7 @@ Use the attached images (this character's full-body illustration and three-view 
 
 ### 第一步：角色立繪（上傳 2～3 張照片＋貼這段）
 
-**做法 A：上傳照片（畫法跟發大財議長那張一樣）**　存檔：`assets/select/wang.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
+**做法 A：上傳照片（畫法跟發大財院長那張一樣）**　存檔：`assets/select/wang.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
 
 ```
 請參考附上的照片，畫一張這個角色的「諷刺漫畫風」全身立繪：乾淨的手繪漫畫插畫風（不是像素風），正常成人比例約六頭身，不要大頭。
@@ -452,7 +452,7 @@ Use the attached images (this character's full-body illustration and three-view 
 
 ---
 
-## 發大財議長（`han`）　金句：「放馬過來，林北蛋你！」
+## 發大財院長（`han`）　金句：「放馬過來，林北蛋你！」
 
 ### 第零步：每次開新對話，先貼這段
 
@@ -477,14 +477,14 @@ Use the attached images (this character's full-body illustration and three-view 
 - 我會上傳這個角色的全身立繪和三視圖，每一張都要和它的臉、髮型、服裝、配色、身材比例、畫風完全一樣
 - 一次只畫一張圖，畫完等我確認再畫下一張
 
-這次要畫的角色叫「發大財議長」，圓臉、親切、笑口常開，招牌台詞是「放馬過來，林北蛋你！」。外型：頭頂禿、兩側短灰髮、寬圓臉、笑起來眼睛瞇成彎月形、咧嘴大笑、淺藍襯衫捲起袖子、黑皮帶、深藍長褲、黑皮鞋，招式會拿木製議事槌。招式：議事槌敲地震波、丟出水果貨箱、吃一碗滷肉飯回血。大絕是舉起雙手大笑，天上掉下金幣和金元寶。
+這次要畫的角色叫「發大財院長」，圓臉、親切、笑口常開，招牌台詞是「放馬過來，林北蛋你！」。外型：頭頂禿、兩側短灰髮、寬圓臉、笑起來眼睛瞇成彎月形、咧嘴大笑、淺藍襯衫捲起袖子、黑皮帶、深藍長褲、黑皮鞋，招式會拿木製議事槌。招式：議事槌敲地震波、丟出水果貨箱、吃一碗滷肉飯回血。大絕是舉起雙手大笑，天上掉下金幣和金元寶。
 
 如果了解了，請回答「了解」，然後等我上傳圖片和下一步的指示。
 ```
 
 ### 第一步：角色立繪（上傳 2～3 張照片＋貼這段）
 
-**做法 A：上傳照片（畫法跟發大財議長那張一樣）**　存檔：`assets/select/han.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
+**做法 A：上傳照片（畫法跟發大財院長那張一樣）**　存檔：`assets/select/han.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
 
 ```
 請參考附上的照片，畫一張這個角色的「諷刺漫畫風」全身立繪：乾淨的手繪漫畫插畫風（不是像素風），正常成人比例約六頭身，不要大頭。
@@ -702,7 +702,7 @@ Use the attached images (this character's full-body illustration and three-view 
 
 ### 第一步：角色立繪（上傳 2～3 張照片＋貼這段）
 
-**做法 A：上傳照片（畫法跟發大財議長那張一樣）**　存檔：`assets/select/ma.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
+**做法 A：上傳照片（畫法跟發大財院長那張一樣）**　存檔：`assets/select/ma.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
 
 ```
 請參考附上的照片，畫一張這個角色的「諷刺漫畫風」全身立繪：乾淨的手繪漫畫插畫風（不是像素風），正常成人比例約六頭身，不要大頭。
@@ -920,7 +920,7 @@ Use the attached images (this character's full-body illustration and three-view 
 
 ### 第一步：角色立繪（上傳 2～3 張照片＋貼這段）
 
-**做法 A：上傳照片（畫法跟發大財議長那張一樣）**　存檔：`assets/select/ko.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
+**做法 A：上傳照片（畫法跟發大財院長那張一樣）**　存檔：`assets/select/ko.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
 
 ```
 請參考附上的照片，畫一張這個角色的「諷刺漫畫風」全身立繪：乾淨的手繪漫畫插畫風（不是像素風），正常成人比例約六頭身，不要大頭。
@@ -1138,7 +1138,7 @@ Use the attached images (this character's full-body illustration and three-view 
 
 ### 第一步：角色立繪（上傳 2～3 張照片＋貼這段）
 
-**做法 A：上傳照片（畫法跟發大財議長那張一樣）**　存檔：`assets/select/guan.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
+**做法 A：上傳照片（畫法跟發大財院長那張一樣）**　存檔：`assets/select/guan.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
 
 ```
 請參考附上的照片，畫一張這個角色的「諷刺漫畫風」全身立繪：乾淨的手繪漫畫插畫風（不是像素風），正常成人比例約六頭身，不要大頭。
@@ -1356,7 +1356,7 @@ Use the attached images (this character's full-body illustration and three-view 
 
 ### 第一步：角色立繪（上傳 2～3 張照片＋貼這段）
 
-**做法 A：上傳照片（畫法跟發大財議長那張一樣）**　存檔：`assets/select/shen.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
+**做法 A：上傳照片（畫法跟發大財院長那張一樣）**　存檔：`assets/select/shen.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
 
 ```
 請參考附上的照片，畫一張這個角色的「諷刺漫畫風」全身立繪：乾淨的手繪漫畫插畫風（不是像素風），正常成人比例約六頭身，不要大頭。
@@ -1574,7 +1574,7 @@ Use the attached images (this character's full-body illustration and three-view 
 
 ### 第一步：角色立繪（上傳 2～3 張照片＋貼這段）
 
-**做法 A：上傳照片（畫法跟發大財議長那張一樣）**　存檔：`assets/select/chiang.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
+**做法 A：上傳照片（畫法跟發大財院長那張一樣）**　存檔：`assets/select/chiang.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
 
 ```
 請參考附上的照片，畫一張這個角色的「諷刺漫畫風」全身立繪：乾淨的手繪漫畫插畫風（不是像素風），正常成人比例約六頭身，不要大頭。
@@ -1792,7 +1792,7 @@ Use the attached images (this character's full-body illustration and three-view 
 
 ### 第一步：角色立繪（上傳 2～3 張照片＋貼這段）
 
-**做法 A：上傳照片（畫法跟發大財議長那張一樣）**　存檔：`assets/select/tsai.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
+**做法 A：上傳照片（畫法跟發大財院長那張一樣）**　存檔：`assets/select/tsai.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
 
 ```
 請參考附上的照片，畫一張這個角色的「諷刺漫畫風」全身立繪：乾淨的手繪漫畫插畫風（不是像素風），正常成人比例約六頭身，不要大頭。
@@ -2010,7 +2010,7 @@ Use the attached images (this character's full-body illustration and three-view 
 
 ### 第一步：角色立繪（上傳 2～3 張照片＋貼這段）
 
-**做法 A：上傳照片（畫法跟發大財議長那張一樣）**　存檔：`assets/select/hsieh.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
+**做法 A：上傳照片（畫法跟發大財院長那張一樣）**　存檔：`assets/select/hsieh.png（這張也直接當選角立繪）`　尺寸：直式 2:3（800×1200）
 
 ```
 請參考附上的照片，畫一張這個角色的「諷刺漫畫風」全身立繪：乾淨的手繪漫畫插畫風（不是像素風），正常成人比例約六頭身，不要大頭。
@@ -2790,13 +2790,13 @@ Use the attached images as the exact reference for the character: same face, sam
 Use the attached images as the exact reference for the character: same face, same hairstyle, same outfit and colors, same body proportions. A dramatic comic-style ending scene for a video game: the character from the attached reference images stands tall on the right side, seen from a low angle, clenching a fierce fist and looking down with a cold confident glare. At the bottom left, three generic defeated rival politicians in rumpled suits are sprawled on the ground in a cartoon dust cloud, ties loose, cartoon swirly eyes and little stars over their heads, faces turned away so they are not recognizable. Dark red background with dramatic speed lines. Keep the top-left area simple for a caption. clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art, wide 16:9, no text.
 ```
 
-**發大財議長・結局 1：總統府升旗典禮**　存檔：`assets/stages/ending1_han.png`　尺寸：16:9（1920×1080）
+**發大財院長・結局 1：總統府升旗典禮**　存檔：`assets/stages/ending1_han.png`　尺寸：16:9（1920×1080）
 
 ```
 Use the attached images as the exact reference for the character: same face, same hairstyle, same outfit and colors, same body proportions. A triumphant ending scene for a video game: the character from the attached reference images stands proudly in the center on a red-carpeted ceremony stage in front of a grand red brick presidential office building with a clock tower, saluting during a morning flag-raising ceremony, a flag being raised on a tall flagpole on the right, golden morning sunlight, confetti, an honor guard and a cheering crowd silhouette waving small flags at the bottom. Keep the top 15 percent of the image simple sky for a caption. clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art, wide 16:9, no text.
 ```
 
-**發大財議長・結局 2：俯視落敗的對手**　存檔：`assets/stages/ending2_han.png`　尺寸：16:9（1920×1080）
+**發大財院長・結局 2：俯視落敗的對手**　存檔：`assets/stages/ending2_han.png`　尺寸：16:9（1920×1080）
 
 ```
 Use the attached images as the exact reference for the character: same face, same hairstyle, same outfit and colors, same body proportions. A dramatic comic-style ending scene for a video game: the character from the attached reference images stands tall on the right side, seen from a low angle, clenching a fierce fist and looking down with a cold confident glare. At the bottom left, three generic defeated rival politicians in rumpled suits are sprawled on the ground in a cartoon dust cloud, ties loose, cartoon swirly eyes and little stars over their heads, faces turned away so they are not recognizable. Dark red background with dramatic speed lines. Keep the top-left area simple for a caption. clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), caricature face that keeps a strong likeness, light-hearted video game character art, wide 16:9, no text.

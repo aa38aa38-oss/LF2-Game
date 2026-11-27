@@ -46,7 +46,7 @@ export const CHARS = [
   },
   {
     id: 'han',
-    title: '發大財議長',
+    title: '發大財院長',
     type: '重量範圍型',
     quote: '放馬過來，林北蛋你！',
     specials: [
@@ -151,7 +151,7 @@ export const CHARS = [
   },
   {
     id: 'chiang',
-    title: '帥氣市長',
+    title: '蔣寶市長',
     type: '帥氣速攻型',
     quote: '輝達、牛奶、大巨蛋！',
     specials: [

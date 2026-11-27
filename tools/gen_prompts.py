@@ -4,7 +4,7 @@
 """
 import json, sys, html, pathlib
 
-# 畫風：照使用者在 Gemini 做出、確定喜歡的「諷刺漫畫插畫風」（發大財議長那張立繪）
+# 畫風：照使用者在 Gemini 做出、確定喜歡的「諷刺漫畫插畫風」（發大財院長那張立繪）
 STYLE = ("clean hand-drawn comic caricature illustration, bold black outlines, flat cel-shaded colors, "
          "realistic adult body proportions (about 6 heads tall, NOT chibi, NOT big-headed), "
          "caricature face that keeps a strong likeness, light-hearted video game character art")
@@ -66,8 +66,8 @@ CHARS = [
     ],
     poster="pointing his finger straight at the viewer, shouting with fiery passion, hair flowing dramatically, golden light behind him",
     victory="fist raised high, eyes closed, deeply moved and emotional, tears of passion"),
-  dict(id='han', brief='這次要畫的角色叫「發大財議長」，圓臉、親切、笑口常開，招牌台詞是「放馬過來，林北蛋你！」。外型：頭頂禿、兩側短灰髮、寬圓臉、笑起來眼睛瞇成彎月形、咧嘴大笑、淺藍襯衫捲起袖子、黑皮帶、深藍長褲、黑皮鞋，招式會拿木製議事槌。招式：議事槌敲地震波、丟出水果貨箱、吃一碗滷肉飯回血。大絕是舉起雙手大笑，天上掉下金幣和金元寶。',
-    title='發大財議長', quote='放馬過來，林北蛋你！', color='royal blue and navy',
+  dict(id='han', brief='這次要畫的角色叫「發大財院長」，圓臉、親切、笑口常開，招牌台詞是「放馬過來，林北蛋你！」。外型：頭頂禿、兩側短灰髮、寬圓臉、笑起來眼睛瞇成彎月形、咧嘴大笑、淺藍襯衫捲起袖子、黑皮帶、深藍長褲、黑皮鞋，招式會拿木製議事槌。招式：議事槌敲地震波、丟出水果貨箱、吃一碗滷肉飯回血。大絕是舉起雙手大笑，天上掉下金幣和金元寶。',
+    title='發大財院長', quote='放馬過來，林北蛋你！', color='royal blue and navy',
     zh='韓國瑜', en='Han Kuo-yu', role='Speaker of the Legislative Yuan of Taiwan',
     face='bald crown with short grey hair only on the sides and back, big round face, small smiling eyes, wide warm grin, full cheeks',
     desc="a chubby round-faced elderly Taiwanese politician, bald on top with short grey hair on the sides, big warm friendly grin, light blue dress shirt with rolled-up sleeves, black belt, slight round belly, dark navy trousers, black shoes, holding a wooden judge's gavel",
@@ -211,7 +211,7 @@ def char_sections(c):
     items.append(dict(group=G0, name='遊戲說明＋這個角色的說明', file='（不用存檔）', size='文字',
         prompt=BRIEF + c['brief'] + "\n\n如果了解了，請回答「了解」，然後等我上傳圖片和下一步的指示。"))
     feat = f"{c['face']}; {c['desc']}"
-    items.append(dict(group=G1, name='做法 A：上傳照片（畫法跟發大財議長那張一樣）', file=f"assets/select/{c['id']}.png（這張也直接當選角立繪）",
+    items.append(dict(group=G1, name='做法 A：上傳照片（畫法跟發大財院長那張一樣）', file=f"assets/select/{c['id']}.png（這張也直接當選角立繪）",
         size='直式 2:3（800×1200）',
         prompt=("請參考附上的照片，畫一張這個角色的「諷刺漫畫風」全身立繪：乾淨的手繪漫畫插畫風（不是像素風），正常成人比例約六頭身，不要大頭。\n"
                 "畫之前，請先用文字列出照片中最能認出他的 5 個特徵（臉型、髮際線與髮型、眼睛形狀、笑容或招牌表情、體型），畫的時候這 5 點要明顯保留，並稍微誇張化。\n"
@@ -485,7 +485,7 @@ def write_md(data, path):
     L.append("# Gemini 生圖 Prompt（可直接複製貼上）\n")
     L.append("> 這份是 `tools/gen_prompts.py` 自動產生的，要改內容請改那支程式再重跑。\n")
     L.append("## 怎麼用\n")
-    L.append("**畫風**：照發大財議長那張成功的立繪（手繪諷刺漫畫風、約六頭身）。**Gemini 會擋**：寫真實姓名又附真人照片的圖，以及真人「被打」的畫面，所以 prompt 都不寫姓名，被打、倒地也寫成卡通搞笑的反應。\n")
+    L.append("**畫風**：照發大財院長那張成功的立繪（手繪諷刺漫畫風、約六頭身）。**Gemini 會擋**：寫真實姓名又附真人照片的圖，以及真人「被打」的畫面，所以 prompt 都不寫姓名，被打、倒地也寫成卡通搞笑的反應。\n")
     L.append("1. **每個角色開一個新對話**，先貼「第零步」（遊戲說明＋角色說明），等 Gemini 回「了解」。")
     L.append("2. **第一步・立繪**：上傳 2～3 張清楚的照片（正面、側面、全身，自己上網找），貼「做法 A」。不夠像就貼「不夠像時」那段修。滿意後存成 `assets/select/<角色>.png`，這張直接當選角立繪。被拒絕就開新對話改用「做法 B」。")
     L.append("3. **第二步・三視圖**：上傳立繪，貼「三視圖」。")

@@ -4,6 +4,7 @@
 // - 兩個人碰在一起會互相卡住；按攻擊可以把對方推開，但推人的自己也會扣 1 血
 // - 三戰兩勝？不：要連贏三戰。第 1、2 戰 1 對 1，第 3 戰 1 打 2，一戰比一戰難
 // - 比賽中得票會一直增加
+import { CHEAT, readCheat } from './cheat.js';
 import { Fighter } from './fighter.js';
 import { CHARS, CHAR_BY_ID } from './characters.js';
 import { ARENA, rand, pick, clamp, sign, easeOut } from './util.js';
@@ -165,6 +166,21 @@ export class ShaftScene {
     }
     this.time += dt;
     this.phaseT += dt;
+    // 密技（跟劇情模式共用）：無敵、碰到對手直接打倒
+    this.cheatSt = this.cheatSt || {};
+    if (readCheat(this.cheatSt, c, dt) && this.P) {
+      this.pop(this.P, '密技啟動！無敵', '#ff5adc');
+      this.sfx('super');
+    }
+    if (CHEAT.on && this.phase === 'fight' && this.P && !this.P.dead) {
+      this.P.hp = MAXHP;
+      for (const o of this.chars) {
+        if (o !== this.P && !o.dead && Math.abs(o.x - this.P.x) < 60 && Math.abs(o.y - this.P.y) < 70) {
+          o.hp = 0;
+          this.die(o, '密技！');
+        }
+      }
+    }
     if (this.announce) {
       this.announce.t += dt;
       if (this.announce.t > this.announce.life) this.announce = null;
@@ -439,6 +455,7 @@ export class ShaftScene {
     } else this.sfx('land');
   }
   hurt(c, n, msg) {
+    if (CHEAT.on && c === this.P) return; // 密技：主角不受傷
     c.hp = Math.max(0, c.hp - n);
     c.f.flash = 0.2;
     c.f.setState('hurt');
@@ -450,6 +467,18 @@ export class ShaftScene {
   }
   die(c, msg) {
     if (c.dead) return;
+    if (CHEAT.on && c === this.P) {
+      // 密技：主角不會死，掉下去就放回最上面的台階
+      c.hp = MAXHP;
+      const p = this.plats.filter((q) => !q.broken && q.type !== 'spike' && q.y > CEIL + BODY + 40).sort((a, b) => a.y - b.y)[0];
+      if (p) {
+        c.x = p.x;
+        c.y = p.y;
+        c.vy = 0;
+        c.plat = p;
+      }
+      return;
+    }
     c.dead = true;
     c.plat = null;
     c.vy = -260;
@@ -476,9 +505,13 @@ export class ShaftScene {
     c.f.setState('a1');
     c.atkT = 0.26;
     this.sfx('whiff');
-    const t = this.chars.find((o) => o !== c && !o.dead && (o === this.P) !== (c === this.P) && Math.abs(o.x - c.x) < 66 && Math.abs(o.y - c.y) < 56 && sign(o.x - c.x) !== -c.f.facing);
+    // 不分左右：打離自己最近、在範圍內的人，並自動轉身面向他
+    const near = this.chars.filter((o) => o !== c && !o.dead && (o === this.P) !== (c === this.P) && Math.abs(o.x - c.x) < 66 && Math.abs(o.y - c.y) < 56);
+    near.sort((a, b) => Math.abs(a.x - c.x) - Math.abs(b.x - c.x));
+    const t = near[0];
     if (!t) return;
     const dir = sign(t.x - c.x) || c.f.facing;
+    c.f.facing = dir;
     t.push = dir * 620;
     t.stun = 0.3;
     t.f.flash = 0.15;

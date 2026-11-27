@@ -136,7 +136,7 @@ export const MOVES = {
     },
   },
 
-  // ───────── 發大財議長 ─────────
+  // ───────── 發大財院長 ─────────
   han: {
     special: {
       cost: 25, dur: 0.8, ai: 'close', range: 120,
@@ -608,7 +608,7 @@ const EXTRA = {
 };
 for (const [id, ex] of Object.entries(EXTRA)) Object.assign(MOVES[id], ex);
 
-// ═════════ 第二批主角：黑熊教授、帥氣市長、辣台妹總統、龍介仙 ═════════
+// ═════════ 第二批主角：黑熊教授、蔣寶市長、辣台妹總統、龍介仙 ═════════
 // 投射物丟出時機共用：stateT 過了 at 秒就發射一次
 const fireOnce = (f, at, fn) => {
   if (!f.mv.fired && f.stateT > at) {
@@ -682,7 +682,7 @@ Object.assign(MOVES, {
     },
   },
 
-  // ───────── 帥氣市長 ─────────
+  // ───────── 蔣寶市長 ─────────
   chiang: {
     special: {
       name: '帥氣閃光', cost: 22, dur: 0.55, ai: 'close', range: 160,
