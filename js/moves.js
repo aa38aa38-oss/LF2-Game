@@ -802,19 +802,20 @@ Object.assign(MOVES, {
       pose: () => ({ aF: [2.6, 1.6], aB: [0.6, 1.2], expr: 'smile' }),
     },
     super: {
-      // 巨貓衝鋒：兩隻巨貓前後衝過全場
-      dur: 1.6, aiRange: 650, aiZ: 90,
+      // 綠鳥出巢：一大群綠色小鳥從身後飛出往前衝，前面的把人啄住，最後幾隻把人撞飛
+      dur: 1.7, aiRange: 700, aiZ: 90,
       update(f, b) {
         f.vx = f.vz = 0;
         const n = f.mv.n || 0;
-        if (n < 2 && f.stateT > 0.35 + n * 0.3) {
+        if (n < 26 && f.stateT > 0.3 + n * 0.04) {
           f.mv.n = n + 1;
-          b.sfx('heavy');
-          b.shake(9, 0.35);
+          const last = n >= 21;
           b.spawnProj({
-            owner: f, kind: 'bigcat', tabby: n === 0, x: f.x - f.facing * 20, z: f.z + (n ? 22 : -22), y: 0, vx: f.facing * 760, life: 1.3, w: 70, zr: 70, h: 150,
-            dmg: 26, knock: true, launch: 460, kb: 340, pierce: true, unblockable: true, dir: f.facing,
+            owner: f, kind: 'bird', seed: n, x: f.x - f.facing * 30, z: f.z + rand(-40, 40), y: rand(40, 120),
+            vx: f.facing * rand(620, 780), vz: rand(-90, 90), life: 1.4, w: 26, zr: 30, h: 50, noClash: true, unblockable: true,
+            ...(last ? { dmg: 7, knock: true, launch: 360, kb: 220, fall: 80 } : { dmg: 2.2, stun: 0.25, kb: 20, fall: 0 }),
           });
+          if (n % 4 === 0) b.sfx('special');
         }
       },
       pose: () => ({ aF: [1.57, 0], aB: [0.6, 1.2], tilt: 0.05, expr: 'smile' }),
@@ -865,7 +866,7 @@ Object.assign(MOVES, {
       pose: (f, T) => throwPose(T, 0.25),
     },
     super: {
-      // 金龍出海：五道金龍追著對手咬，最後兩道把人打倒
+      // 愛的監督：五顆粉紅愛心追著對手跑，最後兩顆把人打倒
       dur: 1.4, aiRange: 800,
       update(f, b) {
         f.vx = f.vz = 0;
@@ -877,7 +878,7 @@ Object.assign(MOVES, {
           const tgt = foes.length ? foes[n % foes.length] : null;
           const last = n >= 3;
           b.spawnProj({
-            owner: f, kind: 'dragon', homing: tgt, x: f.x + f.facing * 20, z: f.z, y: f.y + 90,
+            owner: f, kind: 'loveheart', homing: tgt, x: f.x + f.facing * 20, z: f.z, y: f.y + 90,
             vx: f.facing * rand(260, 360), vz: rand(-160, 160), life: 2.8, w: 30, zr: 28, h: 44, unblockable: true, noClash: true,
             ...(last ? { dmg: 14, knock: true, launch: 340, kb: 170, fall: 80 } : { dmg: 8, stun: 0.4, kb: 30, fall: 0 }),
           });

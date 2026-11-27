@@ -1720,34 +1720,81 @@ function drawProjExtra(ctx, p, x, y) {
       break;
     }
     case 'sea': {
-      // 洋流：深藍大浪＋白色浪花
+      // 洋流：橘色大浪＋黑體大字「洋流」
       const a = Math.max(0, 1 - p.t / p.life);
       ctx.globalAlpha = Math.min(1, a * 1.6);
       ctx.translate(x, y);
       ctx.scale(d, 1);
       const g = ctx.createLinearGradient(0, -170, 0, 0);
-      g.addColorStop(0, '#5cc0ff');
-      g.addColorStop(1, '#0d3a7a');
+      g.addColorStop(0, '#ffb347');
+      g.addColorStop(1, '#ff6a00');
       ctx.fillStyle = g;
       ctx.beginPath();
-      ctx.moveTo(-70, 0);
-      ctx.quadraticCurveTo(-60, -120, 10, -160);
-      ctx.quadraticCurveTo(60, -170, 50, -120);
-      ctx.quadraticCurveTo(20, -130, 26, -90);
-      ctx.quadraticCurveTo(40, -40, 60, 0);
+      ctx.moveTo(-80, 0);
+      ctx.quadraticCurveTo(-70, -120, 10, -165);
+      ctx.quadraticCurveTo(70, -178, 58, -122);
+      ctx.quadraticCurveTo(24, -134, 30, -92);
+      ctx.quadraticCurveTo(44, -40, 70, 0);
       ctx.closePath();
       ctx.fill();
-      ctx.strokeStyle = '#06204a';
-      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#1a0a00';
+      ctx.lineWidth = 4;
       ctx.stroke();
-      ctx.fillStyle = '#ffffff';
-      for (let i = 0; i < 6; i++) {
+      ctx.fillStyle = '#fff3e0';
+      for (let i = 0; i < 5; i++) {
         ctx.beginPath();
-        ctx.arc(6 + i * 8, -160 + Math.sin(p.t * 18 + i) * 4 + (i > 3 ? 10 : 0), 7, 0, Math.PI * 2);
+        ctx.arc(8 + i * 9, -164 + Math.sin(p.t * 18 + i) * 4 + (i > 2 ? 8 : 0), 6, 0, Math.PI * 2);
         ctx.fill();
       }
-      ctx.fillStyle = 'rgba(255,255,255,0.7)';
-      for (let i = 0; i < 4; i++) ctx.fillRect(-40 + i * 18, -20 - ((p.t * 260 + i * 41) % 110), 5, 14);
+      // 大字（不跟著左右翻轉）
+      ctx.scale(d, 1);
+      ctx.font = "900 46px 'Noto Sans TC', 'Microsoft JhengHei', sans-serif";
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = '#fff3e0';
+      ctx.strokeText('洋流', -d * 4, -62);
+      ctx.fillStyle = '#111';
+      ctx.fillText('洋流', -d * 4, -62);
+      break;
+    }
+    case 'bird': {
+      // 綠色小鳥：拍翅膀往前飛
+      const flap = Math.sin(p.t * 30 + (p.seed || 0)) ;
+      ctx.translate(x, y);
+      ctx.scale(d, 1);
+      ctx.fillStyle = '#2e9e3e';
+      ctx.strokeStyle = '#0d2e12';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 13, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#5cd06a';
+      ctx.beginPath();
+      ctx.moveTo(-4, -2);
+      ctx.lineTo(4, -2);
+      ctx.lineTo(-2, -4 - flap * 14);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-12, 0);
+      ctx.lineTo(-20, -5);
+      ctx.lineTo(-20, 5);
+      ctx.closePath();
+      ctx.fillStyle = '#2e9e3e';
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#ffcc33';
+      ctx.beginPath();
+      ctx.moveTo(12, -2);
+      ctx.lineTo(19, 0);
+      ctx.lineTo(12, 3);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#111';
+      ctx.fillRect(6, -4, 2.5, 2.5);
       break;
     }
     case 'firework': {
@@ -1800,6 +1847,42 @@ function drawProjExtra(ctx, p, x, y) {
       ctx.moveTo(-24, -2);
       ctx.quadraticCurveTo(-40, -20, -32, -30);
       ctx.stroke();
+      break;
+    }
+    case 'loveheart': {
+      // 粉紅愛心：發光外圈＋跳動的愛心＋拖尾小愛心
+      const beat = 1 + Math.sin(p.t * 18) * 0.12;
+      ctx.translate(x, y);
+      ctx.globalCompositeOperation = 'lighter';
+      const g = ctx.createRadialGradient(0, 0, 4, 0, 0, 34);
+      g.addColorStop(0, 'rgba(255,170,210,0.9)');
+      g.addColorStop(1, 'rgba(255,80,160,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(0, 0, 34, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
+      const heart = (hx, hy, s, fill) => {
+        ctx.beginPath();
+        ctx.moveTo(hx, hy + s * 0.9);
+        ctx.bezierCurveTo(hx - s * 1.4, hy - s * 0.1, hx - s * 0.7, hy - s * 1.2, hx, hy - s * 0.45);
+        ctx.bezierCurveTo(hx + s * 0.7, hy - s * 1.2, hx + s * 1.4, hy - s * 0.1, hx, hy + s * 0.9);
+        ctx.fillStyle = fill;
+        ctx.fill();
+        ctx.strokeStyle = '#8a1450';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      };
+      for (let i = 1; i <= 3; i++) {
+        ctx.globalAlpha = 0.5 - i * 0.12;
+        heart(-d * i * 14, Math.sin(p.t * 10 + i) * 5, 6, '#ff8ac4');
+      }
+      ctx.globalAlpha = 1;
+      heart(0, 0, 15 * beat, '#ff4fa3');
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.beginPath();
+      ctx.ellipse(-6 * beat, -6 * beat, 4, 2.5, -0.6, 0, Math.PI * 2);
+      ctx.fill();
       break;
     }
     case 'dragon': {

@@ -823,7 +823,7 @@
       },
       "run": {
         "sheet": "assets/characters/chiang/run.webp",
-        "frames": 6
+        "frames": 3
       },
       "run_attack": {
         "sheet": "assets/characters/chiang/run_attack.webp",
@@ -855,7 +855,7 @@
       },
       "walk": {
         "sheet": "assets/characters/chiang/walk.webp",
-        "frames": 6
+        "frames": 4
       }
     },
     "hsieh": {
@@ -950,7 +950,7 @@
       },
       "walk": {
         "sheet": "assets/characters/hsieh/walk.webp",
-        "frames": 6
+        "frames": 5
       }
     },
     "shen": {
@@ -1013,7 +1013,7 @@
       },
       "run": {
         "sheet": "assets/characters/shen/run.webp",
-        "frames": 6
+        "frames": 4
       },
       "run_attack": {
         "sheet": "assets/characters/shen/run_attack.webp",
@@ -1037,7 +1037,7 @@
       },
       "super": {
         "sheet": "assets/characters/shen/super.webp",
-        "frames": 6
+        "frames": 4
       },
       "victory": {
         "sheet": "assets/characters/shen/victory.webp",
@@ -1045,7 +1045,7 @@
       },
       "walk": {
         "sheet": "assets/characters/shen/walk.webp",
-        "frames": 6
+        "frames": 3
       }
     },
     "tsai": {
@@ -1132,7 +1132,7 @@
       },
       "super": {
         "sheet": "assets/characters/tsai/super.webp",
-        "frames": 6
+        "frames": 3
       },
       "victory": {
         "sheet": "assets/characters/tsai/victory.webp",
@@ -1205,7 +1205,10 @@
     "ending2_chiang": "assets/stages/ending2_chiang.jpg",
     "ending2_shen": "assets/stages/ending2_shen.jpg",
     "ending2_tsai": "assets/stages/ending2_tsai.jpg",
-    "ending2_hsieh": "assets/stages/ending2_hsieh.jpg"
+    "ending2_hsieh": "assets/stages/ending2_hsieh.jpg",
+    "intro_5_bg": "assets/stages/intro_5_bg.jpg",
+    "title_bg": "assets/stages/title_bg.jpg",
+    "intro_3_bg": "assets/stages/intro_3_bg.jpg"
   },
   "scenery": {
     "s1_apartment": "assets/scenery/s1_apartment.webp",

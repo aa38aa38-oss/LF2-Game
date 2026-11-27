@@ -29,9 +29,14 @@ PAD = 6             # 每格邊緣留白（輸出像素）
 EXPECTED = {'idle': 4, 'walk': 6, 'run': 6, 'jump': 2, 'attack1': 3, 'attack2': 3, 'attack3': 4, 'jump_attack': 2,
             'run_attack': 3, 'defend': 1, 'hurt': 2, 'fall': 3, 'down': 1, 'getup': 2, 'dizzy': 3, 'roll': 4,
             'catch': 2, 'victory': 4, 'spin': 4, 'special': 4, 'special_fwd': 4, 'special_up': 4, 'special_down': 4, 'super': 6}
-FRAMES_HINT = {'cheerleader/attack1': 4, 'protester/walk': 4, 'kingpin/hurt': 4, 'kingpin/super': 4, 'guan/walk': 8, 'guan/run': 8, 'guan/super': 8}
+FRAMES_HINT = {'cheerleader/attack1': 4, 'protester/walk': 4, 'kingpin/hurt': 4, 'kingpin/super': 4, 'guan/walk': 8, 'guan/run': 8, 'guan/super': 8,
+               'hsieh/walk': 8, 'shen/walk': 7, 'chiang/walk': 8, 'shen/super': 4}
 # 只用其中幾格（原圖有幾格人形疊在一起、切不開時用）
-FRAME_PICK = {'reporter/idle': [0, 2, 3], 'kingpin/hurt': [0, 1], 'guan/run': [0, 1, 2, 3, 6, 7]}
+FRAME_PICK = {'reporter/idle': [0, 2, 3], 'kingpin/hurt': [0, 1], 'guan/run': [0, 1, 2, 3, 6, 7],
+              # 第二批主角：Gemini 加了動態模糊的格子不用
+              'hsieh/walk': [0, 4, 5, 6, 7], 'shen/walk': [0, 5, 6], 'shen/run': [0, 3, 4, 5],
+              'chiang/walk': [0, 4, 6, 7], 'chiang/run': [0, 4, 5],
+              'tsai/super': [0, 1, 2]}
 STRIP_SCALE = {}    # 某條動作畫得特別大／小時，可手動縮放，例如 {'han/roll': 0.8}
 
 

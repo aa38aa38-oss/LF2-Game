@@ -94,7 +94,23 @@ export class TitleScene {
   draw() {
     const g = this.g, t = this.t;
     const p = g.beginPix();
-    if (ASSETS.stages.title) p.drawImage(ASSETS.stages.title, 0, 0, 960, 540);
+    if (ASSETS.stages.title_bg) {
+      // 背景圖＋全部主角排成一排（用遊戲裡的角色圖），正中間輪流有一位擺勝利姿勢
+      p.drawImage(ASSETS.stages.title_bg, 0, 0, 960, 540);
+      const n = CHARS.length, hero = Math.floor(t / 3) % n;
+      const gap = Math.min(96, 900 / n), x0 = 480 - ((n - 1) * gap) / 2;
+      CHARS.forEach((ch, i) => {
+        if (i === hero) return;
+        drawChar(p, ch, poseOf(ch, 'idle', t + i), x0 + i * gap, 530, i < n / 2 ? 1 : -1, 1.65, 1, false, t);
+      });
+      const H = CHARS[hero], hx = x0 + hero * gap;
+      const sp = p.createRadialGradient(hx, 470, 10, hx, 470, 140);
+      sp.addColorStop(0, 'rgba(255,230,150,0.55)');
+      sp.addColorStop(1, 'rgba(0,0,0,0)');
+      p.fillStyle = sp;
+      p.fillRect(hx - 150, 330, 300, 210);
+      drawChar(p, H, poseOf(H, 'victory', t), hx, 534, hero < n / 2 ? 1 : -1, 1.95, 1, false, t);
+    } else if (ASSETS.stages.title) p.drawImage(ASSETS.stages.title, 0, 0, 960, 540);
     else {
       titleArt(p, t);
       // 角色陣容：中間主角輪播
@@ -117,7 +133,7 @@ export class TitleScene {
     pixelText(ctx, '政壇大亂鬥', 480, 82, { size: 96, scale: 4, color: '#8CFF5B', color2: '#2fbf2f', outline: '#062006' });
     pixelText(ctx, 'TAIWAN POLITICS BRAWL', 480, 150, { size: 26, scale: 2, font: 'px', color: '#ffd84a', color2: '#ff9a1a', outline: '#2a1000' });
     const hero = Math.floor(t / 3) % CHARS.length;
-    if (!ASSETS.stages.title) {
+    if (!ASSETS.stages.title || ASSETS.stages.title_bg) {
       txt(ctx, CHARS[hero].title, 480, 200, { size: 22, weight: 900, color: CHARS[hero].color, align: 'center', stroke: '#000', sw: 5 });
     }
     txt(ctx, '法案卡關、協商破裂……剩下的，只能用拳頭解決！', 480, 392, { size: 20, weight: 900, color: '#fff', align: 'center', stroke: '#000', sw: 5 });

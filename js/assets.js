@@ -70,7 +70,7 @@ export async function loadAssets() {
   // 分兩批：選單會用到的（站立、走路、勝利、選角圖、頭像、開場與選單背景）先載完就開遊戲，
   // 其他動作、關卡背景、結局圖在背景繼續載；開打前若還沒載完會等一下（ASSETS.ready）
   const MENU_ANIMS = new Set(['idle', 'walk', 'victory']);
-  const MENU_STAGES = /^(intro_\d|title|studio|legislature|rally)$/;
+  const MENU_STAGES = /^(intro_\d(_bg)?|title(_bg)?|studio|legislature|rally)$/;
   const critical = [], rest = [];
   const jobs = {
     push(p, crit) {

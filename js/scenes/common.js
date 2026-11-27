@@ -12,7 +12,8 @@ export function menuBg(p, t, stageId = 'studio', dark = 0.6) {
 
 // 用「假角色」呼叫 poseFor，取得某狀態的姿勢
 export function poseOf(ch, state, t, stateT = t) {
-  return poseFor({ char: ch, state, animT: t, stateT, mv: {}, facing: 1 });
+  // _state／_t：讓 drawChar 在有動作圖時直接畫圖
+  return { ...poseFor({ char: ch, state, animT: t, stateT, mv: {}, facing: 1 }), _state: state, _t: t };
 }
 
 export function drawLineup(p, t, y = 470, scale = 1.6, gap = 140, opts = {}) {

@@ -736,6 +736,26 @@ export const POSTER_POSE = {
 const ext = (l) => 13 * Math.cos(l[0]) + 13 * Math.cos(l[0] + l[1]);
 
 export function drawChar(ctx, ch, pose, x, y, facing, sc = SC, alpha = 1, flash = false, t = 0) {
+  // 選單／開場用的角色：有 Gemini 動作圖就畫圖（跟遊戲裡同一套），沒有才用程式畫的
+  if (pose && pose._state && ASSETS.chars[ch.id] && ASSETS.chars[ch.id].idle) {
+    const want = ANIM_MAP[pose._state] || pose._state;
+    let img = null;
+    for (const a of [want, ...(FALLBACK[want] || []), 'idle']) {
+      img = charFrame(ch.id, a, pose._t || 0, 8, true);
+      if (img) break;
+    }
+    if (img) {
+      const sH = ASSETS.spriteH || 128, st = ASSETS.standH[ch.id];
+      const h = (st ? img.height * (sH / st) : sH) * (sc / SC), w = (img.width * h) / img.height;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(facing, 1);
+      if (alpha < 1) ctx.globalAlpha *= alpha;
+      ctx.drawImage(flash ? flashImg(img) : img, -w / 2, -h, w, h);
+      ctx.restore();
+      return;
+    }
+  }
   const L = ch.look;
   const p = pose;
   ctx.save();

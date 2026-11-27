@@ -40,6 +40,18 @@ const SLIDES = [
   },
   {
     text: '政壇傳奇們，同時被叫進了議場……',
+    // 有 intro_3_bg（只有聚光燈的背景）時：在每道聚光燈下畫角色（先剪影、再一個個亮相）
+    chars(p, t) {
+      const X = [110, 203, 282, 360, 441, 520, 600, 680, 760, 849];
+      const n = CHARS.length;
+      CHARS.forEach((ch, i) => {
+        const x = n === X.length ? X[i] : 80 + (i * 800) / Math.max(1, n - 1);
+        const reveal = t > 0.4 + i * (2.1 / n);
+        const draw = () => drawChar(p, ch, poseOf(ch, 'idle', t + i), x, 406, i < n / 2 ? 1 : -1, 1.4, 1, false, t);
+        if (reveal) draw();
+        else silhouette(p, draw);
+      });
+    },
     draw(p, t) {
       p.fillStyle = '#05040c';
       p.fillRect(0, 0, 960, 540);
@@ -97,6 +109,19 @@ const SLIDES = [
   },
   {
     text: '只剩下拳頭！政壇大亂鬥，現在開打！',
+    // 有 intro_5_bg（只有舞台的背景）時：全員分兩排往前衝
+    chars(p, t) {
+      const n = CHARS.length;
+      const back = CHARS.filter((_, i) => i % 2 === 1), front = CHARS.filter((_, i) => i % 2 === 0);
+      const row = (list, y, sc, x0, x1, k) =>
+        list.forEach((ch, i) => {
+          const x = x0 + (i * (x1 - x0)) / Math.max(1, list.length - 1) + Math.sin(t * 3 + i + k) * 8;
+          drawChar(p, ch, poseOf(ch, 'run', t * 1.2 + i + k), x, y - Math.abs(Math.sin(t * 9 + i)) * 4, 1, sc, 1, false, t);
+        });
+      row(back, 440, 1.3, 170, 800, 1);
+      row(front, 520, 1.6, 110, 860, 0);
+      void n;
+    },
     draw(p, t) {
       STAGE_BY_ID.rally.draw(p, t);
       p.fillStyle = 'rgba(0,0,0,0.2)';
@@ -155,12 +180,17 @@ export class IntroScene {
     if (this.i >= SLIDES.length) return;
     const g = this.g;
     const p = g.beginPix();
-    const img = ASSETS.stages['intro_' + (this.i + 1)];
-    if (img) p.drawImage(img, 0, 0, 960, 540);
+    // 有「只有背景」的版本（intro_N_bg）就用背景＋程式畫角色（角色永遠跟遊戲裡的圖一致）
+    const bg = this.slide.chars && ASSETS.stages['intro_' + (this.i + 1) + '_bg'];
+    const img = bg ? null : ASSETS.stages['intro_' + (this.i + 1)];
+    if (bg) {
+      p.drawImage(bg, 0, 0, 960, 540);
+      this.slide.chars(p, this.t);
+    } else if (img) p.drawImage(img, 0, 0, 960, 540);
     else this.slide.draw(p, this.t);
     g.flushPix();
     const ctx = g.ctx;
-    if (!img && this.slide.overlay) this.slide.overlay(ctx, this.t);
+    if (!img && !bg && this.slide.overlay) this.slide.overlay(ctx, this.t);
     const grd = ctx.createLinearGradient(0, 400, 0, 540);
     grd.addColorStop(0, 'rgba(0,0,0,0)');
     grd.addColorStop(1, 'rgba(0,0,0,0.9)');
