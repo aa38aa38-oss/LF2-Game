@@ -592,6 +592,18 @@ export class StoryScene extends BattleScene {
       return;
     }
     if (this.phase === 'kneel') return this.updateKneel(dt);
+    if (this.phase === 'bossko') {
+      // Boss 被打倒：慢動作看他飛出去倒地，再進通關畫面
+      for (const p of this.popups) p.t += dt;
+      this.popups = this.popups.filter((p) => p.t < 1.4);
+      P.invuln = Math.max(P.invuln || 0, 1);
+      if (T > 0.9) this.slow = Math.min(0.25 + (T - 0.9) * 0.5, 1);
+      if (T > 2.8) {
+        this.slow = 1;
+        this.winStage();
+      }
+      return;
+    }
     // fight
     this.clock += dt;
     this.runQueue();
@@ -629,6 +641,7 @@ export class StoryScene extends BattleScene {
     this.updateTaxi(dt);
     this.updateBossMinions(dt);
     this.hint = this.ladderHint();
+    this.guide = this.stairGuide();
   }
 
   // 紅包：在畫面裡放太久沒被拿走就消失，之後再從天上掉回原來的地方（換一個標語）
@@ -676,7 +689,7 @@ export class StoryScene extends BattleScene {
       if (bossDown || (!this.enemiesAlive().length && !this.queue.length)) {
         this.waveActive = null;
         this.setFloor(P, P.floor);
-        if (w.boss) return this.winStage();
+        if (w.boss) return this.startBossKO();
         this.say('GO →', 1.2, '#5cff7a');
         if (w.after) this.popups.push({ t: -1.2, text: w.after, color: '#ffd84a', x: P.x, z: P.z, big: true });
         this.sfx('confirm');
@@ -764,6 +777,22 @@ export class StoryScene extends BattleScene {
     this.sfx('cutin');
   }
 
+  startBossKO() {
+    this.setPhase('bossko');
+    this.slow = 0.25;
+    this.hint = null;
+    this.guide = null;
+    this.player.invuln = 3;
+    // 其他小弟一起倒下
+    for (const f of this.enemiesAlive()) {
+      if (f === this.boss || f === this.rival) continue;
+      this.applyHit(this.player, f, { dmg: 99999, knock: true, launch: 300, kb: 300, unblockable: true, dir: Math.sign(f.x - this.player.x) || 1 });
+    }
+    this.say('K.O.!', 2.4, '#ff3b3b');
+    this.shake(14, 0.5);
+    this.sfx('ko');
+  }
+
   winStage() {
     this.setPhase('won');
     this.wonT = 0;
@@ -782,6 +811,32 @@ export class StoryScene extends BattleScene {
       if (P.floor === r.top && Math.abs(P.x - r.xt) < 55 && P.z >= T.zMax - 30) return { r, dir: 'down', toward: Math.sign(r.xb - r.xt) };
     }
     return null;
+  }
+  // 下一個要去的樓層需要「上樓梯」時，回傳要走的那條斜坡（畫面上顯示方向提示）
+  stairGuide() {
+    const P = this.player, L = this.L;
+    if (this.waveActive || P.climb || this.bossOn) return null;
+    const i = L.waves.findIndex((w, k) => !this.wavesDone.has(k));
+    const target = i >= 0 ? L.waves[i].floor : L.boss.floor;
+    if (target === P.floor) return null;
+    // 用斜坡連成的路找下一層
+    const prev = { [P.floor]: null }, q = [P.floor];
+    while (q.length) {
+      const f = q.shift();
+      if (f === target) break;
+      for (const r of L.ramps) {
+        const n = r.bot === f ? r.top : r.top === f ? r.bot : null;
+        if (n == null || n in prev) continue;
+        prev[n] = { f, r };
+        q.push(n);
+      }
+    }
+    if (!(target in prev)) return null;
+    let n = target;
+    while (prev[n].f !== P.floor) n = prev[n].f;
+    const r = prev[n].r;
+    if (r.bot !== P.floor) return null; // 只提示「上樓梯」
+    return { r, up: true, toward: Math.sign(r.xt - r.xb) || 1 };
   }
   ladderHint() {
     if (this.waveActive || this.player.climb) return null;
@@ -972,6 +1027,25 @@ export class StoryScene extends BattleScene {
       const P = this.player;
       txt(ctx, this.hint, P.x, FY + P.z - 170, { size: 18, weight: 900, color: '#ffe14a', align: 'center', stroke: '#000', sw: 5, alpha: blink(this.time, 3) ? 1 : 0.6 });
     }
+    if (this.guide && this.phase === 'fight') {
+      const { r, toward } = this.guide;
+      const F = this.L.floors[r.bot];
+      const bob = Math.sin(this.time * 5) * 10;
+      const gx = r.xb, gy = FY + F.zMin - 130 + bob;
+      ctx.save();
+      ctx.translate(gx, gy);
+      ctx.rotate(toward > 0 ? 0.5 : -0.5);
+      ctx.fillStyle = blink(this.time, 3) ? '#ffe14a' : '#ffb020';
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(0, -46); ctx.lineTo(34, -6); ctx.lineTo(13, -6); ctx.lineTo(13, 36);
+      ctx.lineTo(-13, 36); ctx.lineTo(-13, -6); ctx.lineTo(-34, -6); ctx.closePath();
+      ctx.stroke();
+      ctx.fill();
+      ctx.restore();
+      txt(ctx, '上樓梯', gx, gy + 62, { size: 22, weight: 900, color: '#ffe14a', align: 'center', stroke: '#000', sw: 6 });
+    }
     for (const p of this.popups) {
       if (p.t < 0) continue;
       const a = 1 - Math.max(0, p.t - 0.9) / 0.5;
@@ -1012,6 +1086,8 @@ export class StoryScene extends BattleScene {
     }
     ctx.restore();
     if (this.scandalFx) this.drawScandal(ctx, this.scandalFx);
+    if (this.guide && this.phase === 'fight') this.drawGuide(ctx, this.guide);
+    if (this.phase === 'bossko') this.drawBossKO(ctx);
     if (this.phase === 'intro') this.drawIntro(ctx);
     if (this.phase === 'lost') this.drawLost(ctx);
     if (this.phase === 'won') this.drawWon(ctx);
@@ -1031,7 +1107,7 @@ export class StoryScene extends BattleScene {
     // 得票
     const L = this.L, gx = 430, gw = 510;
     const B = this.boss;
-    const bossFight = B && this.bossOn && (this.phase === 'fight' || this.phase === 'kneel');
+    const bossFight = B && this.bossOn && (this.phase === 'fight' || this.phase === 'kneel' || this.phase === 'bossko');
     txt(ctx, `第${NUM[this.stageIdx]}關　${L.name}`, gx, 16, { size: 15, weight: 900, color: '#ffd84a' });
     txt(ctx, `得票 ${this.votes.toLocaleString()}`, gx + gw, 16, { size: 15, weight: 900, color: '#fff', align: 'right' });
     if (bossFight) {
@@ -1075,6 +1151,33 @@ export class StoryScene extends BattleScene {
       ctx.fillRect(10, 90, 600, 22);
       txt(ctx, '測試模式：無敵＋攻擊×20　1/2/3 換關　B 打 Boss　G 清怪　H +1萬票　N 下個中途點　W 過關', 18, 101, { size: 12, weight: 900, color: '#ffe14a' });
     }
+  }
+
+  // 畫面上方的方向提示：「⬆ 上樓梯」＋往樓梯的左右箭頭
+  drawGuide(ctx, g) {
+    const P = this.player;
+    const dx = g.r.xb - P.x;
+    const side = Math.abs(dx) < 60 ? '' : dx > 0 ? '　往右 ▶▶' : '◀◀ 往左　';
+    const text = dx < -60 ? `${side}⬆ 上樓梯` : `⬆ 上樓梯${side}`;
+    const a = blink(this.time, 2) ? 1 : 0.75;
+    ctx.save();
+    ctx.globalAlpha = a;
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(330, 144, 300, 40);
+    ctx.strokeStyle = '#ffe14a';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(330, 144, 300, 40);
+    ctx.restore();
+    txt(ctx, text, 480, 164, { size: 22, weight: 900, color: '#ffe14a', align: 'center', stroke: '#000', sw: 5, alpha: a });
+  }
+
+  // Boss 被打倒的慢動作：上下黑邊
+  drawBossKO(ctx) {
+    const T = this.phaseT;
+    const h = Math.min(1, T / 0.3) * 60;
+    ctx.fillStyle = '#000';
+    ctx.fillRect(-this.g.ox, 0, this.g.CW, h);
+    ctx.fillRect(-this.g.ox, 540 - h, this.g.CW, h);
   }
 
   drawScandal(ctx, s) {
