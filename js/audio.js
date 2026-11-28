@@ -23,185 +23,183 @@ function seq(str) {
   return out;
 }
 
-const SONGS = {
-  battle: {
-    bpm: 152,
-    lead: seq(
-      'A4 - C5 - E5 - A5 - G5 - E5 - C5 - D5 - ' +
-      'C5 - - - A4 - - - F4 - A4 - C5 - - - ' +
-      'B4 - D5 - G5 - - - F5 - E5 - D5 - B4 - ' +
-      'E5 - - - - - G#4 - B4 - D5 - E5 - - - ' +
-      'A5 - G5 - E5 - A5 - G5 - E5 - C5 - E5 - ' +
-      'F5 - E5 - C5 - A4 - C5 - F5 - A5 - - - ' +
-      'G5 - F5 - D5 - B4 - D5 - G5 - B5 - - - ' +
-      'G#5 - - - E5 - - - B4 - - - E5 . E5 . '
-    ),
-    bass: seq(
-      'A2 . A2 A3 A2 . A2 A3 A2 . A2 A3 A2 . G2 G3 ' +
-      'F2 . F2 F3 F2 . F2 F3 F2 . F2 F3 F2 . E2 E3 ' +
-      'G2 . G2 G3 G2 . G2 G3 G2 . G2 G3 G2 . A2 A3 ' +
-      'E2 . E2 E3 E2 . E2 E3 E2 . E2 E3 G#2 . B2 B3 ' +
-      'A2 . A2 A3 A2 . A2 A3 A2 . A2 A3 A2 . G2 G3 ' +
-      'F2 . F2 F3 F2 . F2 F3 F2 . F2 F3 F2 . E2 E3 ' +
-      'G2 . G2 G3 G2 . G2 G3 G2 . G2 G3 G2 . A2 A3 ' +
-      'E2 . E2 E3 E2 . E2 E3 E2 . E2 E3 G#2 . B2 B3'
-    ),
-    drums: 'k.h.s.hkk.h.s.hh',
-  },
-  title: {
-    bpm: 128,
-    lead: seq(
-      'E5 - G5 - C6 - - - B5 - G5 - D5 - - - ' +
-      'D5 - G5 - B5 - - - A5 - G5 - D5 - - - ' +
-      'C5 - E5 - A5 - - - G5 - E5 - C5 - - - ' +
-      'F5 - - - E5 - - - D5 - - - G5 - - - '
-    ),
-    bass: seq(
-      'C3 . C3 . C4 . C3 . C3 . C3 . C4 . G2 . ' +
-      'G2 . G2 . G3 . G2 . G2 . G2 . G3 . D3 . ' +
-      'A2 . A2 . A3 . A2 . A2 . A2 . A3 . E3 . ' +
-      'F2 . F2 . F3 . F2 . G2 . G2 . G3 . G2 . '
-    ),
-    drums: 'k.h.s.h.k.h.s.hh',
-  },
-  menu: {
-    bpm: 116,
-    lead: seq(
-      'C5 . E5 . G5 . E5 . C5 . E5 . G5 - - - ' +
-      'A4 . C5 . E5 . C5 . A4 . C5 . E5 - - - ' +
-      'F4 . A4 . C5 . A4 . F4 . A4 . C5 - - - ' +
-      'G4 . B4 . D5 . B4 . G4 . B4 . D5 - - - '
-    ),
-    bass: seq(
-      'C3 - - - G2 - - - C3 - - - G2 - - - ' +
-      'A2 - - - E2 - - - A2 - - - E2 - - - ' +
-      'F2 - - - C3 - - - F2 - - - C3 - - - ' +
-      'G2 - - - D3 - - - G2 - - - B2 - - - '
-    ),
-    drums: 'k...h...s...h...',
-  },
-};
-
-// 一小節 16 格（16 分音符），用陣列寫比較好對齊
+// ───── 背景音樂：原創曲，走掌機 RPG 冒險風（主旋律＋快速分解和弦＋跳動低音＋輕鼓） ─────
+// lead：主旋律（一小節 16 格）；chords：每小節的和弦（一格寫一個或兩個，兩個就是各半小節）
+// bass / harm 的樣式由程式依和弦自動產生
 const bars = (...b) => seq(b.join(' '));
+const ROOT = { C: 0, 'C#': 1, Db: 1, D: 2, 'D#': 3, Eb: 3, E: 4, F: 5, 'F#': 6, Gb: 6, G: 7, 'G#': 8, Ab: 8, A: 9, 'A#': 10, Bb: 10, B: 11 };
+function chord(name) {
+  const m = name.match(/^([A-G][#b]?)(m?)(7?)$/);
+  const r = ROOT[m[1]];
+  return { r, third: m[2] ? 3 : 4, seventh: m[3] ? 10 : null };
+}
+// 低音樣式（半小節 8 格）
+const BASS = {
+  walk: (c) => [[0, 2], null, [12, 2], null, [7, 2], null, [12, 2], null],
+  drive: (c) => [[0, 1], [0, 1], [12, 1], [0, 1], [0, 1], [12, 1], [0, 1], [7, 1]],
+  march: (c) => [[0, 3], null, null, [7, 1], [0, 3], null, null, [7, 1]],
+  calm: (c) => [[0, 4], null, null, null, [7, 4], null, null, null],
+};
+function build(song) {
+  const n = song.chords.length * 16;
+  const bass = new Array(n).fill(null), harm = new Array(n).fill(null);
+  song.chords.forEach((bar, bi) => {
+    const cs = bar.split(' ');
+    const halves = cs.length === 1 ? [cs[0], cs[0]] : cs;
+    halves.forEach((name, hi) => {
+      const c = chord(name);
+      const base = bi * 16 + hi * 8;
+      const bm = 48 + c.r + (c.r > 4 ? -12 : 0); // 低音落在 F2～E3
+      BASS[song.bassStyle || 'walk'](c).forEach((v, k) => {
+        if (v) bass[base + k] = { m: bm + v[0], len: v[1] };
+      });
+      const tones = [0, c.third, 7, c.seventh || 12];
+      const hm = 60 + c.r - (c.r > 7 ? 12 : 0);
+      for (let k = 0; k < 8; k++) {
+        if (song.harmStyle === 'arp8' && k % 2) continue;
+        const idx = song.harmStyle === 'arp8' ? k / 2 : k;
+        harm[base + k] = { m: hm + tones[idx % 4], len: 1 };
+      }
+    });
+  });
+  return { ...song, bass, harm };
+}
 
-// ───── 劇情模式配樂（原創 8-bit 小曲，輕快的紅白機風格） ─────
-const MORE = {
-  // 第一關：廟口老街（C 大調，蹦蹦跳跳）
-  story1: {
-    bpm: 144,
-    lead: bars(
-      'E5 . G5 . C6 . G5 . E5 . G5 . A5 - G5 .',
-      'E5 . C5 . A4 . C5 . E5 - - . D5 . C5 .',
-      'F5 . A5 . C6 . A5 . F5 . A5 . C6 - A5 .',
-      'G5 - - . F5 . E5 . D5 - - . B4 . G4 .',
-      'C5 . E5 . G5 . C6 . E6 - - . D6 . C6 .',
-      'A5 . E5 . C5 . E5 . A5 - G5 . E5 . C5 .',
-      'F5 . A5 . C6 . A5 . G5 . B5 . D6 . B5 .',
-      'C6 - - . G5 . E5 . C5 - - - . . . .',
-    ),
-    bass: bars(
-      'C3 . G3 . C3 . G3 . C3 . G3 . C3 . G3 .',
-      'A2 . E3 . A2 . E3 . A2 . E3 . A2 . E3 .',
-      'F2 . C3 . F2 . C3 . F2 . C3 . F2 . C3 .',
-      'G2 . D3 . G2 . D3 . G2 . D3 . G2 . B2 .',
-      'C3 . G3 . C3 . G3 . C3 . G3 . C3 . G3 .',
-      'A2 . E3 . A2 . E3 . A2 . E3 . A2 . E3 .',
-      'F2 . C3 . F2 . C3 . G2 . D3 . G2 . D3 .',
-      'C3 . G3 . C3 . G3 . C3 . . . G2 . . .',
-    ),
-    drums: 'k.h.s.h.k.h.s.h.',
-    wave: 'pulse',
-  },
-  // 第二關：政見發表會・下樓梯（F 大調，一路往下溜）
-  shaft: {
-    bpm: 168,
-    lead: bars(
-      'C6 . A5 . F5 . C5 . D5 . F5 . A5 . F5 .',
-      'D6 . A5 . F5 . D5 . E5 . F5 . A5 - - .',
-      'D6 . A#5 . F5 . D5 . F5 . A#5 . D6 - C6 .',
-      'C6 - - . A#5 . G5 . E5 . C5 . E5 . G5 .',
-      'A5 . G5 . F5 . E5 . F5 . A5 . C6 . A5 .',
-      'D6 . C6 . A5 . F5 . D5 - - . F5 . A5 .',
-      'A#5 . A5 . G5 . F5 . E5 . G5 . C6 . E6 .',
-      'F6 - - . C6 . A5 . F5 - - - . . . .',
-    ),
-    bass: bars(
-      'F2 . F3 . F2 . F3 . F2 . F3 . F2 . F3 .',
-      'D2 . D3 . D2 . D3 . D2 . D3 . D2 . D3 .',
-      'A#1 . A#2 . A#1 . A#2 . A#1 . A#2 . A#1 . A#2 .',
-      'C2 . C3 . C2 . C3 . C2 . C3 . E2 . G2 .',
-      'F2 . F3 . F2 . F3 . F2 . F3 . F2 . F3 .',
-      'D2 . D3 . D2 . D3 . D2 . D3 . D2 . D3 .',
-      'A#1 . A#2 . A#1 . A#2 . C2 . C3 . C2 . C3 .',
-      'F2 . F3 . F2 . C3 . F2 . . . . . . .',
-    ),
-    drums: 'k.hhs.hhk.hhs.hh',
-    wave: 'pulse',
-  },
-  // 第三關：總統大選（G 大調進行曲）
-  story3: {
+const SONGS = {
+  // 標題：冒險開始（C 大調）
+  title: build({
     bpm: 132,
     lead: bars(
-      'G4 - - B4 D5 - - G5 B5 - - A5 G5 - D5 -',
-      'E5 - - G5 B5 - - E5 G5 - F#5 - E5 - - -',
-      'C5 - - E5 G5 - - C6 E6 - - D6 C6 - G5 -',
-      'D6 - - - A5 - - - F#5 - G5 - A5 - - -',
-      'B5 - - A5 G5 - - D5 G5 - - A5 B5 - D6 -',
-      'E6 - - D6 B5 - - G5 E5 - - G5 B5 - - -',
-      'C6 - B5 - A5 - G5 - D6 - C6 - B5 - A5 -',
-      'G5 - - - - - D5 - G5 - - - . . . .',
+      'G4 - C5 - E5 - G5 - - - - - E5 - G5 -',
+      'A5 - - - G5 - F5 - G5 - - - - - . .',
+      'E5 - - - C5 - E5 - A5 - - - G5 - E5 -',
+      'F5 - - - A5 - C6 - D6 - - - - - . .',
+      'E6 - - - D6 - C6 - G5 - - - E5 - G5 -',
+      'B5 - - - G5 - E5 - A5 - - - C6 - - -',
+      'D6 - - - C6 - A5 - B5 - - - D6 - - -',
+      'C6 - - - - - - - - - - - . . . .',
     ),
-    bass: bars(
-      'G2 - . G2 D3 - . D3 G2 - . G2 D3 - B2 .',
-      'E2 - . E2 B2 - . B2 E2 - . E2 B2 - G2 .',
-      'C3 - . C3 G2 - . G2 C3 - . C3 G2 - E2 .',
-      'D3 - . D3 A2 - . A2 D3 - . D3 A2 - F#2 .',
-      'G2 - . G2 D3 - . D3 G2 - . G2 D3 - B2 .',
-      'E2 - . E2 B2 - . B2 E2 - . E2 B2 - G2 .',
-      'C3 - . C3 G2 - . G2 D3 - . D3 A2 - . .',
-      'G2 - . G2 D3 - . D3 G2 - - - . . . .',
+    chords: ['C', 'F G', 'Am', 'F G', 'C', 'Em F', 'Dm G', 'C'],
+    bassStyle: 'walk',
+    drums: 'k...h.h.s...h.h.',
+  }),
+  // 選單：安靜的小鎮（F 大調）
+  menu: build({
+    bpm: 112,
+    lead: bars(
+      'A5 - - - C6 - A5 - G5 - F5 - - - - -',
+      'F5 - - - A5 - D6 - - - C6 - A5 - - -',
+      'A#5 - - - A5 - G5 - F5 - - - D5 - - -',
+      'E5 - - - G5 - C6 - - - - - . . . .',
+      'A5 - - - C6 - F6 - - - E6 - D6 - C6 -',
+      'C6 - - - E5 - - - F5 - - - A5 - - -',
+      'A#5 - - - A5 - G5 - E5 - G5 - C6 - - -',
+      'A5 - - - - - - - . . . . . . . .',
     ),
-    drums: 'k..ks.k.k..ks.ss',
-    wave: 'pulse',
-  },
-  // Boss 戰（D 小調，緊張快節奏）
-  boss: {
+    chords: ['F', 'Dm', 'Bb', 'C', 'F', 'Am Dm', 'Gm C', 'F'],
+    bassStyle: 'calm',
+    harmStyle: 'arp8',
+    drums: 'k.......s.......',
+  }),
+  // 對戰模式（E 小調，快節奏）
+  battle: build({
     bpm: 172,
     lead: bars(
-      'D5 . D5 . F5 . D5 . A5 - G5 . F5 . E5 .',
-      'D5 . D5 . F5 . A5 . D6 - - . C6 - A5 .',
-      'A#5 . A#5 . A5 . G5 . F5 - G5 . A5 - F5 .',
-      'E5 - - . C#5 . E5 . A5 - - . G5 . E5 .',
-      'D5 . D5 . F5 . D5 . A5 - G5 . F5 . E5 .',
-      'D5 . F5 . A5 . D6 . F6 - E6 . D6 . C6 .',
-      'B5 - - . G5 . A#5 . D6 - C6 . A#5 . G5 .',
-      'A5 - - . E5 . C#5 . A4 . C#5 . E5 . G5 .',
+      'E5 . E5 . G5 . E5 . B5 - - . A5 . G5 .',
+      'F#5 . G5 . A5 - - . B5 - - - E5 - - -',
+      'C6 . C6 . B5 . A5 . G5 - - . E5 . G5 .',
+      'A5 - - - F#5 - - - D6 - - - C6 - B5 -',
+      'E6 . E6 . D6 . B5 . G5 - A5 . B5 - - .',
+      'E6 - - . G6 - - . F#6 - E6 . C6 - - .',
+      'C6 . B5 . A5 . C6 . D#6 - - . F#6 - - .',
+      'E6 - - - B5 - - - E5 - - - . . . .',
     ),
-    bass: bars(
-      'D2 D2 D3 D2 D2 D2 D3 D2 D2 D2 D3 D2 D2 D2 C3 D3',
-      'D2 D2 D3 D2 D2 D2 D3 D2 D2 D2 D3 D2 D2 D2 C3 D3',
-      'A#1 A#1 A#2 A#1 A#1 A#1 A#2 A#1 A#1 A#1 A#2 A#1 A#1 A#1 A#2 A#1',
-      'A1 A1 A2 A1 A1 A1 A2 A1 A1 A1 A2 A1 C#2 C#2 E2 G2',
-      'D2 D2 D3 D2 D2 D2 D3 D2 D2 D2 D3 D2 D2 D2 C3 D3',
-      'D2 D2 D3 D2 D2 D2 D3 D2 D2 D2 D3 D2 D2 D2 C3 D3',
-      'G1 G1 G2 G1 G1 G1 G2 G1 G1 G1 G2 G1 G1 G1 G2 G1',
-      'A1 A1 A2 A1 A1 A1 A2 A1 A1 A1 A2 A1 C#2 C#2 E2 G2',
+    chords: ['Em', 'Em', 'C', 'D', 'Em', 'Em C', 'Am B', 'Em'],
+    bassStyle: 'drive',
+    drums: 'k.h.s.hkk.h.s.hh',
+  }),
+  // 第一關：廟口老街（D 大調，輕快冒險路線）
+  story1: build({
+    bpm: 150,
+    lead: bars(
+      'A4 - D5 - F#5 - A5 - - - F#5 - G5 - A5 -',
+      'B5 - - - A5 - G5 - A5 - - - E5 - - -',
+      'F#5 - E5 - D5 - E5 - F#5 - A5 - D6 - - -',
+      'D6 - B5 - - - F#5 - A5 - - - - - . .',
+      'G5 - B5 - D6 - - - B5 - G5 - D5 - G5 -',
+      'A5 - - - C#6 - E6 - F#6 - - - C#6 - - -',
+      'D6 - C#6 - B5 - A5 - B5 - - - F#5 - - -',
+      'G5 - A5 - B5 - C#6 - A5 - - - - - - -',
     ),
+    chords: ['D', 'G A', 'D', 'Bm A', 'G', 'A F#m', 'Bm', 'G A'],
+    bassStyle: 'walk',
+    drums: 'k.h.s.h.k.hks.h.',
+  }),
+  // 第二關：下樓梯（F 大調，快又俏皮）
+  shaft: build({
+    bpm: 176,
+    lead: bars(
+      'C5 . F5 . A5 - G5 . F5 . C5 . F5 - A5 .',
+      'D6 - - . C6 . A5 . F5 - A5 . D5 - - .',
+      'D6 . D6 . C6 . A#5 - A5 . F5 . D5 . F5 .',
+      'G5 - - - E5 - C5 - E5 - G5 - C6 - - -',
+      'A5 . C6 . F6 - E6 . D6 . C6 . A5 - G5 .',
+      'C#6 - - . E6 . A5 . D6 - - . F6 . D6 .',
+      'D6 . C6 . A#5 . A5 . G5 . A5 . A#5 . C6 .',
+      'A5 - - - F5 - - - F6 - - - . . . .',
+    ),
+    chords: ['F', 'Dm', 'Bb', 'C', 'F', 'A Dm', 'Bb C', 'F'],
+    bassStyle: 'walk',
+    drums: 'k.hhs.hhk.hhs.hh',
+  }),
+  // 第三關：總統大選（G 大調，英雄進行曲）
+  story3: build({
+    bpm: 138,
+    lead: bars(
+      'D5 - - G5 - - B5 - D6 - - - B5 - D6 -',
+      'E6 - - - D6 - C6 - D6 - - - A5 - - -',
+      'B5 - - - G5 - E5 - G5 - B5 - E6 - - -',
+      'C6 - B5 - A5 - G5 - F#5 - G5 - A5 - - -',
+      'D6 - - G6 - - F#6 - E6 - D6 - B5 - D6 -',
+      'E6 - - - G6 - E6 - C6 - - - E6 - - -',
+      'C6 - B5 - A5 - - - F#5 - A5 - D6 - C6 -',
+      'B5 - - - - - - - G5 - - - . . . .',
+    ),
+    chords: ['G', 'C D', 'Em', 'C D', 'G', 'Em C', 'Am D', 'G'],
+    bassStyle: 'march',
+    drums: 'k..ks.k.k..ks.ss',
+  }),
+  // Boss 戰（A 小調，館主對決的氣勢）
+  boss: build({
+    bpm: 168,
+    lead: bars(
+      'A5 - E5 - A5 - B5 - C6 - B5 - A5 - E5 -',
+      'A5 - - - G5 - A5 - - - E5 - - - . .',
+      'F5 - A5 - C6 - F6 - E6 - - - C6 - A5 -',
+      'B5 - - - D6 - - - G5 - - - B5 - D6 -',
+      'E6 - - - C6 - A5 - E6 - F6 - E6 - D6 -',
+      'C6 - - - B5 - A5 - B5 - C6 - B5 - G#5 -',
+      'A5 - - - C6 - F6 - - - E6 - D6 - B5 -',
+      'G#5 - - - B5 - - - E6 - - - - - - -',
+    ),
+    chords: ['Am', 'Am', 'F', 'G', 'Am', 'Am', 'F G', 'E'],
+    bassStyle: 'drive',
     drums: 'k.hsk.hsk.hsk.ss',
-    wave: 'pulse',
-  },
-  // 過關小號角（只放一次）
-  clear: {
+  }),
+  // 過關：勝利號角（只放一次）
+  clear: build({
     bpm: 150,
     loop: false,
-    lead: seq('G4 C5 E5 G5 C6 - E6 - G6 - - - E6 - - - F6 - - - D6 - - - C6 - - - - - - - . . . .'),
-    bass: seq('C3 . . . E3 . . . G3 . . . C3 . . . F2 - - - G2 - - - C3 - - - - - - - . . . .'),
-    drums: 'k...k...k...k...s...s...k...........',
-    wave: 'pulse',
-  },
+    lead: bars(
+      'C5 . C5 . C5 . G5 - - - E5 - G5 - - -',
+      'A5 - - - F5 - A5 - B5 - - - G5 - B5 -',
+      'C6 - - - - - - - - - - - . . . .',
+    ),
+    chords: ['C', 'F G', 'C'],
+    bassStyle: 'walk',
+    drums: 'k...s...k...s...',
+  }),
 };
-Object.assign(SONGS, MORE);
 
 export class Sound {
   constructor() {
@@ -236,10 +234,14 @@ export class Sound {
     this.noiseBuf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
     const d = this.noiseBuf.getChannelData(0);
     for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
-    // 紅白機風格的 25% 方波（比一般方波更「嗶嗶」）
-    const N = 32, re = new Float32Array(N), im = new Float32Array(N);
-    for (let n = 1; n < N; n++) re[n] = (2 / (n * Math.PI)) * Math.sin(n * Math.PI * 0.25);
-    this.pulseWave = this.ctx.createPeriodicWave(re, im);
+    // 掌機風格的窄方波：25%（主旋律）、12.5%（分解和弦）
+    const pulse = (duty) => {
+      const N = 32, re = new Float32Array(N), im = new Float32Array(N);
+      for (let n = 1; n < N; n++) re[n] = (2 / (n * Math.PI)) * Math.sin(n * Math.PI * duty);
+      return this.ctx.createPeriodicWave(re, im);
+    };
+    this.pulseWave = pulse(0.25);
+    this.pulse12 = pulse(0.125);
     if (this.pendingBgm) {
       const n = this.pendingBgm;
       this.pendingBgm = null;
@@ -413,25 +415,58 @@ export class Sound {
     this.timer = null;
     this.bgmName = null;
   }
+  // 一個音：快速起音、慢慢變小聲、長音加顫音
+  voice(type, f, dur, vol, when, vib) {
+    const c = this.ctx;
+    const t = c.currentTime + when;
+    const o = c.createOscillator();
+    if (type === 'pulse') o.setPeriodicWave(this.pulseWave);
+    else if (type === 'pulse12') o.setPeriodicWave(this.pulse12);
+    else o.type = type;
+    o.frequency.setValueAtTime(f, t);
+    const g = c.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + 0.008);
+    g.gain.linearRampToValueAtTime(vol * 0.75, t + Math.min(0.1, dur * 0.5));
+    g.gain.linearRampToValueAtTime(vol * 0.5, t + dur);
+    g.gain.linearRampToValueAtTime(0, t + dur + 0.04);
+    o.connect(g);
+    g.connect(this.musBus);
+    if (vib && dur > 0.25) {
+      const lfo = c.createOscillator(), lg = c.createGain();
+      lfo.frequency.value = 5.5;
+      lg.gain.setValueAtTime(0, t);
+      lg.gain.setValueAtTime(0, t + 0.14);
+      lg.gain.linearRampToValueAtTime(f * 0.014, t + 0.3);
+      lfo.connect(lg);
+      lg.connect(o.frequency);
+      lfo.start(t);
+      lfo.stop(t + dur + 0.06);
+    }
+    o.start(t);
+    o.stop(t + dur + 0.06);
+  }
   schedule(song) {
     if (!this.ctx || this.ctx.state !== 'running') return;
     const spb = 60 / song.bpm / 4;
     const len = song.lead.length;
     while (this.nextT < this.ctx.currentTime + 0.12) {
-      const when = this.nextT - this.ctx.currentTime;
       if (song.loop === false && this.step >= len) {
         this.stopBgm();
         return;
       }
+      const when = this.nextT - this.ctx.currentTime;
       const i = this.step % len;
       const L = song.lead[i];
-      if (L && L.m) this.tone(song.wave || 'square', freq(L.m), null, spb * L.len * 0.95, song.wave === 'pulse' ? 0.12 : 0.09, when, this.musBus);
-      const B = song.bass[i % song.bass.length];
-      if (B && B.m) this.tone('triangle', freq(B.m), null, spb * B.len * 0.9, 0.3, when, this.musBus);
+      if (L && L.m) this.voice('pulse', freq(L.m), spb * L.len * 0.96, 0.11, when, true);
+      const H = song.harm[i];
+      if (H && H.m) this.voice('pulse12', freq(H.m), spb * 0.85, 0.03, when, false);
+      const B = song.bass[i];
+      if (B && B.m) this.voice('triangle', freq(B.m), spb * B.len * 0.9, 0.34, when, false);
       const d = song.drums[i % song.drums.length];
-      if (d === 'k') this.tone('sine', 150, 40, 0.12, 0.5, when, this.musBus);
-      else if (d === 's') this.noise(0.1, 0.25, 'bandpass', 1800, when, this.musBus);
-      else if (d === 'h') this.noise(0.03, 0.08, 'highpass', 7000, when, this.musBus);
+      if (d === 'k') this.tone('sine', 130, 45, 0.1, 0.32, when, this.musBus);
+      else if (d === 's') this.noise(0.08, 0.13, 'bandpass', 2600, when, this.musBus);
+      else if (d === 'h') this.noise(0.02, 0.05, 'highpass', 8000, when, this.musBus);
       this.nextT += spb;
       this.step++;
     }
