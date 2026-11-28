@@ -55,7 +55,7 @@ class Game {
     this.supBtn = touch.querySelector('.sup');
 
     // 音樂開關鈕（每個畫面都看得到；鍵盤按 M 也可以）
-    const mus = document.getElementById('mus');
+    const mus = (this.musEl = document.getElementById('mus'));
     const showMus = (on) => {
       mus.textContent = on ? '♪ 音樂開' : '♪ 音樂關';
       mus.classList.toggle('off', !on);
@@ -181,6 +181,38 @@ class Game {
   goResult(data) { this.setScene(new ResultScene(this, data)); }
   goLeaderboard(highlight) { this.setScene(new LeaderboardScene(this, highlight)); }
 
+  // 手機對戰中：音樂鈕放在右上角 HUD 黑底的空位（計時器右邊）；螢幕太窄放不下時，改放在 HUD 正下方的右邊
+  placeMus() {
+    const mus = this.musEl, b = document.body;
+    if (!mus) return;
+    if (!b.classList.contains('touch') || b.dataset.scene !== 'battle') {
+      if (this.musKey) {
+        this.musKey = '';
+        mus.style.top = mus.style.right = '';
+      }
+      return;
+    }
+    const r = this.canvas.getBoundingClientRect(), p = (mus.offsetParent || b).getBoundingClientRect();
+    const k = r.width / this.CW, ky = r.height / H;
+    const hudRight = r.left + (948 + this.ox) * k; // HUD 文字最右邊在邏輯座標 940
+    const free = r.right - hudRight;
+    const w = mus.offsetWidth || 60;
+    const edge = p.right - r.right;
+    let top, right;
+    if (free >= w + 8) {
+      top = r.top - p.top + Math.max(8, (84 * ky - mus.offsetHeight) / 2);
+      right = edge + Math.max(6, (free - w) / 2);
+    } else {
+      top = r.top - p.top + 88 * ky;
+      right = edge + 8;
+    }
+    const key = `${Math.round(top)},${Math.round(right)}`;
+    if (key === this.musKey) return;
+    this.musKey = key;
+    mus.style.top = `${Math.round(top)}px`;
+    mus.style.right = `${Math.round(right)}px`;
+  }
+
   loop() {
     let last = performance.now();
     let acc = 0;
@@ -208,6 +240,7 @@ class Game {
         this.supBtn.classList.toggle('ready', !!(P && P.mp >= 100 && !P.dead));
 
       }
+      this.placeMus();
       if (this.audio.muted) txt(this.ctx, '🔇', 940, 528, { size: 14, align: 'right', alpha: 0.7 });
       if (this.fade > 0) {
         this.ctx.fillStyle = `rgba(0,0,0,${this.fade})`;
