@@ -192,7 +192,8 @@ body.touch[data-scene='battle'] #fs { display: none; }
 }
 #mus.off { color: #888; border-color: #555; text-decoration: line-through; }
 body.touch #mus { top: max(8px, env(safe-area-inset-top)); right: calc(max(8px, env(safe-area-inset-right)) + 46px); bottom: auto; height: 34px; }
-body.touch[data-scene='battle'] #mus { right: auto; left: calc(max(8px, env(safe-area-inset-left)) + 52px); }
+/* 手機對戰中：放在畫面最下面中間（不擋血條、名字和按鈕） */
+body.touch[data-scene='battle'] #mus { top: auto; right: auto; left: 50%; transform: translateX(-50%); bottom: max(6px, env(safe-area-inset-bottom)); height: 30px; font-size: 13px; opacity: 0.85; }
 
 /* ───── 直拿提示 ───── */
 #rotate {

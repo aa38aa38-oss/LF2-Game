@@ -37,6 +37,11 @@ class Game {
     this.scene = null;
     this.fade = 0;
     this.input.onAny = () => this.audio.unlock();
+    // iPhone 要在 touchend / click 裡解鎖聲音才算數（pointerdown 不算）
+    for (const ev of ['touchend', 'click', 'pointerup']) window.addEventListener(ev, () => this.audio.unlock(), { capture: true, passive: true });
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && this.audio.ctx && this.audio.ctx.state !== 'running') this.audio.ctx.resume().catch(() => {});
+    });
     this.canvas.addEventListener('pointerdown', (e) => {
       this.audio.unlock();
       const r = this.canvas.getBoundingClientRect();

@@ -214,13 +214,22 @@ export class Sound {
     return !!this.ctx && this.ctx.state === 'running';
   }
   unlock() {
+    // iPhone：讓網頁聲音走「播放」通道（加入主畫面的 App 也會出聲，不受靜音鍵影響）
+    try {
+      if (navigator.audioSession && navigator.audioSession.type !== 'playback') navigator.audioSession.type = 'playback';
+    } catch (e) {}
     if (this.ctx) {
-      if (this.ctx.state === 'suspended') this.ctx.resume();
+      // iPhone 的主畫面 App 常卡在 suspended / interrupted：每次點擊都再叫醒一次
+      if (this.ctx.state !== 'running') {
+        this.ctx.resume().catch(() => {});
+        this.kick();
+      }
       return;
     }
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
     this.ctx = new AC();
+    this.kick();
     this.master = this.ctx.createGain();
     this.master.gain.value = this.muted ? 0 : 0.5;
     this.master.connect(this.ctx.destination);
@@ -249,6 +258,16 @@ export class Sound {
     }
   }
   // 只開關背景音樂（音效照常）
+  // 播一小段無聲的音，iOS 才會真的把音訊打開
+  kick() {
+    try {
+      const b = this.ctx.createBuffer(1, 1, 22050);
+      const s = this.ctx.createBufferSource();
+      s.buffer = b;
+      s.connect(this.ctx.destination);
+      s.start(0);
+    } catch (e) {}
+  }
   toggleMusic() {
     this.musicOn = !this.musicOn;
     store.set('tpb_music', this.musicOn);
