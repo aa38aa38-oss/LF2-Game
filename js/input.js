@@ -11,7 +11,7 @@ const KEYMAP = {
   KeyS: 'spin', KeyL: 'spin',
   Enter: 'start', NumpadEnter: 'start',
   KeyP: 'pause', Escape: 'pause',
-  KeyM: 'mute',
+  KeyM: 'music',
 };
 const btnsOf = (code) => {
   const b = KEYMAP[code];

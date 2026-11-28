@@ -52,7 +52,7 @@ export class ShaftScene {
     const rv = (cfg.rivals || []).filter((id) => id !== cfg.playerChar);
     for (const id of pool) if (rv.length < 4 && !rv.includes(id)) rv.push(id);
     cfg.rivals = rv;
-    this.g.audio.playBgm('battle');
+    this.g.audio.playBgm('shaft');
     this.setPhase(this.round === 0 && !cfg.retry ? 'intro' : 'vs');
     this.startRound();
   }
@@ -187,7 +187,7 @@ export class ShaftScene {
           this.say('密技！直接通過第二關', 2, '#ff5adc');
           this.sfx('super');
           this.setPhase('won');
-          this.g.audio.playBgm('menu');
+          this.g.audio.playBgm('clear');
           return;
         }
       }
@@ -232,7 +232,7 @@ export class ShaftScene {
           if (this.round >= ROUNDS.length) {
             this.setPhase('won');
             this.sfx('confirm');
-            this.g.audio.playBgm('menu');
+            this.g.audio.playBgm('clear');
           } else {
             this.setPhase('vs');
             this.startRound();

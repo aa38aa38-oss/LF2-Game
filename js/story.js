@@ -359,6 +359,7 @@ export class StoryScene extends BattleScene {
     super.enter();
     this.stageIdx = Math.min(STAGES.length - 1, cfg.storyStage || 0);
     const L = (this.L = STAGES[this.stageIdx]);
+    this.g.audio.playBgm(L.id === 3 ? 'story3' : 'story1');
     this.worldW = L.worldW;
     this.noRandomItems = true;
     this.fighters = [];
@@ -774,6 +775,7 @@ export class StoryScene extends BattleScene {
     this.say(`${L.final ? '最終 BOSS' : 'BOSS'}：${label}`, 2, '#ff5a3c');
     if (B.quote) this.popups.push({ t: 0, text: `「${B.quote}」`, color: '#ff9a3a', x: L.boss.x + 200, z: 20, big: true });
     this.refill(L.final ? 1 : 0.4, '支持者應援：回血！');
+    this.g.audio.playBgm('boss');
     this.sfx('cutin');
   }
 
@@ -796,8 +798,7 @@ export class StoryScene extends BattleScene {
   winStage() {
     this.setPhase('won');
     this.wonT = 0;
-    this.sfx('confirm');
-    this.g.audio.playBgm('menu');
+    this.g.audio.playBgm('clear');
     for (const f of this.fighters) if (f !== this.player && !f.dead) f.hp = 0;
     if (!this.player.airborne) this.player.setState('victory');
   }

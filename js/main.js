@@ -49,6 +49,21 @@ class Game {
     this.input.bindJoystick(document.getElementById('stickZone'), document.getElementById('stickBase'), document.getElementById('stickKnob'));
     this.supBtn = touch.querySelector('.sup');
 
+    // 音樂開關鈕（每個畫面都看得到；鍵盤按 M 也可以）
+    const mus = document.getElementById('mus');
+    const showMus = (on) => {
+      mus.textContent = on ? '♪ 音樂開' : '♪ 音樂關';
+      mus.classList.toggle('off', !on);
+    };
+    showMus(this.audio.musicOn);
+    this.audio.onMusic = showMus;
+    mus.addEventListener('pointerdown', (e) => e.stopPropagation());
+    mus.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.audio.unlock();
+      this.audio.toggleMusic();
+      mus.blur();
+    });
     const fs = document.getElementById('fs');
     if (canFullscreen()) {
       fs.addEventListener('click', () => this.toggleFullscreen());
@@ -171,7 +186,7 @@ class Game {
       acc += dt;
       while (acc >= STEP) {
         const p1 = this.input.p1;
-        if (p1.pressed('mute')) this.audio.toggleMute();
+        if (p1.pressed('music')) this.audio.toggleMusic();
         this.scene.update(STEP);
         this.input.endFrame();
         if (this.fade > 0) this.fade = Math.max(0, this.fade - STEP * 4);

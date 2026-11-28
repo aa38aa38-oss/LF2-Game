@@ -155,7 +155,7 @@ export class TitleScene {
       this.hot.add(x, y, w, 36, fn);
     };
     btn(806, 14, 140, '🏆 排行榜 (R)', () => g.goLeaderboard());
-    btn(806, 56, 140, g.audio.muted ? '🔇 靜音中 (M)' : '🔊 聲音 (M)', () => g.audio.toggleMute());
+    btn(806, 56, 140, g.audio.muted ? '🔇 靜音中' : '🔊 聲音', () => g.audio.toggleMute());
     if (!g.audio.ready) txt(ctx, '🔊 點一下畫面開啟聲音', 946, 110, { size: 13, color: '#fff', align: 'right', stroke: '#000', sw: 3 });
   }
 }
