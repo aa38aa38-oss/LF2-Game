@@ -247,3 +247,42 @@ body.touch[data-scene='battle'] #mus { top: 10px; right: 12px; left: auto; botto
   border: 0;
   color: #111;
 }
+
+/* ───── 劇情模式最快通關榜（線上，HTML 視窗） ───── */
+#sb { position: absolute; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.72); padding: 12px; box-sizing: border-box; touch-action: auto;
+      -webkit-user-select: text; user-select: text; }
+#sb[hidden] { display: none; }
+#sb .box { width: 100%; max-width: 520px; max-height: 100%; overflow: auto; -webkit-overflow-scrolling: touch;
+           background: #15121e; border: 3px solid var(--gold, #c9a227); box-shadow: 0 0 0 3px #000, 0 8px 30px rgba(0,0,0,0.6);
+           padding: 12px 14px 12px; box-sizing: border-box; color: #fff; }
+#sb .head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+#sb .head b { font-size: 19px; color: #ffd84a; }
+#sb button { font: 900 15px 'Noto Sans TC', sans-serif; color: #fff; border: 2px solid #000; cursor: pointer; touch-action: manipulation; }
+#sb .x { background: #444; width: 36px; height: 36px; font-size: 16px; }
+#sb .tabs { display: flex; gap: 6px; margin-bottom: 6px; }
+#sb .tabs button { flex: 1; padding: 7px 0; background: #2c2840; }
+#sb .tabs button.on { background: #c9a227; color: #111; }
+#sb ol { list-style: none; margin: 0; padding: 0; }
+#sb li { display: flex; gap: 8px; align-items: center; padding: 6px 6px; font-size: 15px; border-bottom: 1px dashed #3a3550; }
+#sb li.me { background: rgba(255,216,74,0.2); }
+#sb li .rk { width: 28px; text-align: center; font-weight: 900; color: #ffd84a; }
+#sb li .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 900; }
+#sb li .ch { width: 82px; color: #bbb; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#sb li .tm { font-weight: 900; color: #7dff8a; font-variant-numeric: tabular-nums; }
+#sb li .dt { color: #888; font-size: 12px; width: 38px; text-align: right; }
+#sb .msg { text-align: center; color: #ccc; padding: 18px 0; font-size: 14px; }
+#sb .mine { background: #221d33; padding: 9px 10px; margin-bottom: 8px; border: 2px solid #3a3550; }
+#sb .mine p { margin: 0 0 7px; font-size: 14px; color: #ffd84a; }
+#sb .mine p b { color: #7dff8a; font-size: 17px; }
+#sb .row { display: flex; gap: 8px; }
+#sb .row input { flex: 1; min-width: 0; font: 900 16px 'Noto Sans TC', sans-serif; padding: 7px 9px; border: 2px solid #c9a227;
+                 background: #000; color: #fff; outline: none; -webkit-user-select: text; user-select: text; touch-action: manipulation; }
+#sb .go { background: #e0501f; padding: 0 16px; }
+#sb .go:disabled { opacity: 0.5; }
+#sb .st { font-size: 13px; color: #ccc; min-height: 1em; margin-top: 5px; }
+#sb .st.ok { color: #7dff8a; }
+#sb .st.bad { color: #ff9a8a; }
+#sb .foot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 12px; color: #888; }
+#sb .loc { background: #2c2840; padding: 5px 10px; font-size: 13px; }
+#sb .loc[hidden] { display: none; }

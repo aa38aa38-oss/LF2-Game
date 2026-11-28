@@ -1002,7 +1002,7 @@ export class StoryScene extends BattleScene {
     // 全破：先演結局（升旗典禮 → 俯視落敗的對手 → 全劇終），再到結算畫面
     // 排行榜依通關速度：越快分數越高（5 分鐘破關約 7 萬分）
     const result = {
-      cfg: { ...this.cfg, mode: 'story' }, win: true, score: Math.max(1000, Math.round(100000 - this.clock * 100)), wave: 1, clearTime: this.clock,
+      cfg: { ...this.cfg, mode: 'story' }, win: true, score: Math.max(1000, Math.round(100000 - this.clock * 100)), wave: 1, clearTime: this.clock, cheat: !!(GOD || CHEAT.on),
       stats: { ...P.stats }, playerChar: P.char, winnerChar: P.char, stage: 'legislature',
     };
     this.g.setScene(new EndingScene(this.g, { player: P.char.id, rivals: (this.cfg.rivals || []).slice(0, 4), result }));

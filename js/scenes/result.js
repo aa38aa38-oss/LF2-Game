@@ -5,6 +5,7 @@ import { menuBg, poseOf } from './common.js';
 import { Leaderboard } from '../leaderboard.js';
 import { MODE_NAME } from '../battle.js';
 import { store } from '../util.js';
+import { SpeedBoard } from '../speedboard.js';
 
 const OPTS = ['再戰一場', '重新選角', '回到標題'];
 
@@ -22,9 +23,21 @@ export class ResultScene {
     const g = this.g, d = this.d;
     g.audio.playBgm(d.win ? 'title' : 'menu');
     this.newHi = g.setHi(d.score);
+    // 劇情模式破關：上傳通關時間到線上「最快通關榜」
+    if (this.speedRun) return this.openSpeed();
     if (await Leaderboard.qualifies(d.score)) this.openInput();
   }
+  get speedRun() {
+    const d = this.d;
+    return SpeedBoard.enabled && d.win && d.cfg.mode === 'story' && d.clearTime != null;
+  }
+  openSpeed() {
+    const d = this.d;
+    this.mine = this.mine || { diff: d.cfg.difficulty || 'normal', time: d.clearTime, char: d.playerChar.title, cheat: !!d.cheat };
+    SpeedBoard.open(this.mine);
+  }
   exit() {
+    SpeedBoard.close();
     this.closeInput();
   }
   openInput() {
@@ -81,6 +94,7 @@ export class ResultScene {
     if (this.entering) return;
     const c = this.g.input.p1;
     if (this.t < 0.8) return;
+    if (this.speedRun && c.pressed('rank')) return this.openSpeed();
     if (c.pressed('up') || c.pressed('left')) {
       this.sel = (this.sel + 2) % 3;
       this.g.audio.sfx('move');
@@ -155,6 +169,16 @@ export class ResultScene {
       txt(ctx, o, x + w / 2, y + h / 2, { size: 18, weight: 900, color: sel ? '#ffd84a' : '#fff', align: 'center' });
       this.hot.add(x, y, w, h, () => this.choose(i));
     });
+    if (this.speedRun) {
+      const x = 540, y = 494, w = 380, h = 34;
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeStyle = '#ffd84a';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x, y, w, h);
+      txt(ctx, '🏆 最快通關排行榜（R）', x + w / 2, y + h / 2, { size: 16, weight: 900, color: '#ffd84a', align: 'center' });
+      this.hot.add(x, y, w, h, () => this.openSpeed());
+    }
     if (this.entering) {
       ctx.fillStyle = 'rgba(0,0,0,0.7)';
       ctx.fillRect(0, 0, 960, 540);

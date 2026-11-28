@@ -80,7 +80,7 @@ export class TitleScene {
   update(dt) {
     this.t += dt;
     const c = this.g.input.p1;
-    if (c.pressed('rank')) return this.g.goLeaderboard();
+    if (c.pressed('rank')) return this.g.openRanking();
     if (c.confirm) {
       this.g.audio.sfx('confirm');
       this.g.goHowTo();
@@ -154,7 +154,7 @@ export class TitleScene {
       txt(ctx, label, x + w / 2, y + 18, { size: 16, weight: 900, color: '#ffd84a', align: 'center' });
       this.hot.add(x, y, w, 36, fn);
     };
-    btn(806, 14, 140, '🏆 排行榜 (R)', () => g.goLeaderboard());
+    btn(806, 14, 140, '🏆 排行榜 (R)', () => g.openRanking());
     btn(806, 56, 140, g.audio.muted ? '🔇 靜音中' : '🔊 聲音', () => g.audio.toggleMute());
     if (!g.audio.ready) txt(ctx, '🔊 點一下畫面開啟聲音', 946, 110, { size: 13, color: '#fff', align: 'right', stroke: '#000', sw: 3 });
   }

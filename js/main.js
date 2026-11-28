@@ -17,6 +17,7 @@ import { StageSelectScene } from './scenes/stageselect.js';
 import { VSScene } from './scenes/vs.js';
 import { ResultScene } from './scenes/result.js';
 import { LeaderboardScene } from './scenes/leaderboard.js';
+import { SpeedBoard } from './speedboard.js';
 
 class Game {
   constructor() {
@@ -47,7 +48,7 @@ class Game {
       const r = this.canvas.getBoundingClientRect();
       const x = ((e.clientX - r.left) / r.width) * this.CW - this.ox;
       const y = ((e.clientY - r.top) / r.height) * H;
-      if (this.scene && this.scene.onPointer) this.scene.onPointer(x, y);
+      if (this.scene && this.scene.onPointer && !SpeedBoard.isOpen) this.scene.onPointer(x, y);
     });
     const touch = document.getElementById('touch');
     this.input.bindTouch(touch);
@@ -180,6 +181,12 @@ class Game {
   startShaft(cfg) { whenAssetsReady(() => this.setScene(new ShaftScene(this, cfg))); }
   goResult(data) { this.setScene(new ResultScene(this, data)); }
   goLeaderboard(highlight) { this.setScene(new LeaderboardScene(this, highlight)); }
+  // 標題的排行榜：有設定線上榜就先開「劇情最快通關榜」，裡面可以再切到本機分數榜
+  openRanking() {
+    if (!SpeedBoard.enabled) return this.goLeaderboard();
+    SpeedBoard.onLocal = () => this.goLeaderboard();
+    SpeedBoard.open(null);
+  }
 
   // 手機對戰中：音樂鈕放在右上角 HUD 黑底的空位（計時器右邊）；螢幕太窄放不下時，改放在 HUD 正下方的右邊
   placeMus() {
@@ -223,8 +230,11 @@ class Game {
       acc += dt;
       while (acc >= STEP) {
         const p1 = this.input.p1;
-        if (p1.pressed('music')) this.audio.toggleMusic();
-        this.scene.update(STEP);
+        if (SpeedBoard.isOpen) p1.reset(); // 排行榜視窗開著時遊戲先停
+        else {
+          if (p1.pressed('music')) this.audio.toggleMusic();
+          this.scene.update(STEP);
+        }
         this.input.endFrame();
         if (this.fade > 0) this.fade = Math.max(0, this.fade - STEP * 4);
         acc -= STEP;
